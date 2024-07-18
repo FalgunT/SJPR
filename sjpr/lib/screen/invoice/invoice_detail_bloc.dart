@@ -35,6 +35,10 @@ class InvoiceDetailBloc extends BlocBase {
   List<OwnedByListData> oList = [];
   List<ProductServicesListData> pList = [];
 
+  SubCategoryData selectedData = SubCategoryData.empty();
+  ProductServicesListData selectedPData = ProductServicesListData.empty();
+  TypeListData selectedTData = TypeListData.empty();
+
   //StreamController<List<CategoryListData>?> categoryListDataStreamController =
   //StreamController.broadcast();
 
@@ -50,8 +54,35 @@ class InvoiceDetailBloc extends BlocBase {
             message: getInvoiceDetailResponse.message!, bContext: context);
       }
       if (getInvoiceDetailResponse.status == true) {
+        cList.forEach(
+              (element) {
+            element.list?.forEach(
+                  (o) {
+                if (o.sub_category_id == getInvoiceDetailResponse.data?.scanned_category_id) {
+                  selectedData = o;
+                }
+              },
+            );
+          },
+        );
+
+        pList.forEach(
+              (element) {
+            if (element.id == getInvoiceDetailResponse.data?.scanned_product_service_id) {
+              selectedPData = element;
+            }
+          },
+        );
+
+        tList.forEach(
+              (element) {
+            if (element.id == getInvoiceDetailResponse.data?.scanned_type_id) {
+              selectedTData = element;
+            }
+          },
+        );
         invoiceDetailStreamController.sink.add(getInvoiceDetailResponse.data!);
-      } else {}
+      }
     }
   }
 
@@ -76,11 +107,6 @@ class InvoiceDetailBloc extends BlocBase {
         .getApiRepository()
         .getCategoryList();
     if (getCategoryListResponse != null) {
-      /* if (getLineItemListResponse.status == false &&
-          getLineItemListResponse.message != null) {
-        CommonToast.getInstance()
-            ?.displayToast(message: getLineItemListResponse.message!);
-      }*/
       cList = getCategoryListResponse.data!.categories;
     }
   }
@@ -97,6 +123,8 @@ class InvoiceDetailBloc extends BlocBase {
             ?.displayToast(message: getLineItemListResponse.message!);
       }*/
       tList = getCategoryListResponse.data!;
+
+
     }
   }
 
@@ -112,8 +140,10 @@ class InvoiceDetailBloc extends BlocBase {
             ?.displayToast(message: getLineItemListResponse.message!);
       }*/
       oList = getCategoryListResponse.data!;
+
     }
   }
+
   Future getProductService(BuildContext context, String invoiceId) async {
     var getCategoryListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
@@ -126,31 +156,33 @@ class InvoiceDetailBloc extends BlocBase {
             ?.displayToast(message: getLineItemListResponse.message!);
       }*/
       pList = getCategoryListResponse.data!;
+
     }
   }
-
-
 
   getCheckBoxList(int flag) async {
     List<CheckBoxItem> cItems = [];
     if (flag == 0) {
       for (CategoryListData? obj in cList) {
         cItems.add(CheckBoxItem.withChildren(
-            isSelected: false, text: obj!.name!, itemId: obj.id!, myChildren: obj.list!));
+            isSelected: false,
+            text: obj!.name!,
+            itemId: obj.id!,
+            myChildren: obj.list!));
       }
     } else if (flag == 1) {
       for (ProductServicesListData? obj in pList) {
         cItems.add(CheckBoxItem(
-            isSelected: false, text: obj!.productServicesName!, itemId: obj.id!));
+            isSelected: false,
+            text: obj!.productServicesName!,
+            itemId: obj.id!));
       }
-    }
-    else if (flag == 2) {
+    } else if (flag == 2) {
       for (TypeListData? obj in tList) {
         cItems.add(CheckBoxItem(
             isSelected: false, text: obj!.typeName!, itemId: obj.id!));
       }
-    }
-    else if (flag == 3) {
+    } else if (flag == 3) {
       for (OwnedByListData? obj in oList) {
         cItems.add(CheckBoxItem(
             isSelected: false, text: obj!.ownedByName!, itemId: obj.id!));

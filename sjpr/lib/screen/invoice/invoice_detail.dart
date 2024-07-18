@@ -25,19 +25,20 @@ class InvoiceDetailScreen extends StatefulWidget {
 
 class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   final InvoiceDetailBloc bloc = InvoiceDetailBloc();
-  SubCategoryData selectedData = SubCategoryData.empty();
-  ProductServicesListData selectedPData = ProductServicesListData.empty();
-  TypeListData selectedTData = TypeListData.empty();
 
   @override
   void initState() {
+    _init();
+    super.initState();
+  }
+
+  _init() async {
+    await bloc.getDetailCategory(context, widget.id);
+    await bloc.getDetailType(context, widget.id);
+    await bloc.getDetailOwnBy(context, widget.id);
+    await bloc.getProductService(context, widget.id);
     bloc.getInvoiceDetail(context, widget.id);
     bloc.getLineItemList(context, widget.id);
-    bloc.getDetailCategory(context, widget.id);
-    bloc.getDetailType(context, widget.id);
-    bloc.getDetailOwnBy(context, widget.id);
-    bloc.getProductService(context, widget.id);
-    super.initState();
   }
 
   @override
@@ -159,16 +160,16 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                     ),
                     commonRowWidget(context,
                         title: "Category",
-                        value: selectedData.sub_category_name ?? "None",
+                        value: bloc.selectedData.sub_category_name ?? "None",
                         flag: 0),
                     commonRowWidget(context,
                         title: "Product/Service",
-                        value: selectedPData.productServicesName ?? "None",
+                        value: bloc.selectedPData.productServicesName ?? "None",
                         flag: 1,
                         isAdd: true),
                     commonRowWidget(context,
                         title: "Type",
-                        value: selectedTData.typeName ?? "None",
+                        value: bloc.selectedTData.typeName ?? "None",
                         flag: 2),
                     commonRowWidget(context,
                         title: "Owned by",
@@ -492,7 +493,87 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             OutlinedButton.icon(
                               onPressed: () {
                                 Navigator.pop(context);
-                                setState(() {});
+                                showDialog(
+                                    context: context,
+                                    builder: (ctxt) => AlertDialog(
+                                          backgroundColor: listTileBgColor,
+                                          title: Text(
+                                            "Add Product/Service",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const SizedBox(
+                                                height: 16,
+                                              ),
+                                              TextField(
+                                                decoration: InputDecoration(
+                                                  filled: false,
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color:
+                                                            profileListBgColor,
+                                                        width: 1.0),
+                                                  ),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: Colors.white,
+                                                        width: 1.0),
+                                                  ),
+                                                  hintText:
+                                                      'Enter product name',
+                                                  hintStyle: TextStyle(
+                                                      color: Colors.white70),
+                                                  label: Text(
+                                                    'Product Name',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                  border: OutlineInputBorder(
+                                                      borderSide:
+                                                          BorderSide.none,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              50)),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 16,
+                                              ),
+                                              Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  CommonButton(
+                                                    content: 'Cancel',
+                                                    bgColor: buttonBgColor,
+                                                    textColor: Colors.white,
+                                                    outlinedBorderColor:
+                                                        buttonBgColor,
+                                                    onPressed: () {},
+                                                  ),
+                                                  SizedBox(
+                                                    height: 16,
+                                                  ),
+                                                  CommonButton(
+                                                    content: 'Add',
+                                                    bgColor: buttonBgColor,
+                                                    textColor: Colors.white,
+                                                    outlinedBorderColor:
+                                                        buttonBgColor,
+                                                    onPressed: () {},
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ));
                               },
                               label: const Text(
                                 "Add",
@@ -523,20 +604,32 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         items: _list,
                         f: (l) {
                           debugPrint('--->f() called');
-                          selectedData = l;
-                          debugPrint('--->Result: ${selectedData.toString()}');
+                          bloc.selectedData = l;
+                          debugPrint(
+                              '--->Result: ${bloc.selectedData.toString()}');
                         },
                       )
                     : RadioButtonList(
                         items: _list,
                         f: (selected) {
                           CheckBoxItem item = selected;
-                          for (var value in bloc.pList) {
-                            if (value.id == item.itemId) {
-                              selectedPData = value;
-                              debugPrint(
-                                  '--->Result: ${selectedPData.toString()}');
-                              break;
+                          if (flag == 1) {
+                            for (var value in bloc.pList) {
+                              if (value.id == item.itemId) {
+                                bloc.selectedPData = value;
+                                debugPrint(
+                                    '--->Result: ${bloc.selectedPData.toString()}');
+                                break;
+                              }
+                            }
+                          } else if (flag == 2) {
+                            for (var value in bloc.tList) {
+                              if (value.id == item.itemId) {
+                                bloc.selectedTData = value;
+                                debugPrint(
+                                    '--->Result: ${bloc.selectedTData.toString()}');
+                                break;
+                              }
                             }
                           }
                         },
