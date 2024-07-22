@@ -25,6 +25,7 @@ class ApiClient {
   final String urlEncodedHeaderValue = 'application/x-www-form-urlencoded';
   final String formHeaderValue =
       'multipart/form-data; boundary=<calculated when request is sent>';
+
   //var successResponse = [200, 201, 400, 401, 404, 422];
   static String otpTypeSMS = "sms";
   static String otpTypeEmail = "email";
@@ -40,6 +41,11 @@ class ApiClient {
   static String getProductList = "$baseUrl/getproductservices";
   static String getTypeList = "$baseUrl/detailstype";
   static String getOwnedByList = "$baseUrl/getownedby";
+  static String addProduct = "$baseUrl/addproductservices";
+  static String getCurrencyList = "$baseUrl/getcurrencylist";
+  static String getPaymentMethods = "$baseUrl/getpaymentmethod";
+  static String getPublishTo = "$baseUrl/getpublishto";
+  static String updateScannedInvoice = "$baseUrl/scanned/invoice/update";
   static String getLineItemList = "$baseUrl/invoice/line/item/list/";
   static String getLineItemDetail = "$baseUrl/invoice/line/item/details/";
   static String insertLineItemDetail = "$baseUrl/invoice/line/item/insert";

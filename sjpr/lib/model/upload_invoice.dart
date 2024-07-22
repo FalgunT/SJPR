@@ -9,7 +9,7 @@ class CommonModelClass {
   CommonModelClass.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     message = json['message'];
-    data = json['data'];
+    data = json['data'].toString();
   }
 
   Map<String, dynamic> toJson() {

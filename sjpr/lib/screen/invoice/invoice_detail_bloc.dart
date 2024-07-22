@@ -4,10 +4,13 @@ import 'package:sjpr/common/common_toast.dart';
 import 'package:sjpr/di/app_component_base.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sjpr/model/currency_model.dart';
 import 'package:sjpr/model/invoice_detail_model.dart';
 import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/model/lineitem_list_model.dart';
 import 'package:sjpr/model/ownedby_list_model.dart';
+import 'package:sjpr/model/payment_methods.dart';
+import 'package:sjpr/model/publish_to.dart';
 import 'package:sjpr/model/type_list_model.dart';
 
 import '../../model/category_list_model.dart';
@@ -15,6 +18,12 @@ import '../../model/product_list_model.dart';
 import '../../widgets/check_box.dart';
 
 class InvoiceDetailBloc extends BlocBase {
+  Updater update;
+
+  InvoiceDetailBloc({required this.update});
+
+  late InvoiceDetailData? invoiceDetailData;
+
   StreamController mainStreamController = StreamController.broadcast();
 
   Stream get mainStream => mainStreamController.stream;
@@ -30,14 +39,22 @@ class InvoiceDetailBloc extends BlocBase {
   StreamController<List<LineItemListData>?> lineItemListStreamController =
       StreamController.broadcast();
 
+  List<PaymentMethodsModel> pmList = [];
+  List<PublishToModel> publishToList = [];
+
+  List<CurrencyModel> curList = [];
   List<CategoryListData> cList = [];
   List<TypeListData> tList = [];
-  List<OwnedByListData> oList = [];
+
+  //List<OwnedByListData> oList = [];
   List<ProductServicesListData> pList = [];
 
   SubCategoryData selectedData = SubCategoryData.empty();
   ProductServicesListData selectedPData = ProductServicesListData.empty();
   TypeListData selectedTData = TypeListData.empty();
+  CurrencyModel selectedCurrency = CurrencyModel.empty();
+  PaymentMethodsModel selectedPM = PaymentMethodsModel.empty();
+  PublishToModel selectedPublishTo = PublishToModel.empty();
 
   //StreamController<List<CategoryListData>?> categoryListDataStreamController =
   //StreamController.broadcast();
@@ -54,33 +71,7 @@ class InvoiceDetailBloc extends BlocBase {
             message: getInvoiceDetailResponse.message!, bContext: context);
       }
       if (getInvoiceDetailResponse.status == true) {
-        cList.forEach(
-              (element) {
-            element.list?.forEach(
-                  (o) {
-                if (o.sub_category_id == getInvoiceDetailResponse.data?.scanned_category_id) {
-                  selectedData = o;
-                }
-              },
-            );
-          },
-        );
-
-        pList.forEach(
-              (element) {
-            if (element.id == getInvoiceDetailResponse.data?.scanned_product_service_id) {
-              selectedPData = element;
-            }
-          },
-        );
-
-        tList.forEach(
-              (element) {
-            if (element.id == getInvoiceDetailResponse.data?.scanned_type_id) {
-              selectedTData = element;
-            }
-          },
-        );
+        invoiceDetailData = getInvoiceDetailResponse.data;
         invoiceDetailStreamController.sink.add(getInvoiceDetailResponse.data!);
       }
     }
@@ -108,6 +99,18 @@ class InvoiceDetailBloc extends BlocBase {
         .getCategoryList();
     if (getCategoryListResponse != null) {
       cList = getCategoryListResponse.data!.categories;
+      cList.forEach(
+        (element) {
+          element.list?.forEach(
+            (o) {
+              if (o.sub_category_id == invoiceDetailData?.scanned_category_id) {
+                selectedData = o;
+                update.updateWidget();
+              }
+            },
+          );
+        },
+      );
     }
   }
 
@@ -124,40 +127,125 @@ class InvoiceDetailBloc extends BlocBase {
       }*/
       tList = getCategoryListResponse.data!;
 
-
+      tList.forEach(
+        (element) {
+          if (element.id == invoiceDetailData?.scanned_type_id) {
+            selectedTData = element;
+            update.updateWidget();
+          }
+        },
+      );
     }
   }
 
-  Future getDetailOwnBy(BuildContext context, String invoiceId) async {
+  /*Future getDetailOwnBy(BuildContext context, String invoiceId) async {
     var getCategoryListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
         .getOwnedByList();
     if (getCategoryListResponse != null) {
-      /* if (getLineItemListResponse.status == false &&
+      */ /* if (getLineItemListResponse.status == false &&
           getLineItemListResponse.message != null) {
         CommonToast.getInstance()
             ?.displayToast(message: getLineItemListResponse.message!);
-      }*/
+      }*/ /*
       oList = getCategoryListResponse.data!;
 
     }
   }
-
-  Future getProductService(BuildContext context, String invoiceId) async {
+*/
+  Future getProductService(BuildContext context, {bool isAdd = false}) async {
     var getCategoryListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
         .getProductList();
     if (getCategoryListResponse != null) {
-      /* if (getLineItemListResponse.status == false &&
-          getLineItemListResponse.message != null) {
-        CommonToast.getInstance()
-            ?.displayToast(message: getLineItemListResponse.message!);
-      }*/
       pList = getCategoryListResponse.data!;
-
+      pList.forEach(
+        (element) {
+          if (element.id == invoiceDetailData?.scanned_product_service_id) {
+            selectedPData = element;
+            update.updateWidget();
+          }
+        },
+      );
+      if (isAdd) {
+        selectedPData = pList.last;
+        update.updateWidget();
+      }
     }
+  }
+
+  Future addProductService(BuildContext context, String pName) async {
+    var getCategoryListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .addProduct(pName: pName);
+    if (getCategoryListResponse != null) {
+      //refresh the page...
+      getProductService(context, isAdd: true);
+    }
+  }
+
+  Future getCurrency(BuildContext context) async {
+    var getCategoryListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .getCurrencyList();
+    if (getCategoryListResponse != null) {
+      curList = getCategoryListResponse;
+      curList.forEach(
+        (element) {
+          if (element.id == invoiceDetailData?.currency) {
+            selectedCurrency = element;
+            update.updateWidget();
+          }
+        },
+      );
+    }
+  }
+
+  Future getPaymentMethods(BuildContext context) async {
+    var getCategoryListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .getpaymentmethod();
+    if (getCategoryListResponse != null) {
+      pmList = getCategoryListResponse;
+      pmList.forEach(
+        (element) {
+          if (element.id == invoiceDetailData?.payment_method_id) {
+            selectedPM = element;
+            update.updateWidget();
+          }
+        },
+      );
+    }
+  }
+
+  Future getPublishTo(BuildContext context) async {
+    var getCategoryListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .getPublishTo();
+    if (getCategoryListResponse != null) {
+      publishToList = getCategoryListResponse;
+      publishToList.forEach(
+        (element) {
+          if (element.id == invoiceDetailData?.payment_method_id) {
+            selectedPublishTo = element;
+            update.updateWidget();
+          }
+        },
+      );
+    }
+  }
+
+  Future<void> updateScannedInvoice(Map<String, String> json) async {
+    var getCategoryListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .updateScannedInvoice(json);
   }
 
   getCheckBoxList(int flag) async {
@@ -182,10 +270,20 @@ class InvoiceDetailBloc extends BlocBase {
         cItems.add(CheckBoxItem(
             isSelected: false, text: obj!.typeName!, itemId: obj.id!));
       }
-    } else if (flag == 3) {
-      for (OwnedByListData? obj in oList) {
+    } else if (flag == 6) {
+      for (CurrencyModel? obj in curList) {
         cItems.add(CheckBoxItem(
-            isSelected: false, text: obj!.ownedByName!, itemId: obj.id!));
+            isSelected: false, text: obj!.currency_name!, itemId: obj.id!));
+      }
+    } else if (flag == 7) {
+      for (PaymentMethodsModel? obj in pmList) {
+        cItems.add(CheckBoxItem(
+            isSelected: false, text: obj!.method_name!, itemId: obj.id!));
+      }
+    } else if (flag == 8) {
+      for (PublishToModel? obj in publishToList) {
+        cItems.add(
+            CheckBoxItem(isSelected: false, text: obj!.name!, itemId: obj.id!));
       }
     }
 
@@ -193,5 +291,13 @@ class InvoiceDetailBloc extends BlocBase {
   }
 
   @override
-  void dispose() {}
+  void dispose() {
+    // TODO: implement dispose
+  }
+}
+
+class Updater {
+  updateWidget() {
+    debugPrint('updateWidget called!');
+  }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pdf_render/pdf_render_widgets.dart';
 import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/model/invoice_detail_model.dart';
@@ -8,6 +10,7 @@ import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
 import 'package:sjpr/screen/lineitems/line_items.dart';
 import 'package:sjpr/widgets/check_box.dart';
 import 'package:sjpr/widgets/common_button.dart';
+import '../../common/common_toast.dart';
 import '../../model/category_list_model.dart';
 import '../../model/product_list_model.dart';
 import '../../model/type_list_model.dart';
@@ -23,22 +26,27 @@ class InvoiceDetailScreen extends StatefulWidget {
   State<InvoiceDetailScreen> createState() => _InvoiceDetailScreenState();
 }
 
-class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
-  final InvoiceDetailBloc bloc = InvoiceDetailBloc();
+class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
+    implements Updater {
+  late InvoiceDetailBloc bloc;
 
   @override
   void initState() {
+    bloc = InvoiceDetailBloc(update: this);
     _init();
     super.initState();
   }
 
   _init() async {
-    await bloc.getDetailCategory(context, widget.id);
-    await bloc.getDetailType(context, widget.id);
-    await bloc.getDetailOwnBy(context, widget.id);
-    await bloc.getProductService(context, widget.id);
     bloc.getInvoiceDetail(context, widget.id);
     bloc.getLineItemList(context, widget.id);
+    bloc.getDetailCategory(context, widget.id);
+    bloc.getDetailType(context, widget.id);
+    bloc.getCurrency(context);
+    bloc.getPaymentMethods(context);
+    bloc.getPublishTo(context);
+    //  await bloc.getDetailOwnBy(context, widget.id);
+    bloc.getProductService(context);
   }
 
   @override
@@ -60,7 +68,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: StreamBuilder<InvoiceDetailData?>(
             stream: bloc.invoiceDetailStream,
             builder: (context, snapshot) {
@@ -92,7 +100,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          ('${invoiceDetail.currency ?? ""} ${invoiceDetail.netAmount ?? ""}'),
+                          ('${bloc.selectedCurrency.currency_sign ?? ""} ${invoiceDetail.netAmount ?? ""}'),
                           style: TextStyle(
                               color: appTheme.textColor,
                               fontSize: 18,
@@ -173,7 +181,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         flag: 2),
                     commonRowWidget(context,
                         title: "Owned by",
-                        value: invoiceDetail.supplierName,
+                        value: invoiceDetail.supplierName ?? '-',
                         flag: 3),
                     commonRowWidget(context,
                         title: "Date",
@@ -207,21 +215,23 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         title: "Supplier", value: "None", flag: 0),*/
                     commonRowWidget(context,
                         title: "Currency",
-                        value: invoiceDetail.currency ?? 'None',
-                        flag: 0),
+                        value: bloc.selectedCurrency.currency_name ?? 'None',
+                        flag: 6),
                     commonRowWidget(context,
                         title: "Total",
-                        value: '\u{20AC} ${invoiceDetail.totalAmount ?? 0.00}',
-                        flag: 0),
+                        value:
+                            '${bloc.selectedCurrency.currency_sign ?? ""} ${invoiceDetail.totalAmount ?? 0.00}',
+                        flag: 9),
                     commonRowWidget(context,
                         title: "Tax",
                         value:
-                            '\u{20AC} ${invoiceDetail.totalTaxAmount ?? 0.00}',
-                        flag: 0),
+                            '${bloc.selectedCurrency.currency_sign ?? ""} ${invoiceDetail.totalTaxAmount ?? 0.00}',
+                        flag: 10),
                     commonRowWidget(context,
                         title: "Tax total",
-                        value: '\u{20AC} ${invoiceDetail.netAmount ?? 0.00}',
-                        flag: 0),
+                        value:
+                            '${bloc.selectedCurrency.currency_sign ?? ""} ${invoiceDetail.netAmount ?? 0.00}',
+                        flag: 11),
                     /*Container(
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
@@ -255,52 +265,49 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                       ),
                     ),*/
                     commonRowWidget(context,
-                        title: "Payment method", value: "Mastercard", flag: 0),
+                        title: "Payment method",
+                        value: bloc.selectedPM.method_name ?? 'None',
+                        flag: 7),
                     commonRowWidget(context,
-                        title: "Publish to", value: "Credit Card", flag: 0),
+                        title: "Publish to",
+                        value: bloc.selectedPublishTo.name ?? "None",
+                        flag: 8),
                     const SizedBox(
                       height: 10,
                     ),
-                    ExpansionTile(
-                      iconColor: appTheme.activeTxtColor,
-                      collapsedIconColor: appTheme.activeTxtColor,
-                      title: Text(
-                        "Description",
-                        style: TextStyle(
-                            color: appTheme.activeTxtColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      children: [
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Container(
-                          height: 150,
-                          padding: const EdgeInsets.all(20),
-                          width: MediaQuery.sizeOf(context).width,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: const Color.fromRGBO(39, 40, 44, 2)),
-                          child: Text(
-                            "Posted invoice",
-                            style: TextStyle(
-                                color: appTheme.textColor, fontSize: 16),
+                    /*Container(
+                      height: 150,
+                      padding: const EdgeInsets.all(4),
+                     // width: MediaQuery.sizeOf(context).width,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: const Color.fromRGBO(39, 40, 44, 2)),
+                      child: ,
+                    ),*/
+                    TextField(
+                      minLines: 4,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: appTheme.listTileBgColor,
+                        hintStyle: TextStyle(color: Colors.white),
+                        hintText: 'Description',
+                        labelText: 'Add Description',
+                        labelStyle: TextStyle(color: Colors.white),
+                        contentPadding:
+                            EdgeInsets.only(left: 14.0, bottom: 8.0, top: 8.0),
+                        /*focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        /*  CommonButton(
-                            content: "Publish description",
-                            bgColor: appTheme.backGroundColor,
-                            textColor: appTheme.activeTxtColor,
-                            outlinedBorderColor: appTheme.buttonBgColor,
-                            onPressed: () {}),
-                        const SizedBox(
-                          height: 20,
-                        )*/
-                      ],
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                            borderRadius: BorderRadius.circular(25.7),
+                          ),*/
+                      ),
+                      controller: _eDescController,
                     ),
                     const SizedBox(
                       height: 20,
@@ -320,7 +327,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           height: 20,
                         ),
                         Container(
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(16),
                             width: MediaQuery.sizeOf(context).width,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
@@ -409,7 +416,20 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         bgColor: appTheme.buttonBgColor,
                         textColor: appTheme.buttonTextColor,
                         outlinedBorderColor: appTheme.buttonBgColor,
-                        onPressed: () {})
+                        onPressed: () {
+                          //collect all data...
+                          invoiceDetail.payment_method_id = bloc.selectedPM.id;
+                          invoiceDetail.publish_to_id =
+                              bloc.selectedPublishTo.id;
+                          invoiceDetail.currency = bloc.selectedCurrency.id;
+
+                          invoiceDetail.scanned_category_id =
+                              bloc.selectedData.sub_category_id;
+                          invoiceDetail.scanned_product_service_id =
+                              bloc.selectedPData.id;
+                          invoiceDetail.scanned_type_id = bloc.selectedTData.id;
+                          bloc.updateScannedInvoice(invoiceDetail.toJson());
+                        })
                   ],
                 );
               }
@@ -430,12 +450,28 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           _selectDate(context);
           return;
         }
+        if (flag == 9 || flag == 10 || flag == 11) {
+          //total, tax, taxtotal edit option
+          String title = flag == 9
+              ? 'Edit Total Amount'
+              : flag == 10
+                  ? 'Edit Tax Amount'
+                  : 'Edit Tax Total';
+          String label = flag == 9
+              ? 'Edit Total Amount'
+              : flag == 10
+                  ? 'Edit Tax Amount'
+                  : 'Edit Tax Total';
+          String hint = value;
+          _showAddProductDialog(title, hint, label, isAmt: true);
+          return;
+        }
 
         if (flag != 3) _showPicker(context, flag, title, isAdd: isAdd);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           color: appTheme.listTileBgColor,
@@ -447,12 +483,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               title,
               style: TextStyle(
                   color: appTheme.textColor,
-                  fontSize: 17,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold),
             )),
             Text(
               value,
-              style: TextStyle(color: appTheme.textColor, fontSize: 17),
+              style: TextStyle(color: appTheme.textColor, fontSize: 14),
             ),
             const SizedBox(
               width: 5,
@@ -493,87 +529,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             OutlinedButton.icon(
                               onPressed: () {
                                 Navigator.pop(context);
-                                showDialog(
-                                    context: context,
-                                    builder: (ctxt) => AlertDialog(
-                                          backgroundColor: listTileBgColor,
-                                          title: Text(
-                                            "Add Product/Service",
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const SizedBox(
-                                                height: 16,
-                                              ),
-                                              TextField(
-                                                decoration: InputDecoration(
-                                                  filled: false,
-                                                  focusedBorder:
-                                                      OutlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color:
-                                                            profileListBgColor,
-                                                        width: 1.0),
-                                                  ),
-                                                  enabledBorder:
-                                                      OutlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: Colors.white,
-                                                        width: 1.0),
-                                                  ),
-                                                  hintText:
-                                                      'Enter product name',
-                                                  hintStyle: TextStyle(
-                                                      color: Colors.white70),
-                                                  label: Text(
-                                                    'Product Name',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                  border: OutlineInputBorder(
-                                                      borderSide:
-                                                          BorderSide.none,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50)),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                height: 16,
-                                              ),
-                                              Row(
-                                                mainAxisSize: MainAxisSize.max,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                children: [
-                                                  CommonButton(
-                                                    content: 'Cancel',
-                                                    bgColor: buttonBgColor,
-                                                    textColor: Colors.white,
-                                                    outlinedBorderColor:
-                                                        buttonBgColor,
-                                                    onPressed: () {},
-                                                  ),
-                                                  SizedBox(
-                                                    height: 16,
-                                                  ),
-                                                  CommonButton(
-                                                    content: 'Add',
-                                                    bgColor: buttonBgColor,
-                                                    textColor: Colors.white,
-                                                    outlinedBorderColor:
-                                                        buttonBgColor,
-                                                    onPressed: () {},
-                                                  ),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ));
+                                _showAddProductDialog("Add Product/Service",
+                                    'Enter product name', 'Product Name');
                               },
                               label: const Text(
                                 "Add",
@@ -631,6 +588,33 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 break;
                               }
                             }
+                          } else if (flag == 6) {
+                            for (var value in bloc.curList) {
+                              if (value.id == item.itemId) {
+                                bloc.selectedCurrency = value;
+                                debugPrint(
+                                    '--->Result: ${bloc.selectedCurrency.toString()}');
+                                break;
+                              }
+                            }
+                          } else if (flag == 7) {
+                            for (var value in bloc.pmList) {
+                              if (value.id == item.itemId) {
+                                bloc.selectedPM = value;
+                                debugPrint(
+                                    '--->Result: ${bloc.selectedPM.toString()}');
+                                break;
+                              }
+                            }
+                          } else if (flag == 8) {
+                            for (var value in bloc.publishToList) {
+                              if (value.id == item.itemId) {
+                                bloc.selectedPublishTo = value;
+                                debugPrint(
+                                    '--->Result: ${bloc.selectedPublishTo.toString()}');
+                                break;
+                              }
+                            }
                           }
                         },
                       ),
@@ -666,5 +650,117 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         color: Colors.white,
       ),
     );
+  }
+
+  TextEditingController _eController = TextEditingController();
+  TextEditingController _eDescController = TextEditingController();
+
+  void _showAddProductDialog(String title, String hint, String label,
+      {bool isAmt = false}) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctxt) => AlertDialog(
+              backgroundColor: listTileBgColor,
+              insetPadding: EdgeInsets.all(4),
+              title: Text(
+                title,
+                style: TextStyle(color: Colors.white),
+              ),
+              content: Builder(
+                builder: (context) {
+                  // Get available height and width of the build area of this widget. Make a choice depending on the size.
+                  var height = MediaQuery.of(context).size.height;
+                  var width = MediaQuery.of(context).size.width;
+
+                  return Container(
+                    width: width - 100,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        TextField(
+                          style: TextStyle(color: Colors.white),
+                          autofocus: true,
+                          keyboardType: isAmt
+                              ? const TextInputType.numberWithOptions(
+                                  decimal: true, signed: false)
+                              : TextInputType.text,
+                          /*  inputFormatters: <TextInputFormatter>[
+                            isAmt
+                                ? FilteringTextInputFormatter.digitsOnly
+                                : FilteringTextInputFormatter
+                                    .singleLineFormatter
+                          ],*/
+                          decoration: InputDecoration(
+                            filled: false,
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: profileListBgColor, width: 1.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.white, width: 1.0),
+                            ),
+                            hintText: hint,
+                            hintStyle: TextStyle(color: Colors.white70),
+                            labelText: label,
+                            labelStyle: TextStyle(color: Colors.white70),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(50)),
+                          ),
+                          controller: _eController,
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                if (_eController.text.isEmpty) {
+                                  CommonToast.getInstance()?.displayToast(
+                                      message: "Please enter product name",
+                                      bContext: context);
+                                  return;
+                                }
+                                bloc.addProductService(
+                                    context, _eController.text);
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                'Save',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ));
+  }
+
+  @override
+  updateWidget() {
+    setState(() {});
   }
 }

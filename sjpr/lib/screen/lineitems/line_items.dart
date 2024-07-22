@@ -15,11 +15,12 @@ class LineItems extends StatefulWidget {
   State<LineItems> createState() => _LineItemsState();
 }
 
-class _LineItemsState extends State<LineItems> {
-  InvoiceDetailBloc bloc = InvoiceDetailBloc();
+class _LineItemsState extends State<LineItems> implements Updater {
+  late InvoiceDetailBloc bloc;
 
   @override
   void initState() {
+    bloc = InvoiceDetailBloc(update: this);
     bloc.getLineItemList(context, widget.id);
     super.initState();
   }
@@ -312,6 +313,13 @@ class _LineItemsState extends State<LineItems> {
         ),
       ),
     );
+  }
+
+  @override
+  updateWidget() {
+    setState(() {
+      
+    });
   }
 }
 

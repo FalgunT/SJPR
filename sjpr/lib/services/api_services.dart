@@ -5,14 +5,17 @@ import 'package:image_picker/image_picker.dart';
 import 'package:sjpr/di/app_component_base.dart';
 import 'package:sjpr/di/shared_preferences.dart';
 import 'package:sjpr/model/category_list_model.dart';
+import 'package:sjpr/model/currency_model.dart';
 import 'package:sjpr/model/invoice_detail_model.dart';
 import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/model/lineitem_detail_model.dart';
 import 'package:sjpr/model/lineitem_list_model.dart';
 import 'package:sjpr/model/login.dart';
 import 'package:sjpr/model/ownedby_list_model.dart';
+import 'package:sjpr/model/payment_methods.dart';
 import 'package:sjpr/model/product_list_model.dart';
 import 'package:sjpr/model/profile_model.dart';
+import 'package:sjpr/model/publish_to.dart';
 import 'package:sjpr/model/type_list_model.dart';
 import 'package:sjpr/model/upload_invoice.dart';
 import 'package:sjpr/services/api_client.dart';
@@ -177,7 +180,7 @@ class ApiServices extends ApiClient {
     var response = await gets(ApiClient.getCategoryList,
         headers: getLogoutHeader(), isBackground: true);
     if (response != null) {
-       responseData = CategoryList.fromJson(json.decode(response));
+      responseData = CategoryList.fromJson(json.decode(response));
     }
     return responseData;
   }
@@ -207,6 +210,19 @@ class ApiServices extends ApiClient {
         headers: getLogoutHeader(), isBackground: true);
     if (response != null) {
       var data = OwnedByList.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+
+  Future<CommonModelClass?> addProduct(String pName) async {
+    Map<String, String> body = {
+      'product_name': pName,
+    };
+    var response = await posts(ApiClient.addProduct,
+        headers: getLogoutHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
       return data;
     }
     return null;
@@ -294,6 +310,58 @@ class ApiServices extends ApiClient {
     if (response != null) {
       var data = CommonModelClass.fromJson(json.decode(response));
       return data;
+    }
+    return null;
+  }
+
+  Future<List<CurrencyModel>?> getCurrencyList() async {
+    var response = await gets(ApiClient.getCurrencyList,
+        headers: getLogoutHeader(), isBackground: true);
+    if (response != null) {
+      Map res = json.decode(response);
+      var listFromJson = res['data'] as List;
+      List<CurrencyModel> currecyList =
+          listFromJson.map((item) => CurrencyModel.fromJson(item)).toList();
+
+      return currecyList;
+    }
+    return null;
+  }
+
+  Future<List<PaymentMethodsModel>?> getPaymentMethods() async {
+    var response = await gets(ApiClient.getPaymentMethods,
+        headers: getLogoutHeader(), isBackground: true);
+    if (response != null) {
+      Map res = json.decode(response);
+      var listFromJson = res['data'] as List;
+      List<PaymentMethodsModel> currecyList = listFromJson
+          .map((item) => PaymentMethodsModel.fromJson(item))
+          .toList();
+      return currecyList;
+    }
+    return null;
+  }
+
+  Future<List<PublishToModel>?> getPublishTo() async {
+    var response = await gets(ApiClient.getPublishTo,
+        headers: getLogoutHeader(), isBackground: true);
+    if (response != null) {
+      Map res = json.decode(response);
+      var listFromJson = res['data'] as List;
+      List<PublishToModel> currecyList =
+          listFromJson.map((item) => PublishToModel.fromJson(item)).toList();
+      return currecyList;
+    }
+    return null;
+  }
+
+  Future updateScannedInvoice(Map<String, String> json) async {
+    debugPrint(ApiClient.updateScannedInvoice);
+    debugPrint(json.toString());
+    var response = await posts(ApiClient.updateScannedInvoice,
+        headers: getLogoutHeader(), body: json, isBackground: true);
+    if (response != null) {
+      debugPrint('response succeed');
     }
     return null;
   }

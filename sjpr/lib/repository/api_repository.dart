@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sjpr/model/category_list_model.dart';
+import 'package:sjpr/model/currency_model.dart';
 import 'package:sjpr/model/invoice_detail_model.dart';
 import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/model/lineitem_detail_model.dart';
@@ -11,10 +12,12 @@ import 'package:sjpr/model/login.dart';
 import 'package:sjpr/model/ownedby_list_model.dart';
 import 'package:sjpr/model/product_list_model.dart';
 import 'package:sjpr/model/profile_model.dart';
+import 'package:sjpr/model/publish_to.dart';
 import 'package:sjpr/model/type_list_model.dart';
 import 'package:sjpr/model/upload_invoice.dart';
 import 'package:sjpr/services/api_services.dart';
 
+import '../model/payment_methods.dart';
 import '../screen/invoice/custom_camera.dart';
 
 class ApiRepositoryIml extends ApiRepository {
@@ -119,6 +122,33 @@ class ApiRepositoryIml extends ApiRepository {
   ) async {
     return _apiServices.deleteLineItemDetail(invoiceId);
   }
+
+  @override
+  Future<CommonModelClass?> addProduct({required String pName}){
+    return _apiServices.addProduct(pName);
+  }
+
+  @override
+  Future<List<CurrencyModel>?> getCurrencyList() {
+    return _apiServices.getCurrencyList();
+  }
+
+  @override
+  Future<List<PaymentMethodsModel>?> getpaymentmethod() {
+    return _apiServices.getPaymentMethods();
+  }
+
+  @override
+  Future<List<PublishToModel>?> getPublishTo() {
+    return _apiServices.getPublishTo();
+  }
+
+  @override
+  Future updateScannedInvoice(Map<String, String> json) {
+   return _apiServices.updateScannedInvoice(json);
+  }
+
+
 }
 
 abstract class ApiRepository {
@@ -127,6 +157,8 @@ abstract class ApiRepository {
   Future<CommonModelClass?> logout();
 
   Future<Profile?> profile();
+
+  Future<CommonModelClass?> addProduct({required String pName});
 
   Future<CommonModelClass?> uploadInvoice({required XFile invoice});
 
@@ -144,6 +176,13 @@ abstract class ApiRepository {
   Future<TypeList?> getTypeList();
 
   Future<OwnedByList?> getOwnedByList();
+
+  Future<List<CurrencyModel>?> getCurrencyList();
+
+  Future<List<PaymentMethodsModel>?>  getpaymentmethod();
+  Future<List<PublishToModel>?>  getPublishTo();
+
+  Future updateScannedInvoice(Map<String, String> json);
 
   Future<LineItemList?> getLineItemList(String invoiceId);
 
