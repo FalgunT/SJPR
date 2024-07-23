@@ -312,7 +312,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                     const SizedBox(
                       height: 20,
                     ),
-                    ExpansionTile(
+                    invoiceDetail.line_item_count!>0?ExpansionTile(
                       iconColor: appTheme.activeTxtColor,
                       collapsedIconColor: appTheme.activeTxtColor,
                       title: Text(
@@ -368,7 +368,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                                   fontSize: 16,
                                                 )),
                                           ),
-                                          Text("\u{20AC} 6.11",
+                                          Text("${bloc.selectedCurrency.currency_sign??""} ${invoiceDetail.totalAmount}",
                                               style: TextStyle(
                                                   color: appTheme.textColor,
                                                   fontSize: 16,
@@ -407,7 +407,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                           height: 20,
                         )
                       ],
-                    ),
+                    ):Center(),
                     const SizedBox(
                       height: 20,
                     ),
