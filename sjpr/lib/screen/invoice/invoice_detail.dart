@@ -349,8 +349,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                                     fontWeight:
                                                         FontWeight.bold)),
                                           ),
-                                          const Text("12 line items",
-                                              style: TextStyle(
+                                          Text('${invoiceDetail.line_item_count}',
+                                              style: const TextStyle(
                                                 color: Colors.green,
                                                 fontSize: 16,
                                               ))
@@ -362,7 +362,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                       Row(
                                         children: [
                                           Expanded(
-                                            child: Text("Total items",
+                                            child: Text("Total",
                                                 style: TextStyle(
                                                   color: appTheme.textColor,
                                                   fontSize: 16,
@@ -428,7 +428,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                           invoiceDetail.scanned_product_service_id =
                               bloc.selectedPData.id;
                           invoiceDetail.scanned_type_id = bloc.selectedTData.id;
-                          bloc.updateScannedInvoice(invoiceDetail.toJson());
+                          bloc.updateScannedInvoice(
+                              invoiceDetail.toJson(), context);
                         })
                   ],
                 );

@@ -191,12 +191,74 @@ class ApiClient {
         var responseStatus = json.decode(response.body);
         return responseStatus;*/
       } catch (exception) {
+        debugPrint(exception.toString());
         if (isProgressBar) {
           AppComponentBase.getInstance()?.showProgressDialog(false);
         }
         AppComponentBase.getInstance()?.disableWidget(false);
         var e =
             exception is String ? exception : StringUtils.someThingWentWrong;
+        if (!isBackground) {
+          CommonToast.getInstance()?.displayToast(message: e);
+        }
+      }
+      if (isProgressBar) {
+        AppComponentBase.getInstance()?.showProgressDialog(false);
+      }
+      AppComponentBase.getInstance()?.disableWidget(false);
+    } else {
+      if (!isBackground) {
+        CommonToast.getInstance()
+            ?.displayToast(message: StringUtils.noInternetContent);
+      }
+      //throw StringUtils.noInternetContent;
+    }
+  }
+
+  post(String url,
+      {Map<String, String>? headers,
+        dynamic body,
+        Encoding? encoding,
+        bool isProgressBar = true,
+        bool isBackground = false}) async {
+    headers ??= getJsonHeader();
+    if (await AppComponentBase.getInstance()
+        ?.getNetworkManager()
+        .isConnected() ??
+        false) {
+      if (isProgressBar) {
+        AppComponentBase.getInstance()?.showProgressDialog(true);
+        AppComponentBase.getInstance()?.disableWidget(true);
+      }
+      try {
+        http.Response response = await http.post(Uri.parse(url),
+            headers: headers, body: body, encoding: encoding);
+
+        if (response.statusCode != null) {
+          if (isProgressBar) {
+            AppComponentBase.getInstance()?.showProgressDialog(false);
+          }
+          AppComponentBase.getInstance()?.disableWidget(false);
+          String bodyBytes = await response.body;
+          debugPrint('response body : $bodyBytes');
+          return bodyBytes;
+        }
+        /*
+        print(response.body);
+        if (response.statusCode != 200) return null;
+        Map<String, dynamic> map = json.decode(response.body);
+        return map;
+        //return List<Map<String, dynamic>>.from(json.decode(response.body));
+        var responseStatus = json.decode(response.body);
+        return responseStatus;*/
+      } catch (exception) {
+        debugPrint(exception.toString());
+        if (isProgressBar) {
+          AppComponentBase.getInstance()?.showProgressDialog(false);
+        }
+        AppComponentBase.getInstance()?.disableWidget(false);
+        var e =
+        exception is String ? exception : StringUtils.someThingWentWrong;
         if (!isBackground) {
           CommonToast.getInstance()?.displayToast(message: e);
         }

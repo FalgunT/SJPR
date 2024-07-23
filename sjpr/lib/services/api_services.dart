@@ -355,13 +355,17 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future updateScannedInvoice(Map<String, String> json) async {
+  Future updateScannedInvoice(Map<String, dynamic> json) async {
     debugPrint(ApiClient.updateScannedInvoice);
-    debugPrint(json.toString());
-    var response = await posts(ApiClient.updateScannedInvoice,
+    String req = jsonEncode(json);
+    debugPrint(req);
+    var response = await post(ApiClient.updateScannedInvoice,
         headers: getLogoutHeader(), body: json, isBackground: true);
     if (response != null) {
       debugPrint('response succeed');
+      var data = CommonModelClass.fromJson(jsonDecode(response));
+      return data;
+
     }
     return null;
   }

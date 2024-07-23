@@ -241,11 +241,16 @@ class InvoiceDetailBloc extends BlocBase {
     }
   }
 
-  Future<void> updateScannedInvoice(Map<String, String> json) async {
-    var getCategoryListResponse = await AppComponentBase.getInstance()
+  Future<void> updateScannedInvoice(
+      Map<String, dynamic> json, BuildContext context) async {
+    var getResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
         .updateScannedInvoice(json);
+    /* if (getResponse.message != null) {
+     CommonToast.getInstance()
+          ?.displayToast(message: getResponse.message!, bContext: context);
+    }*/
   }
 
   getCheckBoxList(int flag) async {

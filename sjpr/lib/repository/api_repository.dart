@@ -144,7 +144,7 @@ class ApiRepositoryIml extends ApiRepository {
   }
 
   @override
-  Future updateScannedInvoice(Map<String, String> json) {
+  Future updateScannedInvoice(Map<String, dynamic> json) {
    return _apiServices.updateScannedInvoice(json);
   }
 
@@ -182,7 +182,7 @@ abstract class ApiRepository {
   Future<List<PaymentMethodsModel>?>  getpaymentmethod();
   Future<List<PublishToModel>?>  getPublishTo();
 
-  Future updateScannedInvoice(Map<String, String> json);
+  Future updateScannedInvoice(Map<String, dynamic> json);
 
   Future<LineItemList?> getLineItemList(String invoiceId);
 

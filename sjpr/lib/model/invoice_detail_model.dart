@@ -45,7 +45,7 @@ class InvoiceDetailData {
   String? receiverEmail;
   String? receiverPhone;
   String? receiverAddress;
-  String? lineItem;
+  int? line_item_count;
   String? scanned_category_id;
   String? scanned_product_service_id;
   String? scanned_type_id;
@@ -78,7 +78,7 @@ class InvoiceDetailData {
       this.receiverEmail,
       this.receiverPhone,
       this.receiverAddress,
-      this.lineItem,
+      this.line_item_count,
       this.date,
       this.scanned_category_id,
       this.scanned_product_service_id,
@@ -110,7 +110,7 @@ class InvoiceDetailData {
     receiverEmail = json['receiver_email'];
     receiverPhone = json['receiver_phone'];
     receiverAddress = json['receiver_address'];
-    lineItem = json['line_item'];
+    line_item_count = json['line_item_count'] as int;
     date = json['date'];
 
     scanned_category_id = json['scanned_category_id'];
@@ -123,36 +123,36 @@ class InvoiceDetailData {
     payment_method_id = json['payment_method_id'];
   }
 
-  Map<String, String> toJson() => <String, String>{
-        'user_id': userId??"",
-        'scan_invoice': scanInvoice??"",
-        'id': id??"",
-        'invoice_file_id': invoiceFileId??"",
-        'invoice_id': invoiceId??"",
-        'total_amount': totalAmount??"",
-        'net_amount': netAmount??"",
-        'invoice_date': invoiceDate??"",
-        'total_tax_amount': totalTaxAmount??"",
-        'due_date': dueDate??"",
-        'supplier_tax_id': supplierTaxId??"",
-        'currency': currency??"",
-        'supplier_address': supplierAddress??"",
-        'supplier_name': supplierName??"",
-        'supplier_email': supplierEmail??"",
-        'supplier_phone': supplierPhone??"",
-        'receiver_name': receiverName??"",
-        'receiver_email': receiverEmail??"",
-        'receiver_phone': receiverPhone??"",
-        'receiver_address': receiverAddress??"",
-        'line_item': lineItem??"",
-        'date': date??"",
-        'scanned_category_id': scanned_category_id??"",
-        'scanned_product_service_id': scanned_product_service_id??"",
-        'scanned_type_id': scanned_type_id??"",
-        'scanned_owned_by_id': scanned_owned_by_id??"",
-        'document_reference': document_reference??"",
-        'publish_to_id': publish_to_id??"",
-        'scanned_currency_id': scanned_currency_id??"",
-        'payment_method_id': payment_method_id??""
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'user_id': userId ?? "",
+        'scan_invoice': scanInvoice ?? "",
+        'id': id ?? "",
+        'invoice_file_id': invoiceFileId ?? "",
+        'invoice_id': invoiceId ?? "",
+        'total_amount': totalAmount ?? "",
+        'net_amount': netAmount ?? "",
+        'invoice_date': invoiceDate ?? "",
+        'total_tax_amount': totalTaxAmount ?? "",
+        'due_date': dueDate ?? "",
+        'supplier_tax_id': supplierTaxId ?? "",
+        'currency': currency ?? "",
+        'supplier_address': supplierAddress ?? "",
+        'supplier_name': supplierName ?? "",
+        'supplier_email': supplierEmail ?? "",
+        'supplier_phone': supplierPhone ?? "",
+        'receiver_name': receiverName ?? "",
+        'receiver_email': receiverEmail ?? "",
+        'receiver_phone': receiverPhone ?? "",
+        'receiver_address': receiverAddress ?? "",
+        'line_item_count': line_item_count ?? 0,
+        'date': date ?? "",
+        'scanned_category_id': scanned_category_id ?? "",
+        'scanned_product_service_id': scanned_product_service_id ?? "",
+        'scanned_type_id': scanned_type_id ?? "",
+        'scanned_owned_by_id': scanned_owned_by_id ?? "",
+        'document_reference': document_reference ?? "",
+        'publish_to_id': publish_to_id ?? "",
+        'scanned_currency_id': scanned_currency_id ?? "",
+        'payment_method_id': payment_method_id ?? ""
       };
 }
