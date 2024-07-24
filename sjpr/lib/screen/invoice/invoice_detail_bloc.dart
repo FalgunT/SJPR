@@ -196,7 +196,7 @@ class InvoiceDetailBloc extends BlocBase {
       curList = getCategoryListResponse;
       curList.forEach(
         (element) {
-          if (element.id == invoiceDetailData?.currency) {
+          if (element.id == invoiceDetailData?.scanned_currency_id) {
             selectedCurrency = element;
             update.updateWidget();
           }
@@ -241,16 +241,22 @@ class InvoiceDetailBloc extends BlocBase {
     }
   }
 
-  Future<void> updateScannedInvoice(
+  Future<bool> updateScannedInvoice(
       Map<String, dynamic> json, BuildContext context) async {
     var getResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
         .updateScannedInvoice(json);
-    /* if (getResponse.message != null) {
-     CommonToast.getInstance()
-          ?.displayToast(message: getResponse.message!, bContext: context);
-    }*/
+    if (getResponse != null) {
+      if (getResponse.message != null) {
+        CommonToast.getInstance()
+            ?.displayToast(message: getResponse.message!, bContext: context);
+      }
+      if (getResponse.status == true) {
+        return true;
+      }
+    }
+    return false;
   }
 
   getCheckBoxList(int flag) async {

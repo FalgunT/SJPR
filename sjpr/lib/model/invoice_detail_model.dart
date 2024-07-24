@@ -36,7 +36,7 @@ class InvoiceDetailData {
   String? totalTaxAmount;
   String? dueDate;
   String? supplierTaxId;
-  String? currency;
+
   String? supplierAddress;
   String? supplierName;
   String? supplierEmail;
@@ -49,7 +49,7 @@ class InvoiceDetailData {
   String? scanned_category_id;
   String? scanned_product_service_id;
   String? scanned_type_id;
-  String? scanned_owned_by_id;
+
   String? document_reference;
   String? publish_to_id;
   String? payment_method_id;
@@ -69,7 +69,6 @@ class InvoiceDetailData {
       this.totalTaxAmount,
       this.dueDate,
       this.supplierTaxId,
-      this.currency,
       this.supplierAddress,
       this.supplierName,
       this.supplierEmail,
@@ -83,7 +82,6 @@ class InvoiceDetailData {
       this.scanned_category_id,
       this.scanned_product_service_id,
       this.scanned_type_id,
-      this.scanned_owned_by_id,
       this.document_reference,
       this.publish_to_id,
       this.scanned_currency_id,
@@ -101,7 +99,6 @@ class InvoiceDetailData {
     totalTaxAmount = json['total_tax_amount'];
     dueDate = json['due_date'];
     supplierTaxId = json['supplier_tax_id'];
-    currency = json['currency'];
     supplierAddress = json['supplier_address'];
     supplierName = json['supplier_name'];
     supplierEmail = json['supplier_email'];
@@ -110,13 +107,11 @@ class InvoiceDetailData {
     receiverEmail = json['receiver_email'];
     receiverPhone = json['receiver_phone'];
     receiverAddress = json['receiver_address'];
-    line_item_count = json['line_item_count'] as int;
+    line_item_count = json['line_item_count'];
     date = json['date'];
-
     scanned_category_id = json['scanned_category_id'];
     scanned_product_service_id = json['scanned_product_service_id'];
     scanned_type_id = json['scanned_type_id'];
-    scanned_owned_by_id = json['scanned_owned_by_id'];
     document_reference = json['document_reference'];
     publish_to_id = json['publish_to_id'];
     scanned_currency_id = json['scanned_currency_id'];
@@ -135,7 +130,6 @@ class InvoiceDetailData {
         'total_tax_amount': totalTaxAmount ?? "",
         'due_date': dueDate ?? "",
         'supplier_tax_id': supplierTaxId ?? "",
-        'currency': currency ?? "",
         'supplier_address': supplierAddress ?? "",
         'supplier_name': supplierName ?? "",
         'supplier_email': supplierEmail ?? "",
@@ -149,7 +143,6 @@ class InvoiceDetailData {
         'scanned_category_id': scanned_category_id ?? "",
         'scanned_product_service_id': scanned_product_service_id ?? "",
         'scanned_type_id': scanned_type_id ?? "",
-        'scanned_owned_by_id': scanned_owned_by_id ?? "",
         'document_reference': document_reference ?? "",
         'publish_to_id': publish_to_id ?? "",
         'scanned_currency_id': scanned_currency_id ?? "",

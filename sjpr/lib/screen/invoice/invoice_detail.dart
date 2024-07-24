@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:pdf_render/pdf_render_widgets.dart';
 import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/model/invoice_detail_model.dart';
@@ -41,6 +42,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
   _init() async {
     bloc.getInvoiceDetail(context, widget.id);
     bloc.getLineItemList(context, widget.id);
+
     bloc.getDetailCategory(context, widget.id);
     bloc.getDetailType(context, widget.id);
     bloc.getCurrency(context);
@@ -75,6 +77,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data != null) {
                 invoiceDetail = snapshot.data!;
+                _eDescController.text = invoiceDetail.document_reference ?? "";
                 String path = invoiceDetail.scanInvoice ?? "";
                 String extension = path.split(".").last;
                 return Column(
@@ -427,20 +430,27 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                         bgColor: appTheme.buttonBgColor,
                         textColor: appTheme.buttonTextColor,
                         outlinedBorderColor: appTheme.buttonBgColor,
-                        onPressed: () {
-                          //collect all data...
-                          invoiceDetail.payment_method_id = bloc.selectedPM.id;
-                          invoiceDetail.publish_to_id =
-                              bloc.selectedPublishTo.id;
-                          invoiceDetail.currency = bloc.selectedCurrency.id;
+                        onPressed: () async {
+                          if (isValid()) {
+                            //collect all data...
+                            invoiceDetail.payment_method_id = bloc.selectedPM.id;
+                            invoiceDetail.publish_to_id =
+                                bloc.selectedPublishTo.id;
+                            invoiceDetail.scanned_currency_id =
+                                bloc.selectedCurrency.id;
 
-                          invoiceDetail.scanned_category_id =
-                              bloc.selectedData.sub_category_id;
-                          invoiceDetail.scanned_product_service_id =
-                              bloc.selectedPData.id;
-                          invoiceDetail.scanned_type_id = bloc.selectedTData.id;
-                          bloc.updateScannedInvoice(
-                              invoiceDetail.toJson(), context);
+                            invoiceDetail.scanned_category_id =
+                                bloc.selectedData.sub_category_id;
+                            invoiceDetail.scanned_product_service_id =
+                                bloc.selectedPData.id;
+                            invoiceDetail.scanned_type_id = bloc.selectedTData.id;
+                           bool res = await bloc.updateScannedInvoice(
+                                invoiceDetail.toJson(), context);
+                           if(res){
+                             Navigator.pop(context);
+                           }
+                          }
+
                         })
                   ],
                 );
@@ -459,7 +469,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
     return InkWell(
       onTap: () {
         if (flag == 4 || flag == 5) {
-          _selectDate(context);
+          _selectDate(context, flag);
           return;
         }
         if (flag == 9 || flag == 10 || flag == 11) {
@@ -636,9 +646,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
         });
   }
 
-  DateTime? selectedDate;
+  String? selectedDate;
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate(BuildContext context, int flag) async {
     final DateTime? picked = await showDatePicker(
         context: context,
         // initialDate: selectedDate,
@@ -646,7 +656,13 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
         lastDate: DateTime(2101));
     if (picked != null && picked != selectedDate) {
       setState(() {
-        selectedDate = picked;
+        String formattedDate = DateFormat('dd/MM/yyyy').format(picked);
+        selectedDate = formattedDate;
+        if (flag == 4) {
+          invoiceDetail.invoiceDate = selectedDate;
+        } else {
+          invoiceDetail.dueDate = selectedDate;
+        }
       });
     }
   }
@@ -789,5 +805,59 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
   @override
   updateWidget() {
     setState(() {});
+  }
+
+  bool isValid() {
+    String catid = bloc.selectedData.sub_category_id ?? "";
+    if (catid == "") {
+      CommonToast.getInstance()?.displayToast(message: "Category field is required",bContext: context);
+      return false;
+    }
+    String pid = bloc.selectedPData.id ?? "";
+    if (pid == "") {
+      CommonToast.getInstance()?.displayToast(message: "Product/Service field is required",bContext: context);
+      return false;
+    }
+    String tid = bloc.selectedTData.id ?? "";
+    if (tid == "") {
+      CommonToast.getInstance()?.displayToast(message: "Type field is required",bContext: context);
+      return false;
+    }
+    String duedate = invoiceDetail.dueDate ?? "";
+    if (duedate == "") {
+      CommonToast.getInstance()?.displayToast(message: "Due Date field is required",bContext: context);
+      return false;
+    }
+    String curid = bloc.selectedCurrency.id ?? "";
+    if (curid == "") {
+      CommonToast.getInstance()?.displayToast(message: "Currency field is required",bContext: context);
+      return false;
+    }
+    String total = invoiceDetail.totalAmount ?? "";
+    if (total.isEmpty) {
+      CommonToast.getInstance()?.displayToast(message: "Total  field is required",bContext: context);
+      return false;
+    }
+    String tax = invoiceDetail.totalTaxAmount ?? "";
+    if (tax.isEmpty) {
+      CommonToast.getInstance()?.displayToast(message: "Tax  field is required",bContext: context);
+      return false;
+    }
+    String net = invoiceDetail.netAmount ?? "";
+    if (net.isEmpty) {
+      CommonToast.getInstance()?.displayToast(message: "Tax Total field is required",bContext: context);
+      return false;
+    }
+    String pmid = bloc.selectedPM.id ?? "";
+    if (pmid == "") {
+      CommonToast.getInstance()?.displayToast(message: "Payment method field is required",bContext: context);
+      return false;
+    }
+    String pubid = bloc.selectedPublishTo.id ?? "";
+    if (pubid == "") {
+      CommonToast.getInstance()?.displayToast(message: "Publish To field is required",bContext: context);
+      return false;
+    }
+    return true;
   }
 }

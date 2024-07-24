@@ -359,13 +359,14 @@ class ApiServices extends ApiClient {
     debugPrint(ApiClient.updateScannedInvoice);
     String req = jsonEncode(json);
     debugPrint(req);
-    var response = await post(ApiClient.updateScannedInvoice,
-        headers: getLogoutHeader(), body: json, isBackground: true);
+    var response = await postJson(ApiClient.updateScannedInvoice,
+        headers: getLogoutHeader(),
+        body: const JsonEncoder().convert(json),
+        isBackground: true);
     if (response != null) {
-      debugPrint('response succeed');
+      //debugPrint('response succeed');
       var data = CommonModelClass.fromJson(jsonDecode(response));
       return data;
-
     }
     return null;
   }

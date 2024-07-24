@@ -215,7 +215,7 @@ class ApiClient {
     }
   }
 
-  post(String url,
+  postJson(String url,
       {Map<String, String>? headers,
         dynamic body,
         Encoding? encoding,
