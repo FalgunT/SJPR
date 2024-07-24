@@ -29,6 +29,7 @@ class InvoiceDetailScreen extends StatefulWidget {
 class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
     implements Updater {
   late InvoiceDetailBloc bloc;
+  late InvoiceDetailData invoiceDetail;
 
   @override
   void initState() {
@@ -73,7 +74,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
             stream: bloc.invoiceDetailStream,
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data != null) {
-                var invoiceDetail = snapshot.data!;
+                invoiceDetail = snapshot.data!;
                 String path = invoiceDetail.scanInvoice ?? "";
                 String extension = path.split(".").last;
                 return Column(
@@ -312,102 +313,112 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                     const SizedBox(
                       height: 20,
                     ),
-                    invoiceDetail.line_item_count!>0?ExpansionTile(
-                      iconColor: appTheme.activeTxtColor,
-                      collapsedIconColor: appTheme.activeTxtColor,
-                      title: Text(
-                        "Line Items",
-                        style: TextStyle(
-                            color: appTheme.activeTxtColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      children: [
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Container(
-                            padding: const EdgeInsets.all(16),
-                            width: MediaQuery.sizeOf(context).width,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: const Color.fromRGBO(39, 40, 44, 2)),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                    invoiceDetail.line_item_count! > 0
+                        ? ExpansionTile(
+                            iconColor: appTheme.activeTxtColor,
+                            collapsedIconColor: appTheme.activeTxtColor,
+                            title: Text(
+                              "Line Items",
+                              style: TextStyle(
+                                  color: appTheme.activeTxtColor,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            children: [
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Container(
+                                  padding: const EdgeInsets.all(16),
+                                  width: MediaQuery.sizeOf(context).width,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      color:
+                                          const Color.fromRGBO(39, 40, 44, 2)),
+                                  child: Row(
                                     children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text("Consult line items",
-                                                style: TextStyle(
-                                                    color: appTheme.textColor,
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          ),
-                                          Text('${invoiceDetail.line_item_count}',
-                                              style: const TextStyle(
-                                                color: Colors.green,
-                                                fontSize: 16,
-                                              ))
-                                        ],
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                      "Consult line items",
+                                                      style: TextStyle(
+                                                          color: appTheme
+                                                              .textColor,
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                ),
+                                                Text(
+                                                    '${invoiceDetail.line_item_count}',
+                                                    style: const TextStyle(
+                                                      color: Colors.green,
+                                                      fontSize: 16,
+                                                    ))
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text("Total",
+                                                      style: TextStyle(
+                                                        color:
+                                                            appTheme.textColor,
+                                                        fontSize: 16,
+                                                      )),
+                                                ),
+                                                Text(
+                                                    "${bloc.selectedCurrency.currency_sign ?? ""} ${invoiceDetail.totalAmount}",
+                                                    style: TextStyle(
+                                                        color:
+                                                            appTheme.textColor,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold))
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                       const SizedBox(
-                                        height: 5,
+                                        width: 10,
                                       ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text("Total",
-                                                style: TextStyle(
-                                                  color: appTheme.textColor,
-                                                  fontSize: 16,
-                                                )),
-                                          ),
-                                          Text("${bloc.selectedCurrency.currency_sign??""} ${invoiceDetail.totalAmount}",
-                                              style: TextStyle(
-                                                  color: appTheme.textColor,
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold))
-                                        ],
-                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: appTheme.textColor,
+                                      )
                                     ],
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: appTheme.textColor,
-                                )
-                              ],
-                            )),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        CommonButton(
-                            content: "Create line items",
-                            bgColor: appTheme.backGroundColor,
-                            textColor: appTheme.activeTxtColor,
-                            outlinedBorderColor: appTheme.buttonBgColor,
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => LineItems(
-                                            id: widget.id,
-                                          )));
-                            }),
-                        const SizedBox(
-                          height: 20,
-                        )
-                      ],
-                    ):Center(),
+                                  )),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              CommonButton(
+                                  content: "Create line items",
+                                  bgColor: appTheme.backGroundColor,
+                                  textColor: appTheme.activeTxtColor,
+                                  outlinedBorderColor: appTheme.buttonBgColor,
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => LineItems(
+                                                  id: widget.id,
+                                                )));
+                                  }),
+                              const SizedBox(
+                                height: 20,
+                              )
+                            ],
+                          )
+                        : Center(),
                     const SizedBox(
                       height: 20,
                     ),
@@ -463,8 +474,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
               : flag == 10
                   ? 'Edit Tax Amount'
                   : 'Edit Tax Total';
-          String hint = value;
-          _showAddProductDialog(title, hint, label, isAmt: true);
+          String hint = label;
+          _showAddProductDialog(title, hint, label, isAmt: true, flag: flag);
           return;
         }
 
@@ -488,7 +499,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                   fontWeight: FontWeight.bold),
             )),
             Text(
-              value,
+              value ?? "None",
               style: TextStyle(color: appTheme.textColor, fontSize: 14),
             ),
             const SizedBox(
@@ -657,7 +668,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
   TextEditingController _eDescController = TextEditingController();
 
   void _showAddProductDialog(String title, String hint, String label,
-      {bool isAmt = false}) {
+      {bool isAmt = false, int flag = -1}) {
+    _eController.text = "";
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -736,8 +748,22 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                               onPressed: () {
                                 if (_eController.text.isEmpty) {
                                   CommonToast.getInstance()?.displayToast(
-                                      message: "Please enter product name",
+                                      message: "Please enter $label",
                                       bContext: context);
+                                  return;
+                                }
+                                if (isAmt) {
+                                  if (flag == 9) {
+                                    invoiceDetail.totalAmount =
+                                        _eController.text;
+                                  } else if (flag == 10) {
+                                    invoiceDetail.totalTaxAmount =
+                                        _eController.text;
+                                  } else if (flag == 11) {
+                                    invoiceDetail.netAmount = _eController.text;
+                                  }
+                                  Navigator.pop(context);
+                                  setState(() {});
                                   return;
                                 }
                                 bloc.addProductService(
