@@ -40,9 +40,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
   }
 
   _init() async {
-    bloc.getInvoiceDetail(context, widget.id);
-    bloc.getLineItemList(context, widget.id);
-
+    await bloc.getInvoiceDetail(context, widget.id);
     bloc.getDetailCategory(context, widget.id);
     bloc.getDetailType(context, widget.id);
     bloc.getCurrency(context);
@@ -50,6 +48,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
     bloc.getPublishTo(context);
     //  await bloc.getDetailOwnBy(context, widget.id);
     bloc.getProductService(context);
+    //bloc.getLineItemList(context, widget.id);
   }
 
   @override
@@ -331,76 +330,86 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                               const SizedBox(
                                 height: 20,
                               ),
-                              Container(
-                                  padding: const EdgeInsets.all(16),
-                                  width: MediaQuery.sizeOf(context).width,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      color:
-                                          const Color.fromRGBO(39, 40, 44, 2)),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                      "Consult line items",
+                              InkWell(
+                                onTap: (){
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => LineItems(
+                                            id: widget.id,
+                                          )));
+                                },
+                                child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    width: MediaQuery.sizeOf(context).width,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color:
+                                            const Color.fromRGBO(39, 40, 44, 2)),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                        "Consult line items",
+                                                        style: TextStyle(
+                                                            color: appTheme
+                                                                .textColor,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.bold)),
+                                                  ),
+                                                  Text(
+                                                      '${invoiceDetail.line_item_count}',
+                                                      style: const TextStyle(
+                                                        color: Colors.green,
+                                                        fontSize: 16,
+                                                      ))
+                                                ],
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text("Total",
+                                                        style: TextStyle(
+                                                          color:
+                                                              appTheme.textColor,
+                                                          fontSize: 16,
+                                                        )),
+                                                  ),
+                                                  Text(
+                                                      "${bloc.selectedCurrency.currency_sign ?? ""} ${invoiceDetail.totalAmount}",
                                                       style: TextStyle(
-                                                          color: appTheme
-                                                              .textColor,
+                                                          color:
+                                                              appTheme.textColor,
                                                           fontSize: 16,
                                                           fontWeight:
-                                                              FontWeight.bold)),
-                                                ),
-                                                Text(
-                                                    '${invoiceDetail.line_item_count}',
-                                                    style: const TextStyle(
-                                                      color: Colors.green,
-                                                      fontSize: 16,
-                                                    ))
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 5,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text("Total",
-                                                      style: TextStyle(
-                                                        color:
-                                                            appTheme.textColor,
-                                                        fontSize: 16,
-                                                      )),
-                                                ),
-                                                Text(
-                                                    "${bloc.selectedCurrency.currency_sign ?? ""} ${invoiceDetail.totalAmount}",
-                                                    style: TextStyle(
-                                                        color:
-                                                            appTheme.textColor,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold))
-                                              ],
-                                            ),
-                                          ],
+                                                              FontWeight.bold))
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        color: appTheme.textColor,
-                                      )
-                                    ],
-                                  )),
-                              const SizedBox(
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Icon(
+                                          Icons.arrow_forward_ios,
+                                          color: appTheme.textColor,
+                                        )
+                                      ],
+                                    )),
+                              ),
+                             /* const SizedBox(
                                 height: 20,
                               ),
                               CommonButton(
@@ -415,7 +424,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                             builder: (context) => LineItems(
                                                   id: widget.id,
                                                 )));
-                                  }),
+                                  }),*/
                               const SizedBox(
                                 height: 20,
                               )
