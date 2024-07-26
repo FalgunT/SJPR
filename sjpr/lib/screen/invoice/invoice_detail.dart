@@ -14,6 +14,7 @@ import 'package:sjpr/widgets/check_box.dart';
 import 'package:sjpr/widgets/common_button.dart';
 import '../../common/common_toast.dart';
 import '../../utils/color_utils.dart';
+import '../../utils/textinput_utils.dart';
 import '../../widgets/radio_button.dart';
 
 class InvoiceDetailScreen extends StatefulWidget {
@@ -734,12 +735,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                               ? const TextInputType.numberWithOptions(
                                   decimal: true, signed: false)
                               : TextInputType.text,
-                          /*  inputFormatters: <TextInputFormatter>[
-                            isAmt
-                                ? FilteringTextInputFormatter.digitsOnly
-                                : FilteringTextInputFormatter
-                                    .singleLineFormatter
-                          ],*/
+                          inputFormatters: getTextFormatter(isAmt),
                           decoration: InputDecoration(
                             filled: false,
                             focusedBorder: OutlineInputBorder(
@@ -886,5 +882,18 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
       return false;
     }
     return true;
+  }
+
+  getTextFormatter(bool isAmt) {
+    List<TextInputFormatter> formatters = [];
+    if (isAmt) {
+      formatters.add(
+        FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
+      );
+      formatters.add(DecimalTextInputFormatter(decimalRange: 2));
+    } else {
+      formatters.add(FilteringTextInputFormatter.singleLineFormatter);
+    }
+    return formatters;
   }
 }
