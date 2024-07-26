@@ -115,7 +115,7 @@ class _ForgotPwState extends State<ForgotPw> {
                       text: TextSpan(children: [
                     TextSpan(
                         text:
-                            'We have send a verification code OTP to your number ',
+                            'We have send a verification. code OTP to your number ',
                         style: TextStyle(
                             fontWeight: FontWeight.normal,
                             fontSize: 18,

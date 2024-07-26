@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sjpr/model/lineitem_list_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
-import 'package:sjpr/screen/lineitems/line_items_bloc.dart';
-import 'package:sjpr/screen/lineitems/line_items_list.dart';
+import 'package:sjpr/screen/splititems/split_items_detail.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/image_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
 
-class LineItems extends StatefulWidget {
+class SplitItemsListScreen extends StatefulWidget {
   final String id;
-  const LineItems({super.key, required this.id});
+  const SplitItemsListScreen({super.key, required this.id});
   @override
-  State<LineItems> createState() => _LineItemsState();
+  State<SplitItemsListScreen> createState() => _SplitItemsListScreenState();
 }
 
-class _LineItemsState extends State<LineItems> implements Updater {
+class _SplitItemsListScreenState extends State<SplitItemsListScreen>
+    implements Updater {
   late InvoiceDetailBloc bloc;
 
   @override
@@ -61,7 +61,7 @@ class _LineItemsState extends State<LineItems> implements Updater {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const LineItemsListScreen(
+                            builder: (context) => const SplitItemsDetailScreen(
                                   id: "",
                                 )));
                   },
@@ -122,7 +122,7 @@ class _LineItemsState extends State<LineItems> implements Updater {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              LineItemsListScreen(
+                                              SplitItemsDetailScreen(
                                                 id: lineItemList![index].id ??
                                                     "",
                                               )));
@@ -317,9 +317,7 @@ class _LineItemsState extends State<LineItems> implements Updater {
 
   @override
   updateWidget() {
-    setState(() {
-      
-    });
+    setState(() {});
   }
 }
 
@@ -459,7 +457,7 @@ summeryBottomSheet({
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Text(
@@ -480,7 +478,7 @@ summeryBottomSheet({
                       borderRadius: BorderRadius.circular(8)),
                   child: Column(
                     children: [
-                      Row(
+                      const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
@@ -524,7 +522,7 @@ summeryBottomSheet({
                       const SizedBox(
                         height: 10,
                       ),
-                      Row(
+                      const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
@@ -546,7 +544,7 @@ summeryBottomSheet({
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Text(
@@ -567,7 +565,7 @@ summeryBottomSheet({
                       borderRadius: BorderRadius.circular(8)),
                   child: Column(
                     children: [
-                      Row(
+                      const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
@@ -611,7 +609,7 @@ summeryBottomSheet({
                       const SizedBox(
                         height: 10,
                       ),
-                      Row(
+                      const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(

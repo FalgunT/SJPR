@@ -8,11 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ApiClient {
-  static String siteUrl =
-      'http://ec2-3-7-188-163.ap-south-1.compute.amazonaws.com';
-  static String baseUrl = '$siteUrl:8088';
-  static String freshDeskUrl = '';
-  static String userManualUrl = '';
+  static String baseUrl = 'http://127.0.0.1:8000';
+
   static String version = "";
   static String resultflagSuccess = "Success";
   final String jsonHeaderName = 'Content-Type';
@@ -26,36 +23,14 @@ class ApiClient {
   static String otpTypeSMS = "sms";
   static String otpTypeEmail = "email";
 
-  //static String otpTypeUpdateMob = "updatemobile";
-  static String otpTypeAadhar = "aadharcard";
-  static String trainingTypeGI = "gi";
-  static String trainingTypeLI = "li";
-
   static String token = "$baseUrl/token";
   static String bearerToken = "";
-  static String getUrls = "$baseUrl/api/mobileApi/GetUrl";
-  static String requestACallBack = "$baseUrl/api/mobileApi/RequestcallBack";
-  static String registerDevice = "$baseUrl/api/mobileApi/RegisterDevice";
-  static String emailCheck = "$baseUrl/api/mobileApi/EmailCheck";
-  static String updateMobile = "$baseUrl/api/mobileApi/Updatemobile";
-  static String sendOTP = "$baseUrl/api/mobileApi/SendOTP";
-  static String getStatus = "$baseUrl/api/mobileApi/GetStatus";
-  static String getAadharData = "$baseUrl/api/mobileApi/GetAadhardata";
-  static String getPanData = "$baseUrl/api/mobileApi/GetPandata";
-  static String getGstData = "$baseUrl/api/mobileApi/GetGSTdata";
-  static String getBankData = "$baseUrl/api/mobileApi/GetBankdata";
-  static String registerPosp = "$baseUrl/api/APIPospMaster/PUTPospData";
-  static String trainingDayURL = "$baseUrl/Mails/";
-  static String getDashboard = "$baseUrl/api/mobileApi/GetDashboard";
-  static String getProfile = "$baseUrl/api/mobileApi/GetProfile";
-  static String updateProfilePhoto = "$baseUrl/api/mobileApi/UpdateProfilePic";
-  static String completeTrainingDay =
-      "$baseUrl/api/mobileApi/TrainingDayComplete";
-  static String getQuestionAnswerList =
-      "$baseUrl/api/mobileApi/GetQuestionList";
-  static String submitAnswers = "$baseUrl/api/mobileApi/SubmitAnswer";
-  static String downloadCerti = "$baseUrl/api/mobileApi/GetCertificate";
-  static String reExam = "$baseUrl/api/mobileApi/ReExam";
+  static String driverLogin = "$baseUrl/driverapi/login/";
+  static String driverLogout = "$baseUrl/driverapi/logout/";
+  static String drPasswordReset = "$baseUrl/driverapi/dr_password_reset";
+  static String drInvoiceList = "$baseUrl/driverapi/dr_getInvoiceList";
+  static String drInvoiceCount = "$baseUrl/driverapi/dr_invoice_count";
+
   static final RegExp nameRegExp = RegExp('[a-zA-Z]');
 
   Map<String, String> getJsonHeader() {

@@ -6,6 +6,7 @@ import '../model/category_list_model.dart';
 
 class CheckBoxList extends StatefulWidget {
   final List<CheckBoxItem> items;
+  final int? selectedCategoryIndex;
   Function f;
 
   @override
@@ -13,12 +14,23 @@ class CheckBoxList extends StatefulWidget {
     return _CheckBoxState();
   }
 
-  CheckBoxList({super.key, required this.items, required this.f});
+  CheckBoxList(
+      {super.key,
+      required this.items,
+      required this.f,
+      required this.selectedCategoryIndex});
 }
 
 class _CheckBoxState extends State<CheckBoxList> {
-  //List<int> selectedIds = <int>[];
+  int? selectedCategoryIndex;
   var selected;
+  @override
+  void initState() {
+    // TODO: implement initState
+    selectedCategoryIndex = widget.selectedCategoryIndex;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -28,7 +40,7 @@ class _CheckBoxState extends State<CheckBoxList> {
         return ExpansionTile(
           iconColor: Colors.white,
           collapsedIconColor: Colors.white,
-          shape: Border(),
+          shape: const Border(),
           initiallyExpanded: false,
           leading: Icon(Icons.photo_library, color: textColor),
           title: Text(
@@ -49,7 +61,7 @@ class _CheckBoxState extends State<CheckBoxList> {
         padding: const EdgeInsets.only(left: 16.0),
         child: RadioListTile(
           title: Text(
-            item.sub_category_name??"-",
+            item.sub_category_name ?? "-",
             style: TextStyle(color: textColor),
           ),
           value: i,
@@ -57,12 +69,17 @@ class _CheckBoxState extends State<CheckBoxList> {
             setState(() {
               selected = val;
               debugPrint('${selected.toString()}');
-             SubCategoryData selectedData =  widget.items[index].myChildren[selected];
-              widget.f(selectedData);
+              SubCategoryData selectedData =
+                  widget.items[index].myChildren[selected];
+              selectedCategoryIndex = index;
+              widget.f(index, selectedData);
             });
           },
           controlAffinity: ListTileControlAffinity.leading,
-          groupValue: selected,
+          groupValue:
+              (selectedCategoryIndex == null || selectedCategoryIndex == index)
+                  ? selected
+                  : null,
         ),
       ));
     }

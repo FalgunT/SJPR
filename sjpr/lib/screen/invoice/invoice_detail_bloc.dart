@@ -50,6 +50,7 @@ class InvoiceDetailBloc extends BlocBase {
   List<ProductServicesListData> pList = [];
 
   SubCategoryData selectedData = SubCategoryData.empty();
+  int? selectedCategoryIndex;
   ProductServicesListData selectedPData = ProductServicesListData.empty();
   TypeListData selectedTData = TypeListData.empty();
   CurrencyModel selectedCurrency = CurrencyModel.empty();

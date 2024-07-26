@@ -1,94 +1,27 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:sjpr/screen/lineitems/line_items_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sjpr/model/lineitem_list_model.dart';
+import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
+import 'package:sjpr/screen/lineitems/line_items_detail.dart';
 import 'package:sjpr/utils/color_utils.dart';
-import 'package:sjpr/widgets/common_button.dart';
+import 'package:sjpr/utils/image_utils.dart';
+import 'package:sjpr/utils/string_utils.dart';
 
 class LineItemsListScreen extends StatefulWidget {
   final String id;
   const LineItemsListScreen({super.key, required this.id});
-
   @override
   State<LineItemsListScreen> createState() => _LineItemsListScreenState();
 }
 
-class _LineItemsListScreenState extends State<LineItemsListScreen> {
-  LineItemsBloc bloc = LineItemsBloc();
-  String selectedValue = "";
-  String categoryValue = "";
-  String productValue = "";
-  String classValue = "";
-  String locationValue = "";
-  String customerValue = "";
-  ValueNotifier<String> selectedValueC = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueP = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueClass = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueL = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueCustomer = ValueNotifier<String>("");
-
-  List categoryList = [
-    "None",
-    "Accumulated Depreciation",
-    "Ask My Accountant",
-    "Buildings and Improvements",
-    "Business Licenses and Permits",
-    "Charitable Contributions",
-    "Computer and Internet Expenses",
-    "Counting Education",
-    "Depreciation Expense"
-  ];
-
-  List productList = [
-    "None",
-    "Admin Fee",
-    "Annual Return/Confirmation Statement",
-    "Benefits",
-    "Company Restoration",
-    "Consultation On Liquidation",
-    "CVA",
-    "Business Event",
-    "FCA Fees"
-  ];
-
-  List classList = [
-    'None',
-    "Bruno Portfolio",
-    "Jonas Portfolio",
-    "Luiz Portfolio",
-    "Vitor Portfolio",
-    "Wilson Portfolio"
-  ];
-
-  List locationList = [
-    "None",
-    "France",
-    "Germany",
-    "International",
-    "Netherlands",
-    "Portugal",
-    "Saudi Arabia",
-    "Spain",
-    "United Kingdom"
-  ];
-
-  List customerList = [
-    "None",
-    "001 Client",
-    "002 Client",
-    "003 Client",
-    "004 Client",
-    "005 Client",
-    "006 Client",
-    "007 Client",
-    "008 Client",
-  ];
+class _LineItemsListScreenState extends State<LineItemsListScreen>
+    implements Updater {
+  late InvoiceDetailBloc bloc;
 
   @override
   void initState() {
-    if (widget.id != null && widget.id.isNotEmpty) {
-      bloc.getLineItemDetail(context, widget.id);
-    }
+    bloc = InvoiceDetailBloc(update: this);
+    bloc.getLineItemList(context, widget.id);
     super.initState();
   }
 
@@ -104,291 +37,298 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
             color: Colors.white,
           ),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.of(context).pop();
           },
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "List Item 01",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: activeTxtColor,
-                        fontSize: 24),
+      body: Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Line Items",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: activeTxtColor,
+                      fontSize: 24),
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LineItemsDetailScreen(
+                                  id: "",
+                                )));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    height: 40,
+                    width: 100,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: backGroundColor,
+                        border: Border.all(color: activeTxtColor, width: 2)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add,
+                          color: activeTxtColor,
+                          size: 16,
+                        ),
+                        Text(
+                          "Add",
+                          style: TextStyle(
+                              color: activeTxtColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16),
+                        ),
+                      ],
+                    ),
                   ),
-                  CommonButton(
-                      textFontSize: 16,
-                      height: 30,
-                      content: "Delete",
-                      bgColor: backGroundColor,
-                      textColor: activeTxtColor,
-                      outlinedBorderColor: activeTxtColor,
-                      onPressed: () {})
-                ],
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Expanded(
+              child: StreamBuilder<List<LineItemListData>?>(
+                  stream: bloc.lineItemListStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Container();
+                    }
+                    if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+                      var lineItemList = snapshot.data;
+                      return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: lineItemList?.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: listTileBgColor,
+                              ),
+                              child: ListTile(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              LineItemsDetailScreen(
+                                                id: lineItemList![index].id ??
+                                                    "",
+                                              )));
+                                },
+                                dense: true,
+                                contentPadding:
+                                    const EdgeInsets.only(left: 10, right: 10),
+                                title: Text(
+                                  (lineItemList?[index].name != null &&
+                                          lineItemList![index].name!.isNotEmpty)
+                                      ? lineItemList[index].name!
+                                      : "Line Item $index",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: textColor),
+                                ),
+                                subtitle: Text(
+                                  lineItemList?[index].description ??
+                                      "Category name",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: textColor),
+                                ),
+                                trailing: SizedBox(
+                                  width: 100,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Text(
+                                        lineItemList?[index]
+                                                .taxRate
+                                                .toString() ??
+                                            "",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: textColor),
+                                      ),
+                                      const SizedBox(
+                                        width: 4,
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: textColor,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          });
+                    }
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            SvgImages.folder,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            StringUtils.noLineItems,
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+            ),
+            const Divider(
+              thickness: 4,
+              color: Color.fromRGBO(44, 45, 51, 1),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            GestureDetector(
+              onTap: () {
+                summeryBottomSheet(context: context);
+              },
+              child: Text(
+                "Summary",
+                style: TextStyle(
+                    color: activeTxtColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16),
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              Container(
-                  padding: const EdgeInsets.all(12),
-                  height: 112,
-                  width: MediaQuery.sizeOf(context).width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: const Color.fromRGBO(44, 45, 51, 1),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: const Color.fromRGBO(44, 45, 51, 1),
+                        borderRadius: BorderRadius.circular(8)),
+                    height: 98,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Line items",
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: textColor),
+                        ),
+                        Text(
+                          "\u{20AC}1232.00",
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: textColor),
+                        )
+                      ],
+                    ),
                   ),
-                  child: TextField(
-                    maxLines: 5,
-                    style: TextStyle(color: textColor, fontSize: 16),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        border: InputBorder.none,
-                        hintText: "Description",
-                        hintStyle: TextStyle(color: textColor, fontSize: 16)),
-                  )),
-              const SizedBox(
-                height: 10,
-              ),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueC,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Category",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: categoryList,
-                              title: "Category",
-                              bottomSheetType: "category");
-                        },
-                        context: context);
-                  }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueP,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Product/Service",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: productList,
-                              title: "Product/Service",
-                              bottomSheetType: "product");
-                        },
-                        context: context);
-                  }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueClass,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Class",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: classList,
-                              title: "Class",
-                              bottomSheetType: "class");
-                        },
-                        context: context);
-                  }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueL,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Location",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: locationList,
-                              title: "Location",
-                              bottomSheetType: "location");
-                        },
-                        context: context);
-                  }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueCustomer,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Customer",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: customerList,
-                              title: "Customer",
-                              bottomSheetType: "customer");
-                        },
-                        context: context);
-                  }),
-              commonRowWidget(
-                  title: "Quantity",
-                  value: "1.00",
-                  onTap: () {},
-                  context: context),
-              commonRowWidget(
-                  title: "Unit price (Excl.tax)",
-                  value: "0.00",
-                  onTap: () {},
-                  context: context),
-              commonRowWidget(
-                  title: "Unit price (Incl.tax)",
-                  value: "0.00",
-                  onTap: () {},
-                  context: context),
-              commonRowWidget(
-                  title: "Net", value: "0.00", onTap: () {}, context: context),
-              commonRowWidget(
-                  title: "Tax rate",
-                  value: "none",
-                  onTap: () {},
-                  context: context),
-              commonRowWidget(
-                  title: "Tax", value: "0.00", onTap: () {}, context: context),
-              commonRowWidget(
-                  title: "Total Amount",
-                  value: "0.0",
-                  onTap: () {},
-                  context: context),
-            ],
-          ),
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: const Color.fromRGBO(44, 45, 51, 1),
+                        borderRadius: BorderRadius.circular(8)),
+                    height: 98,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Out by",
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: textColor),
+                        ),
+                        const Text(
+                          "\u{20AC}1202.00",
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.red),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: const Color.fromRGBO(44, 45, 51, 1),
+                        borderRadius: BorderRadius.circular(8)),
+                    height: 98,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Items total",
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: textColor),
+                        ),
+                        const Text(
+                          "\u{20AC}1232.00",
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.green),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            )
+          ],
         ),
       ),
     );
   }
 
-  singleSelectBottomSheet({
-    required context,
-    required list,
-    required title,
-    required bottomSheetType,
-  }) {
-    return showModalBottomSheet(
-        backgroundColor: Colors.black,
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                            color: textColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
-                      ),
-                      IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            color: textColor,
-                          ))
-                    ],
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  TextField(
-                    style: TextStyle(color: textColor),
-                    decoration: InputDecoration(
-                        isDense: true,
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: textColor,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(
-                            width: 0,
-                            style: BorderStyle.none,
-                          ),
-                        ),
-                        fillColor: const Color.fromRGBO(44, 45, 51, 1),
-                        filled: true,
-                        hintText: "Search",
-                        hintStyle: TextStyle(color: textColor)),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                        itemCount: list.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return RadioListTile(
-                            activeColor: activeTxtColor,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            contentPadding: const EdgeInsets.only(
-                                left: 6, right: 0, bottom: 0, top: 0),
-                            title: Text(
-                              list[index],
-                              style: TextStyle(
-                                  color: selectedValue == list[index]
-                                      ? activeTxtColor
-                                      : textColor),
-                            ),
-                            value: list[index],
-                            groupValue: selectedValue,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedValue = value;
-                                if (bottomSheetType == "category") {
-                                  categoryValue = selectedValue;
-                                }
-                                if (bottomSheetType == "product") {
-                                  productValue = selectedValue;
-                                }
-                                if (bottomSheetType == "class") {
-                                  classValue = selectedValue;
-                                }
-                                if (bottomSheetType == "location") {
-                                  locationValue = selectedValue;
-                                }
-                                if (bottomSheetType == "customer") {
-                                  customerValue = selectedValue;
-                                }
-                              });
-                              selectedValueC.value = categoryValue;
-                              selectedValueP.value = productValue;
-                              selectedValueClass.value = classValue;
-                              selectedValueL.value = locationValue;
-                              selectedValueCustomer.value = customerValue;
-                            },
-                          );
-                        }),
-                  ),
-                ],
-              ),
-            );
-          });
-        });
+  @override
+  updateWidget() {
+    setState(() {});
   }
 }
 
 Widget commonRowWidget(
-    {required title, required value, required onTap, required context}) {
+    {required title, required subtitle, required value, required onTap}) {
   return InkWell(
     onTap: onTap,
     child: Container(
@@ -398,30 +338,308 @@ Widget commonRowWidget(
         borderRadius: BorderRadius.circular(8),
         color: listTileBgColor,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                  color: textColor, fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(color: textColor, fontSize: 17),
-            ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Icon(
-            Icons.arrow_forward_ios,
-            color: textColor,
-          )
-        ],
+      child: const ListTile(
+        title: Text(""),
       ),
     ),
   );
+}
+
+summeryBottomSheet({
+  required context,
+}) {
+  return showModalBottomSheet(
+      backgroundColor: backGroundColor,
+      context: context,
+      builder: (context) {
+        return SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            //  height: MediaQuery.of(context).size.height*0.8,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Summary",
+                      style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          color: textColor,
+                        ))
+                  ],
+                ),
+                Text(
+                  "Line items",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: textColor),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  width: MediaQuery.sizeOf(context).width,
+                  decoration: BoxDecoration(
+                      color: const Color.fromRGBO(44, 45, 51, 1),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Net",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: textColor),
+                          ),
+                          Text(
+                            "\u{20AC}1,232.00",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: textColor),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Tax",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: textColor),
+                          ),
+                          Text(
+                            "\u{20AC} 0.00",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: textColor),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Total",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: textColor),
+                          ),
+                          Text(
+                            "\u{20AC}1,232.00",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: textColor),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Out by",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: textColor),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  width: MediaQuery.sizeOf(context).width,
+                  decoration: BoxDecoration(
+                      color: const Color.fromRGBO(44, 45, 51, 1),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Column(
+                    children: [
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Net",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: Colors.red),
+                          ),
+                          Text(
+                            "\u{20AC}1,232.00",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: Colors.red),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Tax",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: textColor),
+                          ),
+                          Text(
+                            "\u{20AC} 0.00",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: textColor),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Total",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: Colors.red),
+                          ),
+                          Text(
+                            "\u{20AC}1,232.00",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: Colors.red),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Items total",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: textColor),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  width: MediaQuery.sizeOf(context).width,
+                  decoration: BoxDecoration(
+                      color: const Color.fromRGBO(44, 45, 51, 1),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Column(
+                    children: [
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Net",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: Colors.red),
+                          ),
+                          Text(
+                            "\u{20AC}1,232.00",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: Colors.red),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Tax",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: textColor),
+                          ),
+                          Text(
+                            "\u{20AC} 0.00",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: textColor),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Total",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: Colors.green),
+                          ),
+                          Text(
+                            "\u{20AC}1,232.00",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: Colors.green),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -8,13 +9,10 @@ import 'package:pdf_render/pdf_render_widgets.dart';
 import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/model/invoice_detail_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
-import 'package:sjpr/screen/lineitems/line_items.dart';
+import 'package:sjpr/screen/lineitems/line_items_list.dart';
 import 'package:sjpr/widgets/check_box.dart';
 import 'package:sjpr/widgets/common_button.dart';
 import '../../common/common_toast.dart';
-import '../../model/category_list_model.dart';
-import '../../model/product_list_model.dart';
-import '../../model/type_list_model.dart';
 import '../../utils/color_utils.dart';
 import '../../widgets/radio_button.dart';
 
@@ -291,16 +289,16 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                       minLines: 4,
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: appTheme.listTileBgColor,
-                        hintStyle: TextStyle(color: Colors.white),
+                        hintStyle: const TextStyle(color: Colors.white),
                         hintText: 'Description',
                         labelText: 'Add Description',
-                        labelStyle: TextStyle(color: Colors.white),
-                        contentPadding:
-                            EdgeInsets.only(left: 14.0, bottom: 8.0, top: 8.0),
+                        labelStyle: const TextStyle(color: Colors.white),
+                        contentPadding: const EdgeInsets.only(
+                            left: 14.0, bottom: 8.0, top: 8.0),
                         /*focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.white),
                             borderRadius: BorderRadius.circular(8),
@@ -331,21 +329,22 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                 height: 20,
                               ),
                               InkWell(
-                                onTap: (){
+                                onTap: () {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => LineItems(
-                                            id: widget.id,
-                                          )));
+                                          builder: (context) =>
+                                              LineItemsListScreen(
+                                                id: invoiceDetail.id ?? "",
+                                              )));
                                 },
                                 child: Container(
                                     padding: const EdgeInsets.all(16),
                                     width: MediaQuery.sizeOf(context).width,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
-                                        color:
-                                            const Color.fromRGBO(39, 40, 44, 2)),
+                                        color: const Color.fromRGBO(
+                                            39, 40, 44, 2)),
                                     child: Row(
                                       children: [
                                         Expanded(
@@ -363,7 +362,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                                                 .textColor,
                                                             fontSize: 16,
                                                             fontWeight:
-                                                                FontWeight.bold)),
+                                                                FontWeight
+                                                                    .bold)),
                                                   ),
                                                   Text(
                                                       '${invoiceDetail.line_item_count}',
@@ -381,16 +381,16 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                                   Expanded(
                                                     child: Text("Total",
                                                         style: TextStyle(
-                                                          color:
-                                                              appTheme.textColor,
+                                                          color: appTheme
+                                                              .textColor,
                                                           fontSize: 16,
                                                         )),
                                                   ),
                                                   Text(
                                                       "${bloc.selectedCurrency.currency_sign ?? ""} ${invoiceDetail.totalAmount}",
                                                       style: TextStyle(
-                                                          color:
-                                                              appTheme.textColor,
+                                                          color: appTheme
+                                                              .textColor,
                                                           fontSize: 16,
                                                           fontWeight:
                                                               FontWeight.bold))
@@ -409,7 +409,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                       ],
                                     )),
                               ),
-                             /* const SizedBox(
+                              /* const SizedBox(
                                 height: 20,
                               ),
                               CommonButton(
@@ -430,7 +430,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                               )
                             ],
                           )
-                        : Center(),
+                        : const Center(),
                     const SizedBox(
                       height: 20,
                     ),
@@ -442,7 +442,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                         onPressed: () async {
                           if (isValid()) {
                             //collect all data...
-                            invoiceDetail.payment_method_id = bloc.selectedPM.id;
+                            invoiceDetail.payment_method_id =
+                                bloc.selectedPM.id;
                             invoiceDetail.publish_to_id =
                                 bloc.selectedPublishTo.id;
                             invoiceDetail.scanned_currency_id =
@@ -452,14 +453,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                 bloc.selectedData.sub_category_id;
                             invoiceDetail.scanned_product_service_id =
                                 bloc.selectedPData.id;
-                            invoiceDetail.scanned_type_id = bloc.selectedTData.id;
-                           bool res = await bloc.updateScannedInvoice(
+                            invoiceDetail.scanned_type_id =
+                                bloc.selectedTData.id;
+                            bool res = await bloc.updateScannedInvoice(
                                 invoiceDetail.toJson(), context);
-                           if(res){
-                             Navigator.pop(context);
-                           }
+                            if (res) {
+                              Navigator.pop(context);
+                            }
                           }
-
                         })
                   ],
                 );
@@ -509,17 +510,22 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
         ),
         child: Row(
           children: [
-            Expanded(
-                child: Text(
+            Text(
               title,
               style: TextStyle(
                   color: appTheme.textColor,
                   fontSize: 16,
                   fontWeight: FontWeight.bold),
-            )),
-            Text(
-              value ?? "None",
-              style: TextStyle(color: appTheme.textColor, fontSize: 14),
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            Expanded(
+              child: Text(
+                value ?? "None",
+                style: TextStyle(color: appTheme.textColor, fontSize: 14),
+                textAlign: TextAlign.end,
+              ),
             ),
             const SizedBox(
               width: 5,
@@ -572,7 +578,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 16,
                             ),
                             getCloseButton()
@@ -589,9 +595,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                 ),
                 flag == 0
                     ? CheckBoxList(
+                        selectedCategoryIndex: bloc.selectedCategoryIndex,
                         items: _list,
-                        f: (l) {
+                        f: (index, l) {
                           debugPrint('--->f() called');
+                          bloc.selectedCategoryIndex = index;
                           bloc.selectedData = l;
                           debugPrint(
                               '--->Result: ${bloc.selectedData.toString()}');
@@ -700,10 +708,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
         barrierDismissible: false,
         builder: (ctxt) => AlertDialog(
               backgroundColor: listTileBgColor,
-              insetPadding: EdgeInsets.all(4),
+              insetPadding: const EdgeInsets.all(4),
               title: Text(
                 title,
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ),
               content: Builder(
                 builder: (context) {
@@ -711,7 +719,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                   var height = MediaQuery.of(context).size.height;
                   var width = MediaQuery.of(context).size.width;
 
-                  return Container(
+                  return SizedBox(
                     width: width - 100,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -720,7 +728,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                           height: 16,
                         ),
                         TextField(
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                           autofocus: true,
                           keyboardType: isAmt
                               ? const TextInputType.numberWithOptions(
@@ -738,14 +746,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                               borderSide: BorderSide(
                                   color: profileListBgColor, width: 1.0),
                             ),
-                            enabledBorder: OutlineInputBorder(
+                            enabledBorder: const OutlineInputBorder(
                               borderSide:
                                   BorderSide(color: Colors.white, width: 1.0),
                             ),
                             hintText: hint,
-                            hintStyle: TextStyle(color: Colors.white70),
+                            hintStyle: const TextStyle(color: Colors.white70),
                             labelText: label,
-                            labelStyle: TextStyle(color: Colors.white70),
+                            labelStyle: const TextStyle(color: Colors.white70),
                             border: OutlineInputBorder(
                                 borderSide: BorderSide.none,
                                 borderRadius: BorderRadius.circular(50)),
@@ -763,7 +771,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              child: Text(
+                              child: const Text(
                                 'Cancel',
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 14),
@@ -795,7 +803,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                     context, _eController.text);
                                 Navigator.pop(context);
                               },
-                              child: Text(
+                              child: const Text(
                                 'Save',
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 14),
@@ -819,52 +827,62 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
   bool isValid() {
     String catid = bloc.selectedData.sub_category_id ?? "";
     if (catid == "") {
-      CommonToast.getInstance()?.displayToast(message: "Category field is required",bContext: context);
+      CommonToast.getInstance()?.displayToast(
+          message: "Category field is required", bContext: context);
       return false;
     }
     String pid = bloc.selectedPData.id ?? "";
     if (pid == "") {
-      CommonToast.getInstance()?.displayToast(message: "Product/Service field is required",bContext: context);
+      CommonToast.getInstance()?.displayToast(
+          message: "Product/Service field is required", bContext: context);
       return false;
     }
     String tid = bloc.selectedTData.id ?? "";
     if (tid == "") {
-      CommonToast.getInstance()?.displayToast(message: "Type field is required",bContext: context);
+      CommonToast.getInstance()
+          ?.displayToast(message: "Type field is required", bContext: context);
       return false;
     }
     String duedate = invoiceDetail.dueDate ?? "";
     if (duedate == "") {
-      CommonToast.getInstance()?.displayToast(message: "Due Date field is required",bContext: context);
+      CommonToast.getInstance()?.displayToast(
+          message: "Due Date field is required", bContext: context);
       return false;
     }
     String curid = bloc.selectedCurrency.id ?? "";
     if (curid == "") {
-      CommonToast.getInstance()?.displayToast(message: "Currency field is required",bContext: context);
+      CommonToast.getInstance()?.displayToast(
+          message: "Currency field is required", bContext: context);
       return false;
     }
     String total = invoiceDetail.totalAmount ?? "";
     if (total.isEmpty) {
-      CommonToast.getInstance()?.displayToast(message: "Total  field is required",bContext: context);
+      CommonToast.getInstance()?.displayToast(
+          message: "Total  field is required", bContext: context);
       return false;
     }
     String tax = invoiceDetail.totalTaxAmount ?? "";
     if (tax.isEmpty) {
-      CommonToast.getInstance()?.displayToast(message: "Tax  field is required",bContext: context);
+      CommonToast.getInstance()
+          ?.displayToast(message: "Tax  field is required", bContext: context);
       return false;
     }
     String net = invoiceDetail.netAmount ?? "";
     if (net.isEmpty) {
-      CommonToast.getInstance()?.displayToast(message: "Tax Total field is required",bContext: context);
+      CommonToast.getInstance()?.displayToast(
+          message: "Tax Total field is required", bContext: context);
       return false;
     }
     String pmid = bloc.selectedPM.id ?? "";
     if (pmid == "") {
-      CommonToast.getInstance()?.displayToast(message: "Payment method field is required",bContext: context);
+      CommonToast.getInstance()?.displayToast(
+          message: "Payment method field is required", bContext: context);
       return false;
     }
     String pubid = bloc.selectedPublishTo.id ?? "";
     if (pubid == "") {
-      CommonToast.getInstance()?.displayToast(message: "Publish To field is required",bContext: context);
+      CommonToast.getInstance()?.displayToast(
+          message: "Publish To field is required", bContext: context);
       return false;
     }
     return true;
