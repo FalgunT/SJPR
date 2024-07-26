@@ -7,6 +7,7 @@ import 'package:sjpr/widgets/common_button.dart';
 
 class LineItemsDetailScreen extends StatefulWidget {
   final String id;
+
   const LineItemsDetailScreen({super.key, required this.id});
 
   @override
@@ -15,80 +16,13 @@ class LineItemsDetailScreen extends StatefulWidget {
 
 class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
   LineItemsBloc bloc = LineItemsBloc();
-  String selectedValue = "";
-  String categoryValue = "";
-  String productValue = "";
-  String classValue = "";
-  String locationValue = "";
-  String customerValue = "";
-  ValueNotifier<String> selectedValueC = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueP = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueClass = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueL = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueCustomer = ValueNotifier<String>("");
-
-  List categoryList = [
-    "None",
-    "Accumulated Depreciation",
-    "Ask My Accountant",
-    "Buildings and Improvements",
-    "Business Licenses and Permits",
-    "Charitable Contributions",
-    "Computer and Internet Expenses",
-    "Counting Education",
-    "Depreciation Expense"
-  ];
-
-  List productList = [
-    "None",
-    "Admin Fee",
-    "Annual Return/Confirmation Statement",
-    "Benefits",
-    "Company Restoration",
-    "Consultation On Liquidation",
-    "CVA",
-    "Business Event",
-    "FCA Fees"
-  ];
-
-  List classList = [
-    'None',
-    "Bruno Portfolio",
-    "Jonas Portfolio",
-    "Luiz Portfolio",
-    "Vitor Portfolio",
-    "Wilson Portfolio"
-  ];
-
-  List locationList = [
-    "None",
-    "France",
-    "Germany",
-    "International",
-    "Netherlands",
-    "Portugal",
-    "Saudi Arabia",
-    "Spain",
-    "United Kingdom"
-  ];
-
-  List customerList = [
-    "None",
-    "001 Client",
-    "002 Client",
-    "003 Client",
-    "004 Client",
-    "005 Client",
-    "006 Client",
-    "007 Client",
-    "008 Client",
-  ];
 
   @override
   void initState() {
     if (widget.id != null && widget.id.isNotEmpty) {
       bloc.getLineItemDetail(context, widget.id);
     }
+
     super.initState();
   }
 
@@ -114,158 +48,216 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "List Item 01",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: activeTxtColor,
-                        fontSize: 24),
-                  ),
-                  CommonButton(
-                      textFontSize: 16,
-                      height: 30,
-                      content: "Delete",
-                      bgColor: backGroundColor,
-                      textColor: activeTxtColor,
-                      outlinedBorderColor: activeTxtColor,
-                      onPressed: () {})
-                ],
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Container(
-                  padding: const EdgeInsets.all(12),
-                  height: 112,
-                  width: MediaQuery.sizeOf(context).width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: const Color.fromRGBO(44, 45, 51, 1),
-                  ),
-                  child: TextField(
+            Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ValueListenableBuilder(
+                  valueListenable: bloc.lineItemName,
+                  builder: (context, value, _) {
+                    return Text(
+                      bloc.lineItemName.value,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: activeTxtColor,
+                          fontSize: 24),
+                    );
+                  }),
+              CommonButton(
+                  textFontSize: 16,
+                  height: 30,
+                  content: "Delete",
+                  bgColor: backGroundColor,
+                  textColor: activeTxtColor,
+                  outlinedBorderColor: activeTxtColor,
+                  onPressed: () {})
+            ],
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Container(
+            padding: const EdgeInsets.all(12),
+            height: 112,
+            width: MediaQuery
+                .sizeOf(context)
+                .width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: const Color.fromRGBO(44, 45, 51, 1),
+            ),
+            child: ValueListenableBuilder(
+                valueListenable: bloc.txtController,
+                builder: (context, value, _) {
+                  return TextField(
+                    controller: bloc.txtController,
                     maxLines: 5,
                     style: TextStyle(color: textColor, fontSize: 16),
                     decoration: InputDecoration(
                         contentPadding: EdgeInsets.zero,
                         border: InputBorder.none,
                         hintText: "Description",
-                        hintStyle: TextStyle(color: textColor, fontSize: 16)),
-                  )),
-              const SizedBox(
-                height: 10,
-              ),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueC,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Category",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: categoryList,
-                              title: "Category",
-                              bottomSheetType: "category");
-                        },
-                        context: context);
-                  }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueP,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Product/Service",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: productList,
-                              title: "Product/Service",
-                              bottomSheetType: "product");
-                        },
-                        context: context);
-                  }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueClass,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Class",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: classList,
-                              title: "Class",
-                              bottomSheetType: "class");
-                        },
-                        context: context);
-                  }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueL,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Location",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: locationList,
-                              title: "Location",
-                              bottomSheetType: "location");
-                        },
-                        context: context);
-                  }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueCustomer,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Customer",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: customerList,
-                              title: "Customer",
-                              bottomSheetType: "customer");
-                        },
-                        context: context);
-                  }),
-              commonRowWidget(
-                  title: "Quantity",
-                  value: "1.00",
-                  onTap: () {},
-                  context: context),
-              commonRowWidget(
-                  title: "Unit price (Excl.tax)",
-                  value: "0.00",
-                  onTap: () {},
-                  context: context),
-              commonRowWidget(
+                        hintStyle:
+                        TextStyle(color: textColor, fontSize: 16)),
+                  );
+                }),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          ValueListenableBuilder(
+              valueListenable: bloc.selectedValueC,
+              builder: (context, value, _) {
+                return commonRowWidget(
+                    title: "Category",
+                    value: value,
+                    onTap: () {
+                      singleSelectBottomSheet(
+                          context: context,
+                          list: bloc.categoryList,
+                          title: "Category",
+                          bottomSheetType: "category");
+                    },
+                    context: context);
+              }),
+          ValueListenableBuilder(
+              valueListenable: bloc.selectedValueP,
+              builder: (context, value, _) {
+                return commonRowWidget(
+                    title: "Product/Service",
+                    value: value,
+                    onTap: () {
+                      singleSelectBottomSheet(
+                          context: context,
+                          list: bloc.productList,
+                          title: "Product/Service",
+                          bottomSheetType: "product");
+                    },
+                    context: context);
+              }),
+          ValueListenableBuilder(
+              valueListenable: bloc.selectedValueClass,
+              builder: (context, value, _) {
+                return commonRowWidget(
+                    title: "Class",
+                    value: value,
+                    onTap: () {
+                      singleSelectBottomSheet(
+                          context: context,
+                          list: bloc.classList,
+                          title: "Class",
+                          bottomSheetType: "class");
+                    },
+                    context: context);
+              }),
+          ValueListenableBuilder(
+              valueListenable: bloc.selectedValueL,
+              builder: (context, value, _) {
+                return commonRowWidget(
+                    title: "Location",
+                    value: value,
+                    onTap: () {
+                      singleSelectBottomSheet(
+                          context: context,
+                          list: bloc.locationList,
+                          title: "Location",
+                          bottomSheetType: "location");
+                    },
+                    context: context);
+              }),
+          ValueListenableBuilder(
+              valueListenable: bloc.selectedValueCustomer,
+              builder: (context, value, _) {
+                return commonRowWidget(
+                    title: "Customer",
+                    value: value,
+                    onTap: () {
+                      singleSelectBottomSheet(
+                          context: context,
+                          list: bloc.customerList,
+                          title: "Customer",
+                          bottomSheetType: "customer");
+                    },
+                    context: context);
+              }),
+
+          ValueListenableBuilder(
+              valueListenable: bloc.selectedQuatity,
+              builder: (context, value, _) {
+                return commonRowWidget(
+                    title: "Quantity",
+                    value: bloc.selectedQuatity.value,
+                    onTap: () {},
+                    context: context);
+              }),
+
+          ValueListenableBuilder(
+              valueListenable: bloc.selectedUnitPrice,
+              builder: (context, value, _) {
+                return commonRowWidget(
+                    title: "Unit price ", /*(Excl.tax)*/
+                    value: bloc.selectedUnitPrice.value,
+                    onTap: () {},
+                    context: context);
+              }),
+
+
+          /* commonRowWidget(
                   title: "Unit price (Incl.tax)",
                   value: "0.00",
                   onTap: () {},
-                  context: context),
-              commonRowWidget(
-                  title: "Net", value: "0.00", onTap: () {}, context: context),
-              commonRowWidget(
-                  title: "Tax rate",
-                  value: "none",
-                  onTap: () {},
-                  context: context),
-              commonRowWidget(
-                  title: "Tax", value: "0.00", onTap: () {}, context: context),
-              commonRowWidget(
-                  title: "Total Amount",
-                  value: "0.0",
-                  onTap: () {},
-                  context: context),
-            ],
-          ),
+                  context: context),*/
+
+          ValueListenableBuilder(
+              valueListenable: bloc.selectedNetAmt,
+              builder: (context, value, _) {
+                return commonRowWidget(
+                    title: "Net",
+                    value: bloc.selectedNetAmt.value,
+                    onTap: () {},
+                    context: context);
+              }),
+
+          ValueListenableBuilder(
+              valueListenable: bloc.selectedTaxRate,
+              builder: (context, value, _) {
+                return commonRowWidget(
+                    title: "Tax rate",
+                    value: bloc.selectedTaxRate.value,
+                    onTap: () {},
+                    context: context);
+              }),
+
+          ValueListenableBuilder(
+              valueListenable: bloc.selectedTaxAmt,
+              builder: (context, value, _) {
+                return commonRowWidget(
+                    title: "Tax",
+                    value: bloc.selectedTaxAmt.value,
+                    onTap: () {},
+                    context: context);
+              }),
+
+          ValueListenableBuilder(
+              valueListenable: bloc.selectedTotalAmt,
+              builder: (context, value, _) {
+                return commonRowWidget(
+                    title: "Total Amount",
+                    value: bloc.selectedTotalAmt.value,
+                    onTap: () {},
+                    context: context);
+              }),
+              CommonButton(
+                  textFontSize: 16,
+
+                  content: "Save",
+                  bgColor: buttonBgColor,
+                  textColor: buttonTextColor,
+                  outlinedBorderColor: buttonBgColor,
+                  onPressed: () {})
+          ],
         ),
       ),
-    );
+    ),);
   }
 
   singleSelectBottomSheet({
@@ -280,109 +272,101 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
         builder: (context) {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
-            return Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                return Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                            color: textColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            title,
+                            style: TextStyle(
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(
+                                Icons.close,
+                                color: textColor,
+                              ))
+                        ],
                       ),
-                      IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            color: textColor,
-                          ))
+                      SizedBox(
+                        height: 5,
+                      ),
+                      TextField(
+                        style: TextStyle(color: textColor),
+                        decoration: InputDecoration(
+                            isDense: true,
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: textColor,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                width: 0,
+                                style: BorderStyle.none,
+                              ),
+                            ),
+                            fillColor: const Color.fromRGBO(44, 45, 51, 1),
+                            filled: true,
+                            hintText: "Search",
+                            hintStyle: TextStyle(color: textColor)),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                            itemCount: list.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return RadioListTile(
+                                activeColor: activeTxtColor,
+                                materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                                contentPadding: const EdgeInsets.only(
+                                    left: 6, right: 0, bottom: 0, top: 0),
+                                title: Text(
+                                  list[index],
+                                  style: TextStyle(
+                                      color: bloc.selectedValue == list[index]
+                                          ? activeTxtColor
+                                          : textColor),
+                                ),
+                                value: list[index],
+                                groupValue: bloc.selectedValue,
+                                onChanged: (value) {
+                                  setState(() {
+                                    bloc.selectedValue = value;
+                                    if (bottomSheetType == "category") {
+                                      bloc.selectedValueC.value = value;
+                                    } else if (bottomSheetType == "product") {
+                                      bloc.selectedValueP.value = value;
+                                    } else if (bottomSheetType == "class") {
+                                      bloc.selectedValueClass.value = value;
+                                    } else if (bottomSheetType == "location") {
+                                      bloc.selectedValueL.value = value;
+                                    } else if (bottomSheetType == "customer") {
+                                      bloc.selectedValueCustomer.value = value;
+                                    }
+                                  });
+                                },
+                              );
+                            }),
+                      ),
+
                     ],
                   ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  TextField(
-                    style: TextStyle(color: textColor),
-                    decoration: InputDecoration(
-                        isDense: true,
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: textColor,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(
-                            width: 0,
-                            style: BorderStyle.none,
-                          ),
-                        ),
-                        fillColor: const Color.fromRGBO(44, 45, 51, 1),
-                        filled: true,
-                        hintText: "Search",
-                        hintStyle: TextStyle(color: textColor)),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                        itemCount: list.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return RadioListTile(
-                            activeColor: activeTxtColor,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            contentPadding: const EdgeInsets.only(
-                                left: 6, right: 0, bottom: 0, top: 0),
-                            title: Text(
-                              list[index],
-                              style: TextStyle(
-                                  color: selectedValue == list[index]
-                                      ? activeTxtColor
-                                      : textColor),
-                            ),
-                            value: list[index],
-                            groupValue: selectedValue,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedValue = value;
-                                if (bottomSheetType == "category") {
-                                  categoryValue = selectedValue;
-                                }
-                                if (bottomSheetType == "product") {
-                                  productValue = selectedValue;
-                                }
-                                if (bottomSheetType == "class") {
-                                  classValue = selectedValue;
-                                }
-                                if (bottomSheetType == "location") {
-                                  locationValue = selectedValue;
-                                }
-                                if (bottomSheetType == "customer") {
-                                  customerValue = selectedValue;
-                                }
-                              });
-                              selectedValueC.value = categoryValue;
-                              selectedValueP.value = productValue;
-                              selectedValueClass.value = classValue;
-                              selectedValueL.value = locationValue;
-                              selectedValueCustomer.value = customerValue;
-                            },
-                          );
-                        }),
-                  ),
-                ],
-              ),
-            );
-          });
+                );
+              });
         });
   }
 }

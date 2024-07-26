@@ -77,4 +77,9 @@ class LineItemDetailData {
     data['datetime'] = datetime;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'LineItemDetailData{id: $id, tblapiSaveScannedInvoiceId: $tblapiSaveScannedInvoiceId, name: $name, description: $description, quantity: $quantity, unitPrice: $unitPrice, taxRate: $taxRate, totalAmount: $totalAmount, datetime: $datetime}';
+  }
 }
