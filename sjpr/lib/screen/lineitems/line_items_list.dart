@@ -9,7 +9,9 @@ import 'package:sjpr/utils/string_utils.dart';
 
 class LineItemsListScreen extends StatefulWidget {
   final String id;
+
   const LineItemsListScreen({super.key, required this.id});
+
   @override
   State<LineItemsListScreen> createState() => _LineItemsListScreenState();
 }
@@ -20,9 +22,10 @@ class _LineItemsListScreenState extends State<LineItemsListScreen>
 
   @override
   void initState() {
+    super.initState();
     bloc = InvoiceDetailBloc(update: this);
     bloc.getLineItemList(context, widget.id);
-    super.initState();
+
   }
 
   @override
@@ -123,9 +126,10 @@ class _LineItemsListScreenState extends State<LineItemsListScreen>
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               LineItemsDetailScreen(
-                                                id: lineItemList![index].id ??
-                                                    "",
-                                              )));
+                                                id: lineItemList![index].id ?? "",
+                                              ))).then((response) async {
+                                    bloc.getLineItemList(context, widget.id);
+                                  });
                                 },
                                 dense: true,
                                 contentPadding:
@@ -157,7 +161,7 @@ class _LineItemsListScreenState extends State<LineItemsListScreen>
                                     children: [
                                       Text(
                                         lineItemList?[index]
-                                                .taxRate
+                                                .totalAmount
                                                 .toString() ??
                                             "",
                                         style: TextStyle(

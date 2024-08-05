@@ -1,32 +1,33 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:sjpr/screen/lineitems/line_items_bloc.dart';
+import 'package:flutter/services.dart';
+import 'package:sjpr/common/common_toast.dart';
+import 'package:sjpr/model/split_list_model.dart';
+import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
+import 'package:sjpr/screen/splititems/split_items_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
+import 'package:sjpr/utils/textinput_utils.dart';
+import 'package:sjpr/widgets/check_box.dart';
 import 'package:sjpr/widgets/common_button.dart';
+import 'package:sjpr/widgets/radio_button.dart';
 
 class SplitItemsDetailScreen extends StatefulWidget {
-  final String id;
-  const SplitItemsDetailScreen({super.key, required this.id});
+  final SplitListData? splitListItemData;
+  const SplitItemsDetailScreen({super.key, required this.splitListItemData});
 
   @override
   State<SplitItemsDetailScreen> createState() => _SplitItemsDetailScreenState();
 }
 
-class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
-  LineItemsBloc bloc = LineItemsBloc();
+class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
+    implements Updater {
+  SplitItemsBloc bloc = SplitItemsBloc();
+  late InvoiceDetailBloc blocID;
   String selectedValue = "";
   String categoryValue = "";
-  String productValue = "";
-  String classValue = "";
-  String locationValue = "";
-  String customerValue = "";
+  SplitListData? splitItemDetail;
   ValueNotifier<String> selectedValueC = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueP = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueClass = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueL = ValueNotifier<String>("");
-  ValueNotifier<String> selectedValueCustomer = ValueNotifier<String>("");
 
+  final TextEditingController _eController = TextEditingController();
   List categoryList = [
     "None",
     "Accumulated Depreciation",
@@ -39,55 +40,16 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
     "Depreciation Expense"
   ];
 
-  List productList = [
-    "None",
-    "Admin Fee",
-    "Annual Return/Confirmation Statement",
-    "Benefits",
-    "Company Restoration",
-    "Consultation On Liquidation",
-    "CVA",
-    "Business Event",
-    "FCA Fees"
-  ];
-
-  List classList = [
-    'None',
-    "Bruno Portfolio",
-    "Jonas Portfolio",
-    "Luiz Portfolio",
-    "Vitor Portfolio",
-    "Wilson Portfolio"
-  ];
-
-  List locationList = [
-    "None",
-    "France",
-    "Germany",
-    "International",
-    "Netherlands",
-    "Portugal",
-    "Saudi Arabia",
-    "Spain",
-    "United Kingdom"
-  ];
-
-  List customerList = [
-    "None",
-    "001 Client",
-    "002 Client",
-    "003 Client",
-    "004 Client",
-    "005 Client",
-    "006 Client",
-    "007 Client",
-    "008 Client",
-  ];
-
   @override
   void initState() {
-    if (widget.id != null && widget.id.isNotEmpty) {
-      bloc.getLineItemDetail(context, widget.id);
+    /*  if (widget.id.isNotEmpty) {
+      bloc.getSplitItemDetail(context, widget.id);
+    }*/
+    blocID = InvoiceDetailBloc(update: this);
+    if (widget.splitListItemData != null) {
+      splitItemDetail = widget.splitListItemData!;
+    } else {
+      splitItemDetail = SplitListData();
     }
     super.initState();
   }
@@ -118,149 +80,51 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "List Item 01",
+                    "Split Item",
                     style: TextStyle(
                         fontWeight: FontWeight.w700,
                         color: activeTxtColor,
                         fontSize: 24),
                   ),
-                  CommonButton(
+                  /*   CommonButton(
                       textFontSize: 16,
                       height: 30,
                       content: "Delete",
                       bgColor: backGroundColor,
                       textColor: activeTxtColor,
                       outlinedBorderColor: activeTxtColor,
-                      onPressed: () {})
+                      onPressed: () {})*/
                 ],
               ),
               const SizedBox(
                 height: 20,
               ),
-              Container(
-                  padding: const EdgeInsets.all(12),
-                  height: 112,
-                  width: MediaQuery.sizeOf(context).width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: const Color.fromRGBO(44, 45, 51, 1),
-                  ),
-                  child: TextField(
-                    maxLines: 5,
-                    style: TextStyle(color: textColor, fontSize: 16),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        border: InputBorder.none,
-                        hintText: "Description",
-                        hintStyle: TextStyle(color: textColor, fontSize: 16)),
-                  )),
-              const SizedBox(
-                height: 10,
-              ),
               ValueListenableBuilder(
                   valueListenable: selectedValueC,
                   builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Category",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: categoryList,
-                              title: "Category",
-                              bottomSheetType: "category");
-                        },
-                        context: context);
+                    return commonRowWidget(context,
+                        title: "Category", value: value, flag: 0);
                   }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueP,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Product/Service",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: productList,
-                              title: "Product/Service",
-                              bottomSheetType: "product");
-                        },
-                        context: context);
-                  }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueClass,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Class",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: classList,
-                              title: "Class",
-                              bottomSheetType: "class");
-                        },
-                        context: context);
-                  }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueL,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Location",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: locationList,
-                              title: "Location",
-                              bottomSheetType: "location");
-                        },
-                        context: context);
-                  }),
-              ValueListenableBuilder(
-                  valueListenable: selectedValueCustomer,
-                  builder: (context, value, _) {
-                    return commonRowWidget(
-                        title: "Customer",
-                        value: value,
-                        onTap: () {
-                          singleSelectBottomSheet(
-                              context: context,
-                              list: customerList,
-                              title: "Customer",
-                              bottomSheetType: "customer");
-                        },
-                        context: context);
-                  }),
-              commonRowWidget(
-                  title: "Quantity",
-                  value: "1.00",
-                  onTap: () {},
-                  context: context),
-              commonRowWidget(
-                  title: "Unit price (Excl.tax)",
-                  value: "0.00",
-                  onTap: () {},
-                  context: context),
-              commonRowWidget(
-                  title: "Unit price (Incl.tax)",
-                  value: "0.00",
-                  onTap: () {},
-                  context: context),
-              commonRowWidget(
-                  title: "Net", value: "0.00", onTap: () {}, context: context),
-              commonRowWidget(
-                  title: "Tax rate",
-                  value: "none",
-                  onTap: () {},
-                  context: context),
-              commonRowWidget(
-                  title: "Tax", value: "0.00", onTap: () {}, context: context),
-              commonRowWidget(
+              commonRowWidget(context,
                   title: "Total Amount",
-                  value: "0.0",
-                  onTap: () {},
-                  context: context),
+                  value: '${splitItemDetail?.totalAmount ?? 0.00}',
+                  flag: 1),
+              /*   commonRowWidget(
+                  title: "Tax", value: "0.00", onTap: () {}, context: context),*/
+              commonRowWidget(context,
+                  title: "Total Tax Amount",
+                  value: '${splitItemDetail?.totalAmount ?? 0.00}',
+                  flag: 2),
+              const SizedBox(
+                height: 20,
+              ),
+              CommonButton(
+                  textFontSize: 16,
+                  content: "Save",
+                  bgColor: buttonBgColor,
+                  textColor: buttonTextColor,
+                  outlinedBorderColor: buttonBgColor,
+                  onPressed: () {})
             ],
           ),
         ),
@@ -305,7 +169,7 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
                           ))
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   TextField(
@@ -357,24 +221,8 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
                                 if (bottomSheetType == "category") {
                                   categoryValue = selectedValue;
                                 }
-                                if (bottomSheetType == "product") {
-                                  productValue = selectedValue;
-                                }
-                                if (bottomSheetType == "class") {
-                                  classValue = selectedValue;
-                                }
-                                if (bottomSheetType == "location") {
-                                  locationValue = selectedValue;
-                                }
-                                if (bottomSheetType == "customer") {
-                                  customerValue = selectedValue;
-                                }
                               });
                               selectedValueC.value = categoryValue;
-                              selectedValueP.value = productValue;
-                              selectedValueClass.value = classValue;
-                              selectedValueL.value = locationValue;
-                              selectedValueCustomer.value = customerValue;
                             },
                           );
                         }),
@@ -385,44 +233,187 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
           });
         });
   }
-}
 
-Widget commonRowWidget(
-    {required title, required value, required onTap, required context}) {
-  return InkWell(
-    onTap: onTap,
-    child: Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: listTileBgColor,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                  color: textColor, fontSize: 16, fontWeight: FontWeight.bold),
+  Widget commonRowWidget(BuildContext context,
+      {required title, required value, required int flag, isAdd = false}) {
+    return InkWell(
+      onTap: () {
+        if (flag == 0) {
+          /*  singleSelectBottomSheet(
+              context: context,
+              list: categoryList,
+              title: "Category",
+              bottomSheetType: "category");*/
+          _showPicker(context, flag, title, isAdd: isAdd);
+        }
+        if (flag == 1 || flag == 2) {
+          //total, tax, taxtotal edit option
+          String title = flag == 9
+              ? 'Edit Total Amount'
+              : flag == 10
+                  ? 'Edit Tax Amount'
+                  : 'Edit Tax Total';
+          String label = flag == 9
+              ? 'Edit Total Amount'
+              : flag == 10
+                  ? 'Edit Tax Amount'
+                  : 'Edit Tax Total';
+          String hint = label;
+
+          return;
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: listTileBgColor,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                    color: textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(color: textColor, fontSize: 17),
-              textAlign: TextAlign.end,
+            Expanded(
+              child: Text(
+                value,
+                style: TextStyle(color: textColor, fontSize: 17),
+                textAlign: TextAlign.end,
+              ),
             ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Icon(
-            Icons.arrow_forward_ios,
-            color: textColor,
-          )
-        ],
+            const SizedBox(
+              width: 10,
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: textColor,
+            )
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
+
+  Future<void> _showPicker(BuildContext context, int flag, String title,
+      {isAdd = false}) async {
+    var _list = await blocID.getCheckBoxList(flag);
+    debugPrint('CheckBoxList:--->$_list');
+    showModalBottomSheet(
+        backgroundColor: textFieldBgColor,
+        isDismissible: false,
+        isScrollControlled: true,
+        context: context,
+        builder: (BuildContext bc) {
+          return Padding(
+            padding: EdgeInsets.fromLTRB(
+                16, 16, 16, MediaQuery.of(context).viewInsets.bottom),
+            child: Wrap(
+              children: <Widget>[
+                ListTile(
+                  trailing: isAdd
+                      ? Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            OutlinedButton.icon(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                /*_showAddProductDialog("Add Product/Service",
+                                    'Enter product name', 'Product Name');*/
+                              },
+                              label: const Text(
+                                "Add",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              icon: const Icon(
+                                Icons.add,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 16,
+                            ),
+                            getCloseButton()
+                          ],
+                        )
+                      : getCloseButton(),
+                  title: Text(
+                    title,
+                    style: TextStyle(color: textColor, fontSize: 18),
+                  ),
+                ),
+                const SizedBox(
+                  height: 24,
+                ),
+                flag == 0
+                    ? CheckBoxList(
+                        selectedCategoryIndex: blocID.selectedCategoryIndex,
+                        items: _list,
+                        f: (index, l) {
+                          debugPrint('--->f() called');
+                          blocID.selectedCategoryIndex = index;
+                          blocID.selectedData = l;
+                          debugPrint(
+                              '--->Result: ${blocID.selectedData.toString()}');
+                        },
+                      )
+                    : RadioButtonList(
+                        items: _list,
+                        f: (selected) {
+                          CheckBoxItem item = selected;
+                          if (flag == 1) {
+                            for (var value in blocID.pList) {
+                              if (value.id == item.itemId) {
+                                blocID.selectedPData = value;
+                                debugPrint(
+                                    '--->Result: ${blocID.selectedPData.toString()}');
+                                break;
+                              }
+                            }
+                          }
+                        },
+                      ),
+              ],
+            ),
+          );
+        });
+  }
+
+  getTextFormatter(bool isAmt) {
+    List<TextInputFormatter> formatters = [];
+    if (isAmt) {
+      formatters.add(
+        FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
+      );
+      formatters.add(DecimalTextInputFormatter(decimalRange: 2));
+    } else {
+      formatters.add(FilteringTextInputFormatter.singleLineFormatter);
+    }
+    return formatters;
+  }
+
+  getCloseButton() {
+    return InkWell(
+      onTap: () {
+        Navigator.pop(context);
+        setState(() {});
+      },
+      child: const Icon(
+        Icons.clear,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  @override
+  updateWidget() {
+    setState(() {});
+  }
 }

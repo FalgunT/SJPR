@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sjpr/di/app_component_base.dart';
 import 'package:sjpr/di/shared_preferences.dart';
+import 'package:sjpr/model/api_response_location.dart';
+import 'package:sjpr/model/api_response_taxrate.dart';
 import 'package:sjpr/model/category_list_model.dart';
 import 'package:sjpr/model/currency_model.dart';
 import 'package:sjpr/model/invoice_detail_model.dart';
@@ -23,6 +25,8 @@ import 'package:sjpr/services/api_client.dart';
 import 'package:http/http.dart' as http;
 
 import '../di/app_shared_preferences.dart';
+import '../model/api_response_class.dart';
+import '../model/api_response_costomer.dart';
 import '../screen/invoice/custom_camera.dart';
 
 class ApiServices extends ApiClient {
@@ -239,11 +243,12 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future<LineItemDetail?> getLineItemDetail(String lineItemId) async {
-    var response = await gets("${ApiClient.getLineItemDetail}/$lineItemId",
+  Future<LineItemDetailApiResponse?> getLineItemDetail(
+      String lineItemId) async {
+    var response = await gets("${ApiClient.getLineItemDetail}$lineItemId",
         headers: getLogoutHeader(), isBackground: true);
     if (response != null) {
-      var data = LineItemDetail.fromJson(json.decode(response));
+      var data = LineItemDetailApiResponse.fromJson(json.decode(response));
       return data;
     }
     return null;
@@ -275,27 +280,11 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future<OwnedByList?> updateLineItemDetail(
-      String invoiceId,
-      String desc,
-      String quantity,
-      String unitPrice,
-      String totalAmount,
-      String name,
-      String taxRate) async {
-    Map<String, String> body = {
-      'scanned_invoice_id': invoiceId,
-      'description': desc,
-      'quantity': quantity,
-      'unit_price': unitPrice,
-      'total_amount': totalAmount,
-      'name': name,
-      'tax_rate': taxRate,
-    };
+  Future<CommonModelClass?> updateLineItemDetail(Map<String, String> body) async {
     var response = await posts(ApiClient.updateLineItemDetail,
         headers: getLogoutHeader(), body: body, isBackground: true);
     if (response != null) {
-      var data = OwnedByList.fromJson(json.decode(response));
+      var data = CommonModelClass.fromJson(json.decode(response));
       return data;
     }
     return null;
@@ -303,7 +292,7 @@ class ApiServices extends ApiClient {
 
   Future<CommonModelClass?> deleteLineItemDetail(String invoiceId) async {
     Map<String, String> body = {
-      'scanned_invoice_id': invoiceId,
+      'id': invoiceId,
     };
     var response = await posts(ApiClient.deleteLineItemDetail,
         headers: getLogoutHeader(), body: body, isBackground: true);
@@ -366,6 +355,85 @@ class ApiServices extends ApiClient {
     if (response != null) {
       //debugPrint('response succeed');
       var data = CommonModelClass.fromJson(jsonDecode(response));
+      return data;
+    }
+    return null;
+  }
+
+  Future<CustomerApiResponse?> getAllCustomer() async {
+    var response = await gets(ApiClient.getAllCustomers,
+        headers: getLogoutHeader(), isBackground: true);
+    if (response != null) {
+      Map res = json.decode(response);
+      return CustomerApiResponse.fromJson(res);
+    }
+    return null;
+  }
+
+  Future<ApiResponseClassModel?> getAllClass() async {
+    var response = await gets(ApiClient.getAllClass,
+        headers: getLogoutHeader(), isBackground: true);
+    if (response != null) {
+      Map res = json.decode(response);
+      return ApiResponseClassModel.fromJson(res);
+    }
+    return null;
+  }
+
+  Future<ApiResponseLocationModel?> getAllLocation() async {
+    var response = await gets(ApiClient.getAllLocation,
+        headers: getLogoutHeader(), isBackground: true);
+    if (response != null) {
+      Map res = json.decode(response);
+      return ApiResponseLocationModel.fromJson(res);
+    }
+    return null;
+  }
+
+  Future<ApiResponseTaxRate?> getAllTaxRate() async {
+    var response = await gets(ApiClient.getAllTaxRate,
+        headers: getLogoutHeader(), isBackground: true);
+    if (response != null) {
+      Map res = json.decode(response);
+      return ApiResponseTaxRate.fromJson(res);
+    }
+    return null;
+  }
+
+  Future<CommonModelClass?> addCustomer(String cName) async {
+    Map<String, String> body = {
+      'customer_name': cName,
+    };
+    var response = await posts(ApiClient.postAddCustomer,
+        headers: getLogoutHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+
+  Future<CommonModelClass?> addClass(String cName) async {
+    Map<String, String> body = {
+      'class_name': cName,
+    };
+    var response = await posts(ApiClient.postAddClass,
+        headers: getLogoutHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+
+  Future<CommonModelClass?> addLocation(String cName) async {
+    Map<String, String> body = {
+      'location_name': cName,
+    };
+    var response = await posts(ApiClient.postAddLocation,
+        headers: getLogoutHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
       return data;
     }
     return null;

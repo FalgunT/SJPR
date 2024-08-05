@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sjpr/model/lineitem_list_model.dart';
+import 'package:sjpr/model/split_list_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
+import 'package:sjpr/screen/splititems/split_items_bloc.dart';
 import 'package:sjpr/screen/splititems/split_items_detail.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/image_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
+import 'package:sjpr/widgets/common_button.dart';
 
 class SplitItemsListScreen extends StatefulWidget {
   final String id;
@@ -16,12 +18,12 @@ class SplitItemsListScreen extends StatefulWidget {
 
 class _SplitItemsListScreenState extends State<SplitItemsListScreen>
     implements Updater {
-  late InvoiceDetailBloc bloc;
+  late SplitItemsBloc bloc;
 
   @override
   void initState() {
-    bloc = InvoiceDetailBloc(update: this);
-    bloc.getLineItemList(context, widget.id);
+    bloc = SplitItemsBloc();
+    bloc.getSplitItemList(context, "142"); //widget.id);
     super.initState();
   }
 
@@ -50,7 +52,7 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Line Items",
+                  "Split Items",
                   style: TextStyle(
                       fontWeight: FontWeight.w700,
                       color: activeTxtColor,
@@ -62,7 +64,7 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen>
                         context,
                         MaterialPageRoute(
                             builder: (context) => const SplitItemsDetailScreen(
-                                  id: "",
+                                  splitListItemData: null,
                                 )));
                   },
                   child: Container(
@@ -98,80 +100,97 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen>
               height: 20,
             ),
             Expanded(
-              child: StreamBuilder<List<LineItemListData>?>(
-                  stream: bloc.lineItemListStream,
+              child: StreamBuilder<List<SplitListData>?>(
+                  stream: bloc.splitItemListStream,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Container();
                     }
                     if (snapshot.data != null && snapshot.data!.isNotEmpty) {
-                      var lineItemList = snapshot.data;
-                      return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: 3,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: listTileBgColor,
-                              ),
+                      var splitItemList = snapshot.data;
+                      return ListView(
+                        children: ListTile.divideTiles(
+                          context: context,
+                          tiles: List.generate(splitItemList?.length ?? 0,
+                              (index) {
+                            return SlideMenu(
+                              menuItems: <Widget>[
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                SplitItemsDetailScreen(
+                                                  splitListItemData:
+                                                      splitItemList?[index],
+                                                )));
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () {},
+                                ),
+                              ],
                               child: ListTile(
-                                onTap: () {
-                                  Navigator.push(
+                                /*  onTap: () {
+                                    Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               SplitItemsDetailScreen(
-                                                id: lineItemList![index].id ??
-                                                    "",
+                                                splitListItemData:
+                                                    splitItemList?[index],
                                               )));
-                                },
+                                },*/
                                 dense: true,
                                 contentPadding:
                                     const EdgeInsets.only(left: 10, right: 10),
                                 title: Text(
-                                  "List item $index",
+                                  (splitItemList?[index].categoryId != null &&
+                                          splitItemList![index]
+                                              .categoryId!
+                                              .isNotEmpty)
+                                      ? splitItemList[index].categoryId!
+                                      : "Line Item $index",
                                   style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
                                       color: textColor),
                                 ),
-                                subtitle: Text(
-                                  lineItemList?[index].description ??
-                                      "Category name",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: textColor),
+                                subtitle: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Total Amount : ${splitItemList?[index].totalAmount ?? ""}',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: textColor),
+                                    ),
+                                    Text(
+                                      'Total Tax Amount : ${splitItemList?[index].taxAmount ?? ""}',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: textColor),
+                                    ),
+                                  ],
                                 ),
-                                trailing: SizedBox(
-                                  width: 100,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      Text(
-                                        lineItemList?[index]
-                                                .taxRate
-                                                .toString() ??
-                                            "\u{20AC} 6.11",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: textColor),
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        color: textColor,
-                                      )
-                                    ],
+                                /*    trailing: SizedBox(
+                                  //width: 100,
+                                  child: Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: textColor,
                                   ),
-                                ),
+                                ),*/
                               ),
                             );
-                          });
+                          }),
+                        ).toList(),
+                      );
                     }
                     return Center(
                       child: Column(
@@ -193,122 +212,16 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen>
                     );
                   }),
             ),
-            const Divider(
-              thickness: 4,
-              color: Color.fromRGBO(44, 45, 51, 1),
-            ),
             const SizedBox(
               height: 20,
             ),
-            GestureDetector(
-              onTap: () {
-                summeryBottomSheet(context: context);
-              },
-              child: Text(
-                "Summary",
-                style: TextStyle(
-                    color: activeTxtColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: const Color.fromRGBO(44, 45, 51, 1),
-                        borderRadius: BorderRadius.circular(8)),
-                    height: 98,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Line items",
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: textColor),
-                        ),
-                        Text(
-                          "\u{20AC}1232.00",
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: textColor),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: const Color.fromRGBO(44, 45, 51, 1),
-                        borderRadius: BorderRadius.circular(8)),
-                    height: 98,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Out by",
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: textColor),
-                        ),
-                        const Text(
-                          "\u{20AC}1202.00",
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.red),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: const Color.fromRGBO(44, 45, 51, 1),
-                        borderRadius: BorderRadius.circular(8)),
-                    height: 98,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Items total",
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: textColor),
-                        ),
-                        const Text(
-                          "\u{20AC}1232.00",
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.green),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            )
+            CommonButton(
+                textFontSize: 16,
+                content: "Save",
+                bgColor: buttonBgColor,
+                textColor: buttonTextColor,
+                outlinedBorderColor: buttonBgColor,
+                onPressed: () {})
           ],
         ),
       ),
@@ -318,6 +231,99 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen>
   @override
   updateWidget() {
     setState(() {});
+  }
+}
+
+class SlideMenu extends StatefulWidget {
+  final Widget child;
+  final List<Widget> menuItems;
+
+  const SlideMenu({super.key, required this.child, required this.menuItems});
+
+  @override
+  _SlideMenuState createState() => _SlideMenuState();
+}
+
+class _SlideMenuState extends State<SlideMenu>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  initState() {
+    super.initState();
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200));
+  }
+
+  @override
+  dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final animation =
+        Tween(begin: const Offset(0.0, 0.0), end: const Offset(-0.35, 0.0))
+            .animate(CurveTween(curve: Curves.decelerate).animate(_controller));
+
+    return GestureDetector(
+      onHorizontalDragUpdate: (data) {
+        // we can access context.size here
+        setState(() {
+          _controller.value -= (data.primaryDelta! / context.size!.width);
+        });
+      },
+      onHorizontalDragEnd: (data) {
+        if (data.primaryVelocity! > 2500) {
+          _controller
+              .animateTo(.0); //close menu on fast swipe in the right direction
+        } else if (_controller.value >= .5 || data.primaryVelocity! < -2500) //
+        {
+          // fully open if dragged a lot to left or on fast swipe to left
+          _controller.animateTo(1.0);
+        } else // close if none of above
+        {
+          _controller.animateTo(.0);
+        }
+      },
+      child: Stack(
+        children: <Widget>[
+          SlideTransition(position: animation, child: widget.child),
+          Positioned.fill(
+            child: LayoutBuilder(
+              builder: (context, constraint) {
+                return AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return Stack(
+                      children: <Widget>[
+                        Positioned(
+                          right: .0,
+                          top: .0,
+                          bottom: .0,
+                          width: constraint.maxWidth * animation.value.dx * -1,
+                          child: Container(
+                            color: activeTxtColor,
+                            child: Row(
+                              children: widget.menuItems.map((child) {
+                                return Expanded(
+                                  child: child,
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
 
@@ -337,303 +343,4 @@ Widget commonRowWidget(
       ),
     ),
   );
-}
-
-summeryBottomSheet({
-  required context,
-}) {
-  return showModalBottomSheet(
-      backgroundColor: backGroundColor,
-      context: context,
-      builder: (context) {
-        return SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            //  height: MediaQuery.of(context).size.height*0.8,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Summary",
-                      style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20),
-                    ),
-                    IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(
-                          Icons.close,
-                          color: textColor,
-                        ))
-                  ],
-                ),
-                Text(
-                  "Line items",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                      color: textColor),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  width: MediaQuery.sizeOf(context).width,
-                  decoration: BoxDecoration(
-                      color: const Color.fromRGBO(44, 45, 51, 1),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Net",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: textColor),
-                          ),
-                          Text(
-                            "\u{20AC}1,232.00",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: textColor),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Tax",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: textColor),
-                          ),
-                          Text(
-                            "\u{20AC} 0.00",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: textColor),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Total",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: textColor),
-                          ),
-                          Text(
-                            "\u{20AC}1,232.00",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: textColor),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  "Out by",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                      color: textColor),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  width: MediaQuery.sizeOf(context).width,
-                  decoration: BoxDecoration(
-                      color: const Color.fromRGBO(44, 45, 51, 1),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Column(
-                    children: [
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Net",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: Colors.red),
-                          ),
-                          Text(
-                            "\u{20AC}1,232.00",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: Colors.red),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Tax",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: textColor),
-                          ),
-                          Text(
-                            "\u{20AC} 0.00",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: textColor),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Total",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: Colors.red),
-                          ),
-                          Text(
-                            "\u{20AC}1,232.00",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: Colors.red),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  "Items total",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                      color: textColor),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  width: MediaQuery.sizeOf(context).width,
-                  decoration: BoxDecoration(
-                      color: const Color.fromRGBO(44, 45, 51, 1),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Column(
-                    children: [
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Net",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: Colors.red),
-                          ),
-                          Text(
-                            "\u{20AC}1,232.00",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: Colors.red),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Tax",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: textColor),
-                          ),
-                          Text(
-                            "\u{20AC} 0.00",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: textColor),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Total",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: Colors.green),
-                          ),
-                          Text(
-                            "\u{20AC}1,232.00",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: Colors.green),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      });
 }

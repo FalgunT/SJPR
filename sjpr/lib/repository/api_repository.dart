@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sjpr/model/api_response_class.dart';
+import 'package:sjpr/model/api_response_location.dart';
+import 'package:sjpr/model/api_response_taxrate.dart';
 import 'package:sjpr/model/category_list_model.dart';
 import 'package:sjpr/model/currency_model.dart';
 import 'package:sjpr/model/invoice_detail_model.dart';
@@ -17,6 +20,7 @@ import 'package:sjpr/model/type_list_model.dart';
 import 'package:sjpr/model/upload_invoice.dart';
 import 'package:sjpr/services/api_services.dart';
 
+import '../model/api_response_costomer.dart';
 import '../model/payment_methods.dart';
 import '../screen/invoice/custom_camera.dart';
 
@@ -86,7 +90,7 @@ class ApiRepositoryIml extends ApiRepository {
   }
 
   @override
-  Future<LineItemDetail?> getLineItemDetail(String lineItemId) {
+  Future<LineItemDetailApiResponse?> getLineItemDetail(String lineItemId) {
     return _apiServices.getLineItemDetail(lineItemId);
   }
 
@@ -104,16 +108,8 @@ class ApiRepositoryIml extends ApiRepository {
   }
 
   @override
-  Future<OwnedByList?> updateLineItemDetail(
-      String invoiceId,
-      String desc,
-      String quantity,
-      String unitPrice,
-      String totalAmount,
-      String name,
-      String taxRate) async {
-    return _apiServices.updateLineItemDetail(
-        invoiceId, desc, quantity, unitPrice, totalAmount, name, taxRate);
+  Future<CommonModelClass?> updateLineItemDetail(Map<String, String> json) async {
+    return _apiServices.updateLineItemDetail(json);
   }
 
   @override
@@ -124,7 +120,7 @@ class ApiRepositoryIml extends ApiRepository {
   }
 
   @override
-  Future<CommonModelClass?> addProduct({required String pName}){
+  Future<CommonModelClass?> addProduct({required String pName}) {
     return _apiServices.addProduct(pName);
   }
 
@@ -145,10 +141,44 @@ class ApiRepositoryIml extends ApiRepository {
 
   @override
   Future updateScannedInvoice(Map<String, dynamic> json) {
-   return _apiServices.updateScannedInvoice(json);
+    return _apiServices.updateScannedInvoice(json);
   }
 
+  @override
+  Future<Object?> AddCustomer({required String cName}) {
+    return _apiServices.addCustomer(cName);
+  }
 
+  @override
+  Future<CustomerApiResponse?> getAllCustomer() {
+    return _apiServices.getAllCustomer();
+  }
+
+  @override
+  Future<ApiResponseClassModel?> getAllClass() {
+    // TODO: implement getAllTaxRate
+    return _apiServices.getAllClass();
+  }
+
+  @override
+  Future<ApiResponseLocationModel?> getAllLocation() {
+    return _apiServices.getAllLocation();
+  }
+
+  @override
+  Future<ApiResponseTaxRate?> getAllTaxRate() {
+    return _apiServices.getAllTaxRate();
+  }
+
+  @override
+  Future<Object?> AddClass({required String cName}) {
+    return _apiServices.addClass(cName);
+  }
+
+  @override
+  Future<Object?> AddLocation({required String cName}) {
+    return _apiServices.addLocation(cName);
+  }
 }
 
 abstract class ApiRepository {
@@ -179,14 +209,15 @@ abstract class ApiRepository {
 
   Future<List<CurrencyModel>?> getCurrencyList();
 
-  Future<List<PaymentMethodsModel>?>  getpaymentmethod();
-  Future<List<PublishToModel>?>  getPublishTo();
+  Future<List<PaymentMethodsModel>?> getpaymentmethod();
+
+  Future<List<PublishToModel>?> getPublishTo();
 
   Future updateScannedInvoice(Map<String, dynamic> json);
 
   Future<LineItemList?> getLineItemList(String invoiceId);
 
-  Future<LineItemDetail?> getLineItemDetail(String lineItemId);
+  Future<LineItemDetailApiResponse?> getLineItemDetail(String lineItemId);
 
   Future<CommonModelClass?> insertLineItemDetail(
       String invoiceId,
@@ -197,16 +228,23 @@ abstract class ApiRepository {
       String name,
       String taxRate);
 
-  Future<OwnedByList?> updateLineItemDetail(
-      String invoiceId,
-      String desc,
-      String quantity,
-      String unitPrice,
-      String totalAmount,
-      String name,
-      String taxRate);
+  Future<CommonModelClass?> updateLineItemDetail(Map<String, String> json);
 
   Future<CommonModelClass?> deleteLineItemDetail(
     String invoiceId,
   );
+
+  Future<Object?> AddCustomer({required String cName});
+
+  Future<CustomerApiResponse?> getAllCustomer();
+
+  Future<ApiResponseLocationModel?> getAllLocation();
+
+  Future<ApiResponseClassModel?> getAllClass();
+
+  Future<ApiResponseTaxRate?> getAllTaxRate();
+
+  Future<Object?> AddClass({required String cName});
+  Future<Object?> AddLocation({required String cName});
+
 }

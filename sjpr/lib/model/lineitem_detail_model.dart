@@ -1,85 +1,114 @@
-class LineItemDetail {
-  bool? status;
-  String? message;
-  int? totalCount;
-  List<LineItemDetailData>? data;
+class LineItemDetailApiResponse {
+  bool status;
+  String message;
+  int totalCount;
+  List<LineItem> data;
 
-  LineItemDetail({this.status, this.message, this.totalCount, this.data});
+  LineItemDetailApiResponse({
+    required this.status,
+    required this.message,
+    required this.totalCount,
+    required this.data,
+  });
 
-  LineItemDetail.fromJson(Map<String, dynamic> json) {
-    status = json['status'];
-    message = json['message'];
-    totalCount = json['total_count'];
-    if (json['data'] != null) {
-      data = <LineItemDetailData>[];
-      json['data'].forEach((v) {
-        data!.add(LineItemDetailData.fromJson(v));
-      });
-    }
+  factory LineItemDetailApiResponse.fromJson(Map<String, dynamic> json) {
+    return LineItemDetailApiResponse(
+      status: json['status'],
+      message: json['message'],
+      totalCount: json['total_count'],
+      data: List<LineItem>.from(
+          json['data'].map((item) => LineItem.fromJson(item))),
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['status'] = status;
-    data['message'] = message;
-    data['total_count'] = totalCount;
-    if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
-    }
-    return data;
+    return {
+      'status': status,
+      'message': message,
+      'total_count': totalCount,
+      'data': data.map((item) => item.toJson()).toList(),
+    };
   }
 }
 
-class LineItemDetailData {
-  String? id;
-  String? tblapiSaveScannedInvoiceId;
-  String? name;
-  String? description;
-  String? quantity;
-  String? unitPrice;
-  int? taxRate;
-  String? totalAmount;
-  String? datetime;
+class LineItem {
+   String id="-1";
+   String invoiceId="-1";
+   String name="Line Item";
+   String description="Desc";
+   String quantity="0.0";
+   String unitPrice="0.0";
+   String taxRate="0.0";
+   String totalAmount="0.0";
+   String categoryId="-1";
+   String productId="-1";
+   String customerId="-1";
+   String classId="-1";
+   String locationId="-1";
+   String taxRateId="-1";
+   String netAmount="0.0";
+   String datetime="";
 
-  LineItemDetailData(
-      {this.id,
-      this.tblapiSaveScannedInvoiceId,
-      this.name,
-      this.description,
-      this.quantity,
-      this.unitPrice,
-      this.taxRate,
-      this.totalAmount,
-      this.datetime});
+  LineItem({
+    required this.id,
+    required this.invoiceId,
+    required this.name,
+    required this.description,
+    required this.quantity,
+    required this.unitPrice,
+    required this.taxRate,
+    required this.totalAmount,
+    required this.categoryId,
+    required this.productId,
+    required this.customerId,
+    required this.classId,
+    required this.locationId,
+    required this.taxRateId,
+    required this.netAmount,
+    required this.datetime,
+  });
 
-  LineItemDetailData.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    tblapiSaveScannedInvoiceId = json['tblapi_save_scanned_invoice_id'];
-    name = json['name'];
-    description = json['description'];
-    quantity = json['quantity'];
-    unitPrice = json['unit_price'];
-    taxRate = json['tax_rate'];
-    totalAmount = json['total_amount'];
-    datetime = json['datetime'];
+  LineItem.empty();
+
+  factory LineItem.fromJson(Map<String, dynamic> json) {
+    return LineItem(
+      id: json['id'],
+      invoiceId: json['tblapi_save_scanned_invoice_id'],
+      name: json['name'],
+      description: json['description'],
+      quantity: json['quantity'],
+      unitPrice: json['unit_price'],
+      taxRate: json['tax_rate'],
+      totalAmount: json['total_amount'],
+      categoryId: json['scanned_line_item_category_id'],
+      productId: json['product_services_id'],
+      customerId: json['customers_id'],
+      classId: json['class_id'],
+      locationId: json['location_id'],
+      taxRateId: json['tax_rate_id'],
+      netAmount: json['net_amount'],
+      datetime: json['datetime'],
+    );
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['tblapi_save_scanned_invoice_id'] = tblapiSaveScannedInvoiceId;
-    data['name'] = name;
-    data['description'] = description;
-    data['quantity'] = quantity;
-    data['unit_price'] = unitPrice;
-    data['tax_rate'] = taxRate;
-    data['total_amount'] = totalAmount;
-    data['datetime'] = datetime;
-    return data;
-  }
-
-  @override
-  String toString() {
-    return 'LineItemDetailData{id: $id, tblapiSaveScannedInvoiceId: $tblapiSaveScannedInvoiceId, name: $name, description: $description, quantity: $quantity, unitPrice: $unitPrice, taxRate: $taxRate, totalAmount: $totalAmount, datetime: $datetime}';
+  Map<String, String> toJson() {
+    return {
+      'id': id,
+      'tblapi_save_scanned_invoice_id': invoiceId,
+      'name': name,
+      'description': description,
+      'quantity': quantity,
+      'unit_price': unitPrice,
+      'tax_rate': taxRate,
+      'total_amount': totalAmount,
+      'scanned_line_item_category_id': categoryId,
+      'product_services_id': productId,
+      'customers_id': customerId,
+      'class_id': classId,
+      'location_id': locationId,
+      'tax_rate_id': taxRateId,
+      'net_amount': netAmount,
+      'datetime': datetime,
+    };
   }
 }

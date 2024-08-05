@@ -45,12 +45,24 @@ class ApiClient {
   static String getCurrencyList = "$baseUrl/getcurrencylist";
   static String getPaymentMethods = "$baseUrl/getpaymentmethod";
   static String getPublishTo = "$baseUrl/getpublishto";
+
+  static String postAddCustomer = "$baseUrl/addcustomers";
+  static String postAddClass = "$baseUrl/addclass";
+  static String postAddLocation = "$baseUrl/addlocation";
+
+
+  static String getAllCustomers = "$baseUrl/getallcustomers";
+  static String getAllClass = "$baseUrl/getallclass";
+  static String getAllLocation = "$baseUrl/getalllocation";
+  static String getAllTaxRate = "$baseUrl/getalltaxrate";
+
   static String updateScannedInvoice = "$baseUrl/scanned/invoice/update";
   static String getLineItemList = "$baseUrl/invoice/line/item/list/";
   static String getLineItemDetail = "$baseUrl/invoice/line/item/details/";
   static String insertLineItemDetail = "$baseUrl/invoice/line/item/insert";
   static String updateLineItemDetail = "$baseUrl/invoice/line/item/update";
   static String deleteLineItemDetail = "$baseUrl/invoice/line/item/delete";
+
   static final RegExp nameRegExp = RegExp('[a-zA-Z]');
 
   Map<String, String> getJsonHeader() {
@@ -217,14 +229,14 @@ class ApiClient {
 
   postJson(String url,
       {Map<String, String>? headers,
-        dynamic body,
-        Encoding? encoding,
-        bool isProgressBar = true,
-        bool isBackground = false}) async {
+      dynamic body,
+      Encoding? encoding,
+      bool isProgressBar = true,
+      bool isBackground = false}) async {
     headers ??= getJsonHeader();
     if (await AppComponentBase.getInstance()
-        ?.getNetworkManager()
-        .isConnected() ??
+            ?.getNetworkManager()
+            .isConnected() ??
         false) {
       if (isProgressBar) {
         AppComponentBase.getInstance()?.showProgressDialog(true);
@@ -258,7 +270,7 @@ class ApiClient {
         }
         AppComponentBase.getInstance()?.disableWidget(false);
         var e =
-        exception is String ? exception : StringUtils.someThingWentWrong;
+            exception is String ? exception : StringUtils.someThingWentWrong;
         if (!isBackground) {
           CommonToast.getInstance()?.displayToast(message: e);
         }

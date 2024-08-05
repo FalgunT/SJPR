@@ -42,7 +42,7 @@ class LoginBloc extends BlocBase {
   void initData() {
     // TODO: implement initData
     super.initData();
-    emailController.text = 'prashantbharti@virtualemployee.com';
+    emailController.text = 'falguntanwar@virtualemployee.com';
     passwordController.text = '123456789@';
   }
 
