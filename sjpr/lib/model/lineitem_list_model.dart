@@ -37,7 +37,7 @@ class LineItemListData {
   String? description;
   String? quantity;
   String? unitPrice;
-  dynamic? taxRate;
+  dynamic taxRate;
   String? totalAmount;
   String? datetime;
 

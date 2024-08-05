@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../model/category_list_model.dart';
@@ -10,7 +9,10 @@ class ExpandableRadioList extends StatefulWidget {
   Function f;
 
   ExpandableRadioList(
-      {super.key, required this.catList, required this.selectedId, required this.f});
+      {super.key,
+      required this.catList,
+      required this.selectedId,
+      required this.f});
 
   @override
   State<ExpandableRadioList> createState() => _ExpandableRadioListState();
@@ -67,7 +69,7 @@ class _ExpandableRadioListState extends State<ExpandableRadioList> {
                 widget.selectedId = val as int;
                 var selectedNm = item.sub_category_name!;
                 //var selectedNm = widget.catList[index].list![i].sub_category_id!;
-                widget.f(widget.selectedId,  selectedNm ?? "-");
+                widget.f(widget.selectedId, selectedNm ?? "-");
               });
             },
             controlAffinity: ListTileControlAffinity.leading,

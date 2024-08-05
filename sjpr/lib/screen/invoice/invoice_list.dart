@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -600,15 +599,17 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
         bloc.getInvoiceList(context);
       } else {
         //multiple or combined...
-        List<CaptureModel> models =[];
-        for(int i=0;i<invoices.length;i++){
+        List<CaptureModel> models = [];
+        for (int i = 0; i < invoices.length; i++) {
           var file = XFile(invoices[0].path!,
               name: invoices[0].name,
               bytes: invoices[0].bytes,
               length: invoices[0].size);
-          models.add(CaptureModel(capture: file, widget: Center(), isSelect: false));
+          models.add(
+              CaptureModel(capture: file, widget: Center(), isSelect: false));
         }
-        await bloc.uploadMultiInvoice(context, models, mode == 2 ? 'multiple' : "combine");
+        await bloc.uploadMultiInvoice(
+            context, models, mode == 2 ? 'multiple' : "combine");
       }
 
       /*final picker = ImagePicker();

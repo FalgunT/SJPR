@@ -32,22 +32,22 @@ class LineItemDetailApiResponse {
 }
 
 class LineItem {
-   String id="-1";
-   String invoiceId="-1";
-   String name="Line Item";
-   String description="Desc";
-   String quantity="0.0";
-   String unitPrice="0.0";
-   String taxRate="0.0";
-   String totalAmount="0.0";
-   String categoryId="-1";
-   String productId="-1";
-   String customerId="-1";
-   String classId="-1";
-   String locationId="-1";
-   String taxRateId="-1";
-   String netAmount="0.0";
-   String datetime="";
+  String id = "-1";
+  String invoiceId = "-1";
+  String name = "Line Item";
+  String description = "Desc";
+  String quantity = "0";
+  String unitPrice = "0.0";
+  String taxRate = "0.0";
+  String totalAmount = "0.0";
+  String categoryId = "-1";
+  String productId = "-1";
+  String customerId = "-1";
+  String classId = "-1";
+  String locationId = "-1";
+  String taxRateId = "-1";
+  String netAmount = "0.0";
+  String datetime = "";
 
   LineItem({
     required this.id,
@@ -78,7 +78,10 @@ class LineItem {
       description: json['description'],
       quantity: json['quantity'],
       unitPrice: json['unit_price'],
-      taxRate: json['tax_rate'],
+      taxRate:
+          (json['tax_rate'] != null && json['tax_rate']!.toString().isNotEmpty)
+              ? json['tax_rate']
+              : "0.0",
       totalAmount: json['total_amount'],
       categoryId: json['scanned_line_item_category_id'],
       productId: json['product_services_id'],

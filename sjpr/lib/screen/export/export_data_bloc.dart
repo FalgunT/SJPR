@@ -2,10 +2,8 @@ import 'dart:async';
 import 'package:sjpr/common/bloc_provider.dart';
 import 'package:sjpr/common/common_toast.dart';
 import 'package:sjpr/di/app_component_base.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sjpr/model/category_list_model.dart';
-import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/model/ownedby_list_model.dart';
 import 'package:sjpr/model/product_list_model.dart';
 import 'package:sjpr/model/type_list_model.dart';
@@ -38,11 +36,12 @@ class ExportDataBloc extends BlocBase {
         .getCategoryList();
     if (getCategoryListResponse != null) {
       if (getCategoryListResponse.message != null) {
-        CommonToast.getInstance()
-            ?.displayToast(message: getCategoryListResponse.message!,bContext: context);
+        CommonToast.getInstance()?.displayToast(
+            message: getCategoryListResponse.message!, bContext: context);
       }
       if (getCategoryListResponse.status == true) {
-        categoryListStreamController.sink.add(getCategoryListResponse.data!.categories);
+        categoryListStreamController.sink
+            .add(getCategoryListResponse.data!.categories);
       } else {}
     }
   }
@@ -54,8 +53,8 @@ class ExportDataBloc extends BlocBase {
         .getProductList();
     if (getProductListResponse != null) {
       if (getProductListResponse.message != null) {
-        CommonToast.getInstance()
-            ?.displayToast(message: getProductListResponse.message!,bContext: context);
+        CommonToast.getInstance()?.displayToast(
+            message: getProductListResponse.message!, bContext: context);
       }
       if (getProductListResponse.status == true) {
         productListStreamController.sink.add(getProductListResponse.data);
@@ -70,8 +69,8 @@ class ExportDataBloc extends BlocBase {
         .getTypeList();
     if (getTypeListResponse != null) {
       if (getTypeListResponse.message != null) {
-        CommonToast.getInstance()
-            ?.displayToast(message: getTypeListResponse.message!,bContext: context);
+        CommonToast.getInstance()?.displayToast(
+            message: getTypeListResponse.message!, bContext: context);
       }
       if (getTypeListResponse.status == true) {
         typeListStreamController.sink.add(getTypeListResponse.data);
@@ -86,8 +85,8 @@ class ExportDataBloc extends BlocBase {
         .getOwnedByList();
     if (getOwnedByListResponse != null) {
       if (getOwnedByListResponse.message != null) {
-        CommonToast.getInstance()
-            ?.displayToast(message: getOwnedByListResponse.message!,bContext: context);
+        CommonToast.getInstance()?.displayToast(
+            message: getOwnedByListResponse.message!, bContext: context);
       }
       if (getOwnedByListResponse.status == true) {
         ownedByListStreamController.sink.add(getOwnedByListResponse.data);

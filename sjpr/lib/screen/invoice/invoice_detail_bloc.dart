@@ -2,13 +2,10 @@ import 'dart:async';
 import 'package:sjpr/common/bloc_provider.dart';
 import 'package:sjpr/common/common_toast.dart';
 import 'package:sjpr/di/app_component_base.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sjpr/model/currency_model.dart';
 import 'package:sjpr/model/invoice_detail_model.dart';
-import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/model/lineitem_list_model.dart';
-import 'package:sjpr/model/ownedby_list_model.dart';
 import 'package:sjpr/model/payment_methods.dart';
 import 'package:sjpr/model/publish_to.dart';
 import 'package:sjpr/model/type_list_model.dart';
@@ -100,18 +97,16 @@ class InvoiceDetailBloc extends BlocBase {
         .getCategoryList();
     if (getCategoryListResponse != null) {
       cList = getCategoryListResponse.data!.categories;
-      cList.forEach(
-        (element) {
-          element.list?.forEach(
-            (o) {
-              if (o.sub_category_id == invoiceDetailData?.scanned_category_id) {
-                selectedData = o;
-                update.updateWidget();
-              }
-            },
-          );
-        },
-      );
+      for (var element in cList) {
+        element.list?.forEach(
+          (o) {
+            if (o.sub_category_id == invoiceDetailData?.scanned_category_id) {
+              selectedData = o;
+              update.updateWidget();
+            }
+          },
+        );
+      }
     }
   }
 
@@ -128,14 +123,12 @@ class InvoiceDetailBloc extends BlocBase {
       }*/
       tList = getCategoryListResponse.data!;
 
-      tList.forEach(
-        (element) {
-          if (element.id == invoiceDetailData?.scanned_type_id) {
-            selectedTData = element;
-            update.updateWidget();
-          }
-        },
-      );
+      for (var element in tList) {
+        if (element.id == invoiceDetailData?.scanned_type_id) {
+          selectedTData = element;
+          update.updateWidget();
+        }
+      }
     }
   }
 
@@ -162,14 +155,12 @@ class InvoiceDetailBloc extends BlocBase {
         .getProductList();
     if (getCategoryListResponse != null) {
       pList = getCategoryListResponse.data!;
-      pList.forEach(
-        (element) {
-          if (element.id == invoiceDetailData?.scanned_product_service_id) {
-            selectedPData = element;
-            update.updateWidget();
-          }
-        },
-      );
+      for (var element in pList) {
+        if (element.id == invoiceDetailData?.scanned_product_service_id) {
+          selectedPData = element;
+          update.updateWidget();
+        }
+      }
       if (isAdd) {
         selectedPData = pList.last;
         update.updateWidget();
@@ -195,14 +186,12 @@ class InvoiceDetailBloc extends BlocBase {
         .getCurrencyList();
     if (getCategoryListResponse != null) {
       curList = getCategoryListResponse;
-      curList.forEach(
-        (element) {
-          if (element.id == invoiceDetailData?.scanned_currency_id) {
-            selectedCurrency = element;
-            update.updateWidget();
-          }
-        },
-      );
+      for (var element in curList) {
+        if (element.id == invoiceDetailData?.scanned_currency_id) {
+          selectedCurrency = element;
+          update.updateWidget();
+        }
+      }
     }
   }
 
@@ -213,14 +202,12 @@ class InvoiceDetailBloc extends BlocBase {
         .getpaymentmethod();
     if (getCategoryListResponse != null) {
       pmList = getCategoryListResponse;
-      pmList.forEach(
-        (element) {
-          if (element.id == invoiceDetailData?.payment_method_id) {
-            selectedPM = element;
-            update.updateWidget();
-          }
-        },
-      );
+      for (var element in pmList) {
+        if (element.id == invoiceDetailData?.payment_method_id) {
+          selectedPM = element;
+          update.updateWidget();
+        }
+      }
     }
   }
 
@@ -231,14 +218,12 @@ class InvoiceDetailBloc extends BlocBase {
         .getPublishTo();
     if (getCategoryListResponse != null) {
       publishToList = getCategoryListResponse;
-      publishToList.forEach(
-        (element) {
-          if (element.id == invoiceDetailData?.payment_method_id) {
-            selectedPublishTo = element;
-            update.updateWidget();
-          }
-        },
-      );
+      for (var element in publishToList) {
+        if (element.id == invoiceDetailData?.payment_method_id) {
+          selectedPublishTo = element;
+          update.updateWidget();
+        }
+      }
     }
   }
 

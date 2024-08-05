@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart';
 import 'package:sjpr/widgets/common_button.dart';
 import 'package:sjpr/utils/color_utils.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class ReviewScreen extends StatefulWidget {
   const ReviewScreen({super.key});

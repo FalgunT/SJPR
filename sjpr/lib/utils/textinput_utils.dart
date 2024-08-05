@@ -16,7 +16,7 @@ class DecimalTextInputFormatter extends TextInputFormatter {
     }
 
     if (newText == '.') {
-      return TextEditingValue(
+      return const TextEditingValue(
         text: '0.',
         selection: TextSelection.collapsed(offset: 2),
       );

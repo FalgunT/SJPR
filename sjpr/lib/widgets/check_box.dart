@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sjpr/model/category_list_model.dart';
 import 'package:sjpr/utils/color_utils.dart';
-
-import '../model/category_list_model.dart';
 
 class CheckBoxList extends StatefulWidget {
   final List<CheckBoxItem> items;
@@ -68,7 +66,7 @@ class _CheckBoxState extends State<CheckBoxList> {
           onChanged: (val) {
             setState(() {
               selected = val;
-              debugPrint('${selected.toString()}');
+              debugPrint(selected.toString());
               SubCategoryData selectedData =
                   widget.items[index].myChildren[selected];
               selectedCategoryIndex = index;

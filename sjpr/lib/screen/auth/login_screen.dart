@@ -5,8 +5,6 @@ import 'package:sjpr/screen/auth/login_bloc.dart';
 import 'package:sjpr/widgets/common_button.dart';
 import 'package:sjpr/widgets/common_text_filed.dart';
 
-import '../dashboard/dashboard.dart';
-
 GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
 class LoginScreen extends StatefulWidget {

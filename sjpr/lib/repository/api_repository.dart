@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sjpr/model/api_response_class.dart';
 import 'package:sjpr/model/api_response_location.dart';
@@ -16,6 +13,7 @@ import 'package:sjpr/model/ownedby_list_model.dart';
 import 'package:sjpr/model/product_list_model.dart';
 import 'package:sjpr/model/profile_model.dart';
 import 'package:sjpr/model/publish_to.dart';
+import 'package:sjpr/model/split_list_model.dart';
 import 'package:sjpr/model/type_list_model.dart';
 import 'package:sjpr/model/upload_invoice.dart';
 import 'package:sjpr/services/api_services.dart';
@@ -108,7 +106,8 @@ class ApiRepositoryIml extends ApiRepository {
   }
 
   @override
-  Future<CommonModelClass?> updateLineItemDetail(Map<String, String> json) async {
+  Future<CommonModelClass?> updateLineItemDetail(
+      Map<String, String> json) async {
     return _apiServices.updateLineItemDetail(json);
   }
 
@@ -179,6 +178,22 @@ class ApiRepositoryIml extends ApiRepository {
   Future<Object?> AddLocation({required String cName}) {
     return _apiServices.addLocation(cName);
   }
+
+  @override
+  Future<SplitList?> getSplitItemList(String invoiceId) {
+    return _apiServices.getSplitItemList(invoiceId);
+  }
+
+  @override
+  Future<CommonModelClass?> insertSplitItemDetail(
+    String invoiceId,
+    String categoryId,
+    String totalAmount,
+    String totalTaxAmount,
+  ) async {
+    return _apiServices.insertSplitItemDetail(
+        invoiceId, categoryId, totalAmount, totalTaxAmount);
+  }
 }
 
 abstract class ApiRepository {
@@ -246,5 +261,8 @@ abstract class ApiRepository {
 
   Future<Object?> AddClass({required String cName});
   Future<Object?> AddLocation({required String cName});
+  Future<SplitList?> getSplitItemList(String invoiceId);
 
+  Future<CommonModelClass?> insertSplitItemDetail(String invoiceId,
+      String categoryId, String totalAmount, String totalTaxAmount);
 }

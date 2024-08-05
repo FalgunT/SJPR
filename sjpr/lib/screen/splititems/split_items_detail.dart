@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sjpr/common/common_toast.dart';
 import 'package:sjpr/model/split_list_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
 import 'package:sjpr/screen/splititems/split_items_bloc.dart';
@@ -303,8 +302,8 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
 
   Future<void> _showPicker(BuildContext context, int flag, String title,
       {isAdd = false}) async {
-    var _list = await blocID.getCheckBoxList(flag);
-    debugPrint('CheckBoxList:--->$_list');
+    var list = await blocID.getCheckBoxList(flag);
+    debugPrint('CheckBoxList:--->$list');
     showModalBottomSheet(
         backgroundColor: textFieldBgColor,
         isDismissible: false,
@@ -355,7 +354,7 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
                 flag == 0
                     ? CheckBoxList(
                         selectedCategoryIndex: blocID.selectedCategoryIndex,
-                        items: _list,
+                        items: list,
                         f: (index, l) {
                           debugPrint('--->f() called');
                           blocID.selectedCategoryIndex = index;
@@ -365,7 +364,7 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
                         },
                       )
                     : RadioButtonList(
-                        items: _list,
+                        items: list,
                         f: (selected) {
                           CheckBoxItem item = selected;
                           if (flag == 1) {

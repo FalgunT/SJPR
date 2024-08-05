@@ -1,12 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sjpr/model/api_response_class.dart';
 import 'package:sjpr/model/api_response_location.dart';
 import 'package:sjpr/model/product_list_model.dart';
 import 'package:sjpr/utils/color_utils.dart';
-
 import '../model/api_response_costomer.dart';
-import 'check_box.dart';
 
 class RadioButtonList1 extends StatefulWidget {
   final List items;
@@ -66,5 +63,4 @@ class _RadioButtonState extends State<RadioButtonList1> {
       return obj.productServicesName;
     }
   }
-
 }

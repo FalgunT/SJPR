@@ -10,6 +10,7 @@ import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/model/invoice_detail_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
 import 'package:sjpr/screen/lineitems/line_items_list.dart';
+import 'package:sjpr/screen/splititems/split_items_list.dart';
 import 'package:sjpr/widgets/check_box.dart';
 import 'package:sjpr/widgets/common_button.dart';
 import '../../common/common_toast.dart';
@@ -336,6 +337,127 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen>
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               LineItemsListScreen(
+                                                id: invoiceDetail.id ?? "",
+                                              )));
+                                },
+                                child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    width: MediaQuery.sizeOf(context).width,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: const Color.fromRGBO(
+                                            39, 40, 44, 2)),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                        "Consult line items",
+                                                        style: TextStyle(
+                                                            color: appTheme
+                                                                .textColor,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)),
+                                                  ),
+                                                  Text(
+                                                      '${invoiceDetail.line_item_count}',
+                                                      style: const TextStyle(
+                                                        color: Colors.green,
+                                                        fontSize: 16,
+                                                      ))
+                                                ],
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text("Total",
+                                                        style: TextStyle(
+                                                          color: appTheme
+                                                              .textColor,
+                                                          fontSize: 16,
+                                                        )),
+                                                  ),
+                                                  Text(
+                                                      "${bloc.selectedCurrency.currency_sign ?? ""} ${invoiceDetail.totalAmount}",
+                                                      style: TextStyle(
+                                                          color: appTheme
+                                                              .textColor,
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold))
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Icon(
+                                          Icons.arrow_forward_ios,
+                                          color: appTheme.textColor,
+                                        )
+                                      ],
+                                    )),
+                              ),
+                              /* const SizedBox(
+                                height: 20,
+                              ),
+                              CommonButton(
+                                  content: "Create line items",
+                                  bgColor: appTheme.backGroundColor,
+                                  textColor: appTheme.activeTxtColor,
+                                  outlinedBorderColor: appTheme.buttonBgColor,
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => LineItems(
+                                                  id: widget.id,
+                                                )));
+                                  }),*/
+                              const SizedBox(
+                                height: 20,
+                              )
+                            ],
+                          )
+                        : const Center(),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    invoiceDetail.line_item_count! > 0
+                        ? ExpansionTile(
+                            iconColor: appTheme.activeTxtColor,
+                            collapsedIconColor: appTheme.activeTxtColor,
+                            title: Text(
+                              "Split Items",
+                              style: TextStyle(
+                                  color: appTheme.activeTxtColor,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            children: [
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              SplitItemsListScreen(
                                                 id: invoiceDetail.id ?? "",
                                               )));
                                 },

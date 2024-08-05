@@ -2,19 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sjpr/model/api_response_costomer.dart';
-import 'package:sjpr/model/api_response_location.dart';
 import 'package:sjpr/model/category_list_model.dart';
-import 'package:sjpr/model/product_list_model.dart';
 import 'package:sjpr/screen/lineitems/line_items_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/widgets/common_button.dart';
 import 'package:sjpr/model/api_response_class.dart' as itemclass;
 
 import '../../common/common_toast.dart';
-import '../../model/api_response_class.dart';
 import '../../utils/textinput_utils.dart';
-import '../../widgets/check_box.dart';
 import '../../widgets/expandable_radio_list.dart';
 import '../../widgets/radio_button_list.dart';
 
@@ -197,8 +192,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                         }),
                     commonRowWidget(
                         title: "Quantity",
-                        value: bloc
-                            .getFormetted(bloc.lineitemdetail.value.quantity),
+                        value: bloc.lineitemdetail.value.quantity,
                         onTap: () {
                           _showAddProductDialog(
                               "Edit Quantity", 'Enter Quantity', 'Quantity',
@@ -558,7 +552,9 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                               ? const TextInputType.numberWithOptions(
                                   decimal: true, signed: false)
                               : TextInputType.text,
-                          inputFormatters: getTextFormatter(isAmt),
+                          inputFormatters: getTextFormatter(isAmt,
+                              isDouble:
+                                  label.contains("Quantity") ? false : true),
                           decoration: InputDecoration(
                             filled: false,
                             focusedBorder: OutlineInputBorder(
@@ -609,8 +605,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                                   if (label
                                       .toLowerCase()
                                       .contains('quantity')) {
-                                    String v = bloc
-                                        .getFormetted(bloc.eController.text);
+                                    String v = bloc.eController.text;
                                     bloc.lineitemdetail.value.quantity = v;
                                   } else if (label
                                       .toLowerCase()
@@ -675,13 +670,19 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
             ));
   }
 
-  getTextFormatter(bool isAmt) {
+  getTextFormatter(bool isAmt, {bool isDouble = true}) {
     List<TextInputFormatter> formatters = [];
     if (isAmt) {
-      formatters.add(
-        FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
-      );
-      formatters.add(DecimalTextInputFormatter(decimalRange: 2));
+      if (isDouble) {
+        formatters.add(
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
+        );
+        formatters.add(DecimalTextInputFormatter(decimalRange: 2));
+      } else {
+        formatters.add(
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9]")),
+        );
+      }
     } else {
       formatters.add(FilteringTextInputFormatter.singleLineFormatter);
     }

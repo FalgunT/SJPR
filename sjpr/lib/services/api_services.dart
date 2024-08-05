@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sjpr/di/app_component_base.dart';
-import 'package:sjpr/di/shared_preferences.dart';
 import 'package:sjpr/model/api_response_location.dart';
 import 'package:sjpr/model/api_response_taxrate.dart';
 import 'package:sjpr/model/category_list_model.dart';
@@ -18,6 +16,7 @@ import 'package:sjpr/model/payment_methods.dart';
 import 'package:sjpr/model/product_list_model.dart';
 import 'package:sjpr/model/profile_model.dart';
 import 'package:sjpr/model/publish_to.dart';
+import 'package:sjpr/model/split_list_model.dart';
 import 'package:sjpr/model/type_list_model.dart';
 import 'package:sjpr/model/upload_invoice.dart';
 import 'package:sjpr/services/api_client.dart';
@@ -280,7 +279,8 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future<CommonModelClass?> updateLineItemDetail(Map<String, String> body) async {
+  Future<CommonModelClass?> updateLineItemDetail(
+      Map<String, String> body) async {
     var response = await posts(ApiClient.updateLineItemDetail,
         headers: getLogoutHeader(), body: body, isBackground: true);
     if (response != null) {
@@ -432,6 +432,41 @@ class ApiServices extends ApiClient {
     };
     var response = await posts(ApiClient.postAddLocation,
         headers: getLogoutHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+
+  Future<SplitList?> getSplitItemList(String invoiceId) async {
+    /* Map<String, String> body = {
+      'location_name': cName,
+    };
+    var response = await posts(ApiClient.postAddLocation,
+        headers: getLogoutHeader(), body: body, isBackground: true);*/
+    var response = await gets("${ApiClient.getSplitItemList}$invoiceId",
+        headers: getLogoutHeader(), isBackground: true);
+    if (response != null) {
+      var data = SplitList.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+
+  Future<CommonModelClass?> insertSplitItemDetail(
+    String invoiceId,
+    String categoryId,
+    String totalAmount,
+    String totalTaxAmount,
+  ) async {
+    /* Map<String, String> body = {
+      'location_name': cName,
+    };
+    var response = await posts(ApiClient.postAddLocation,
+        headers: getLogoutHeader(), body: body, isBackground: true);*/
+    var response = await gets("${ApiClient.getSplitItemList}$invoiceId",
+        headers: getLogoutHeader(), isBackground: true);
     if (response != null) {
       var data = CommonModelClass.fromJson(json.decode(response));
       return data;

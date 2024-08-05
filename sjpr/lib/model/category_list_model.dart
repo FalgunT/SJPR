@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
-
 class CategoryList {
   bool? status;
   String? error;
@@ -92,10 +90,10 @@ class SubCategoryData {
      "sub_category_status": "1",
      "code": "4020"*/
 
-   String? sub_category_id ;
-   String? sub_category_name;
-   String? sub_category_status;
-   String? code;
+  String? sub_category_id;
+  String? sub_category_name;
+  String? sub_category_status;
+  String? code;
 
   SubCategoryData(
       {required this.sub_category_id,

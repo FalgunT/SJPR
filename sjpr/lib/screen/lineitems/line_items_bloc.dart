@@ -16,7 +16,8 @@ class LineItemsBloc extends BlocBase {
   TextEditingController eController = TextEditingController();
   int selectedValue = 0;
 
-  ValueNotifier<LineItem> lineitemdetail = ValueNotifier<LineItem>(LineItem.empty());
+  ValueNotifier<LineItem> lineitemdetail =
+      ValueNotifier<LineItem>(LineItem.empty());
 
   ValueNotifier<String> selectedValueC = ValueNotifier<String>("None");
   ValueNotifier<String> selectedValueP = ValueNotifier<String>("None");
@@ -44,10 +45,8 @@ class LineItemsBloc extends BlocBase {
         .getApiRepository()
         .getLineItemDetail(lineItemId);
     if (getLineItemListResponse != null) {
-      if (getLineItemListResponse.message != null) {
-        CommonToast.getInstance()?.displayToast(
-            bContext: context, message: getLineItemListResponse.message!);
-      }
+      CommonToast.getInstance()?.displayToast(
+          bContext: context, message: getLineItemListResponse.message!);
       if (getLineItemListResponse.status == true) {
         lineitemdetail.value = getLineItemListResponse.data.first;
         debugPrint(lineitemdetail.value.toString());
@@ -69,7 +68,7 @@ class LineItemsBloc extends BlocBase {
           element.list?.forEach(
             (o) {
               if (o.sub_category_id == lineitemdetail.value.categoryId) {
-                selectedValueC.value = o.sub_category_name?? 'None';
+                selectedValueC.value = o.sub_category_name ?? 'None';
               }
             },
           );
@@ -281,6 +280,9 @@ class LineItemsBloc extends BlocBase {
   }
 
   getFormetted(String input) {
+    if (input == null || input.isEmpty) {
+      input = "0";
+    }
     double number = double.parse(input);
     return NumberFormat('##0.00').format(number);
   }

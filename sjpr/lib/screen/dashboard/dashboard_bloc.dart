@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:sjpr/di/app_component_base.dart';
 import 'package:sjpr/model/profile_model.dart';
 
-import '../../main.dart';
-
 class DashboardBloc extends BlocBase {
   static DashboardBloc? _instance;
   StreamController mainStreamController = StreamController.broadcast();
@@ -38,7 +36,6 @@ class DashboardBloc extends BlocBase {
         }
       }
     }
-
   }
 
   Future logout(BuildContext context, bool mounted) async {

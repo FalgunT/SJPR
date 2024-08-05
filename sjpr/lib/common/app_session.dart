@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import '../di/app_shared_preferences.dart';
-import '../di/shared_preferences.dart';
-import '../main.dart';
+import 'package:sjpr/di/app_shared_preferences.dart';
+import 'package:sjpr/main.dart';
 
 class AppSession {
   static AppSession? _instance;
@@ -19,7 +17,10 @@ class AppSession {
       AppSharedPreference().clearDataOnLogout();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MyApp()),
+        MaterialPageRoute(
+            builder: (context) => MyApp(
+                  token: '',
+                )),
       );
     } catch (e) {
       print(e);

@@ -50,7 +50,6 @@ class ApiClient {
   static String postAddClass = "$baseUrl/addclass";
   static String postAddLocation = "$baseUrl/addlocation";
 
-
   static String getAllCustomers = "$baseUrl/getallcustomers";
   static String getAllClass = "$baseUrl/getallclass";
   static String getAllLocation = "$baseUrl/getalllocation";
@@ -62,6 +61,9 @@ class ApiClient {
   static String insertLineItemDetail = "$baseUrl/invoice/line/item/insert";
   static String updateLineItemDetail = "$baseUrl/invoice/line/item/update";
   static String deleteLineItemDetail = "$baseUrl/invoice/line/item/delete";
+
+  static String getSplitItemList = "$baseUrl/invoice/split/list/";
+  static String insertSplitItemDetail = "$baseUrl/invoice/split/insert";
 
   static final RegExp nameRegExp = RegExp('[a-zA-Z]');
 
@@ -251,7 +253,7 @@ class ApiClient {
             AppComponentBase.getInstance()?.showProgressDialog(false);
           }
           AppComponentBase.getInstance()?.disableWidget(false);
-          String bodyBytes = await response.body;
+          String bodyBytes = response.body;
           debugPrint('response body : $bodyBytes');
           return bodyBytes;
         }
