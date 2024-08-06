@@ -6,10 +6,9 @@ import '../common/app_theme.dart';
 class DeleteConfirmationDialog extends StatelessWidget {
   const DeleteConfirmationDialog({
     super.key,
-    required this.bloc,
+    required this.onPressed,
   });
-
-  final LineItemsBloc bloc;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -46,15 +45,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
                 backgroundColor: Colors.yellow, // Text color
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               ),
-              onPressed: () async {
-                bool res = await bloc.deleteLineItemDetail(
-                    bloc.lineitemdetail.value.id, context);
-                if (res) {
-                  Navigator.of(context).pop(); // Close the dialog
-                  Navigator.of(context).pop(); // Close the page
-                  // Add your delete logic here
-                }
-              },
+              onPressed: onPressed,
               child: Text(
                 'Continue to delete',
                 style: TextStyle(fontSize: 16),
