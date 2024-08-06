@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:sjpr/screen/lineitems/line_items_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
+import 'package:sjpr/widgets/common_button.dart';
 import '../common/app_theme.dart';
 
 class DeleteConfirmationDialog extends StatelessWidget {
   const DeleteConfirmationDialog({
     super.key,
+    required this.label,
     required this.onPressed,
   });
+  final String label;
   final VoidCallback onPressed;
 
   @override
@@ -22,42 +25,41 @@ class DeleteConfirmationDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.yellow, size: 50),
-            SizedBox(height: 16),
+            Icon(Icons.warning_amber_rounded, color: activeTxtColor, size: 50),
+            const SizedBox(height: 24),
             Text(
-              'Delete line',
+              label,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 12),
+            const Text(
               'Are you sure you want to delete this item?',
-              style: TextStyle(fontSize: 16, color: Colors.white),
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.w400,
+              ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black, // Background color
-                backgroundColor: Colors.yellow, // Text color
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              ),
-              onPressed: onPressed,
-              child: Text(
-                'Continue to delete',
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
+            const SizedBox(height: 24),
+            CommonButton(
+                textFontSize: 16,
+                content: "Continue to delete",
+                bgColor: buttonBgColor,
+                textColor: buttonTextColor,
+                outlinedBorderColor: buttonBgColor,
+                onPressed: onPressed),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(fontSize: 16, color: Colors.yellow),
+                style: TextStyle(fontSize: 16, color: activeTxtColor),
               ),
             ),
           ],
