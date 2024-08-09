@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sjpr/common/app_theme.dart';
+import 'package:sjpr/common/common_toast.dart';
 import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail.dart';
 import 'package:sjpr/screen/invoice/invoice_list_bloc.dart';
@@ -236,7 +237,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
   }
 
   Widget archiveListView(AsyncSnapshot<InvoiceList?> snapshot) {
-    if (!snapshot.hasData) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
       return Container();
     }
     if (snapshot.data != null &&
@@ -342,7 +343,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
   }
 
   Widget inboxListView(AsyncSnapshot<InvoiceList?> snapshot) {
-    if (!snapshot.hasData) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
       return Container();
     }
     if (snapshot.data != null &&
@@ -357,12 +358,18 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
             if (listData.isNotEmpty) {
               return InkWell(
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => InvoiceDetailScreen(
-                                id: listData[index].id!,
-                              )));
+                  if (listData[index].readStatus == "1") {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => InvoiceDetailScreen(
+                                  id: listData[index].id!,
+                                )));
+                  } else {
+                    CommonToast.getInstance()?.displayToast(
+                        message: 'You can only update "To Review" bills',
+                        bContext: context);
+                  }
                 },
                 child: Container(
                     margin: const EdgeInsets.only(bottom: 10),
@@ -372,6 +379,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                       color: listTileBgColor,
                     ),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           child: Column(
@@ -391,6 +399,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                           ),
                         ),
                         Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
@@ -403,15 +412,11 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                   color: Colors.white),
                             ),
                             Text(
-                              listData[index].readStatus == "1"
-                                  ? "To review"
-                                  : "Canceled",
+                              getStatusText(listData[index].readStatus ?? ""),
+                              textAlign: TextAlign.start,
                               style: TextStyle(
-                                  color: listData[index].readStatus == "1"
-                                      ? Colors.green
-                                      : listData[index].readStatus == "Canceled"
-                                          ? Colors.red
-                                          : Colors.amber),
+                                  color: getStatusColor(
+                                      listData[index].readStatus ?? "")),
                             ),
                           ],
                         ),
@@ -621,6 +626,44 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
       // Process the image file
       print('Image selected: ${imageFile.path}');
     }*/
+    }
+  }
+
+  String getStatusText(String? readStatus) {
+    switch (readStatus) {
+      case '0':
+        return 'Updating';
+      case '1':
+        return 'To review';
+      case '2':
+        return 'Pending';
+      case '3':
+        return 'Processing';
+      case '4':
+        return 'Canceled';
+      case '5':
+        return 'Published';
+      default:
+        return "";
+    }
+  }
+
+  Color getStatusColor(String? readStatus) {
+    switch (readStatus) {
+      case '0':
+        return Colors.white;
+      case '1':
+        return Colors.green;
+      case '2':
+        return Colors.red;
+      case '3':
+        return Colors.amber;
+      case '4':
+        return Colors.red;
+      case '5':
+        return Colors.green;
+      default:
+        return Colors.white;
     }
   }
 }
