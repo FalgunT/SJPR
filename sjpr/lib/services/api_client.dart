@@ -41,6 +41,8 @@ class ApiClient {
   static String getProductList = "$baseUrl/getproductservices";
   static String getTypeList = "$baseUrl/detailstype";
   static String getOwnedByList = "$baseUrl/getownedby";
+
+  static String cancelInvoice = '$baseUrl/move/to/archive';
   static String addProduct = "$baseUrl/addproductservices";
   static String getCurrencyList = "$baseUrl/getcurrencylist";
   static String getPaymentMethods = "$baseUrl/getpaymentmethod";

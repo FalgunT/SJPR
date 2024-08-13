@@ -2,28 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:pdf_render/pdf_render_widgets.dart';
 import 'package:sjpr/common/app_theme.dart';
-import 'package:sjpr/model/invoice_detail_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
 import 'package:sjpr/screen/lineitems/line_items_list.dart';
-import 'package:sjpr/screen/splititems/split_items_list.dart';
-import 'package:sjpr/widgets/check_box.dart';
 import 'package:sjpr/widgets/common_button.dart';
 import '../../common/AppEnums.dart';
-import '../../common/common_toast.dart';
 import '../../utils/color_utils.dart';
 import '../../utils/image_utils.dart';
 import '../../utils/string_utils.dart';
-import '../../utils/textinput_utils.dart';
 import '../../widgets/AddNewItemDialog.dart';
 import '../../widgets/CommonBottomSheetDialog.dart';
-import '../../widgets/radio_button.dart';
-import '../lineitems/line_items_detail.dart';
 
 class InvoiceDetailScreen extends StatefulWidget {
   final String id;
@@ -67,7 +57,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         backgroundColor: appTheme.backGroundColor,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context,false);
           },
           icon: Icon(
             Icons.arrow_back_ios,
@@ -112,9 +102,13 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                   fontWeight: FontWeight.bold),
                             ),
                             InkWell(
-                              onTap: () {
+                              onTap: () async {
                                 //set flag cancel ...
                                 //and update the invoice..
+                               bool res =  await bloc.CancelInvoice();
+                               if(res) {
+                                 Navigator.pop(context,res);
+                               }
                               },
                               child: Container(
                                 padding:
@@ -478,7 +472,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     bloc.invoiceDetailData.value.toJson(),
                                     context);
                                 if (res) {
-                                  Navigator.pop(context);
+                                  Navigator.pop(context,res);
                                 }
                               }
                             })

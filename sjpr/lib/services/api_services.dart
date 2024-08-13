@@ -178,6 +178,8 @@ class ApiServices extends ApiClient {
     return null;
   }
 
+
+
   Future<CategoryList?> getCategoryList() async {
     CategoryList? responseData;
     var response = await gets(ApiClient.getCategoryList,
@@ -213,6 +215,19 @@ class ApiServices extends ApiClient {
         headers: getLogoutHeader(), isBackground: true);
     if (response != null) {
       var data = OwnedByList.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+
+  Future<CommonModelClass?> CancelInvoice(String invid) async {
+    Map<String, String> body = {
+      'invoice_file_id': invid,
+    };
+    var response = await posts(ApiClient.cancelInvoice,
+        headers: getLogoutHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
       return data;
     }
     return null;

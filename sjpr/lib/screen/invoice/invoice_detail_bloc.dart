@@ -52,7 +52,7 @@ class InvoiceDetailBloc extends BlocBase {
       }
       if (getInvoiceDetailResponse.status == true) {
         invoiceDetailData.value = getInvoiceDetailResponse.data!;
-        getLineItemList(context,invoiceDetailData.value.id!);
+        getLineItemList(context, invoiceDetailData.value.id!);
       }
     }
   }
@@ -87,6 +87,17 @@ class InvoiceDetailBloc extends BlocBase {
       };
       Check_Cat_Prod(result);
     }
+  }
+
+  Future CancelInvoice() async {
+    var getResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .CancelInvoic(invoiceDetailData.value.invoiceFileId!);
+    if (getResponse != null) {
+      return getResponse.status;
+    }
+    return false;
   }
 
   Future getDetailCategory(BuildContext context, String invoiceId) async {
@@ -363,18 +374,23 @@ class InvoiceDetailBloc extends BlocBase {
   }
 
   bool isValid(BuildContext context) {
-    String catid = invoiceDetailData.value.scanned_category_id ?? "";
-    if (catid == "") {
-      CommonToast.getInstance()?.displayToast(
-          message: "Category field is required", bContext: context);
-      return false;
+    if (!hideCat.value) {
+      String catid = invoiceDetailData.value.scanned_category_id ?? "";
+      if (catid == "") {
+        CommonToast.getInstance()?.displayToast(
+            message: "Category field is required", bContext: context);
+        return false;
+      }
     }
-    String pid = invoiceDetailData.value.scanned_product_service_id ?? "";
-    if (pid == "") {
-      CommonToast.getInstance()?.displayToast(
-          message: "Product/Service field is required", bContext: context);
-      return false;
+    if (!hideProd.value) {
+      String pid = invoiceDetailData.value.scanned_product_service_id ?? "";
+      if (pid == "") {
+        CommonToast.getInstance()?.displayToast(
+            message: "Product/Service field is required", bContext: context);
+        return false;
+      }
     }
+
     String tid = invoiceDetailData.value.scanned_type_id ?? "";
     if (tid == "") {
       CommonToast.getInstance()

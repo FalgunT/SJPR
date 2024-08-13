@@ -93,7 +93,8 @@ class ApiRepositoryIml extends ApiRepository {
   }
 
   @override
-  Future<CommonModelClass?> insertLineItemDetail (Map<String, String> json) async {
+  Future<CommonModelClass?> insertLineItemDetail(
+      Map<String, String> json) async {
     return _apiServices.insertLineItemDetail(json);
   }
 
@@ -186,6 +187,11 @@ class ApiRepositoryIml extends ApiRepository {
     return _apiServices.insertSplitItemDetail(
         invoiceId, categoryId, totalAmount, totalTaxAmount);
   }
+
+  @override
+  Future<CommonModelClass?> CancelInvoic(String id) {
+    return _apiServices.CancelInvoice(id);
+  }
 }
 
 abstract class ApiRepository {
@@ -205,6 +211,8 @@ abstract class ApiRepository {
   Future<InvoiceList?> getInvoiceList();
 
   Future<InvoiceDetail?> getInvoiceDetail(String id);
+
+  Future<CommonModelClass?> CancelInvoic(String id);
 
   Future<CategoryList?> getCategoryList();
 
@@ -245,7 +253,9 @@ abstract class ApiRepository {
   Future<ApiResponseTaxRate?> getAllTaxRate();
 
   Future<Object?> AddClass({required String cName});
+
   Future<Object?> AddLocation({required String cName});
+
   Future<SplitList?> getSplitItemList(String invoiceId);
 
   Future<CommonModelClass?> insertSplitItemDetail(String invoiceId,

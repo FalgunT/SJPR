@@ -356,13 +356,17 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
             var listData = snapshot.data!.data!;
             if (listData.isNotEmpty) {
               return InkWell(
-                onTap: () {
-                  Navigator.push(
+                onTap: () async {
+                  await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => InvoiceDetailScreen(
                                 id: listData[index].id!,
-                              )));
+                              ))).then((onValue) {
+                    if (onValue) {
+                      bloc.getInvoiceList(context);
+                    }
+                  });
                 },
                 child: Container(
                     margin: const EdgeInsets.only(bottom: 10),
