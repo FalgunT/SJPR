@@ -358,38 +358,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 setState(() {});
                               });
                         }),
-                        /*Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: appTheme.listTileBgColor,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                                child: Text(
-                              "Paid",
-                              style: TextStyle(
-                                  color: appTheme.textColor,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold),
-                            )),
-                            CupertinoSwitch(
-                              value: true,
-                              onChanged: (value) {},
-                              activeColor: appTheme.activeTxtColor,
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              color: appTheme.textColor,
-                            )
-                          ],
-                        ),
-                      ),*/
+
                         ValueListenableBuilder(
                           valueListenable: bloc.selectedValuePM,
                           builder: (context, value, child) {
@@ -430,16 +399,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             });
                           },
                         ),
-                        spacer(),
-                        /*Container(
-                        height: 150,
-                        padding: const EdgeInsets.all(4),
-                       // width: MediaQuery.sizeOf(context).width,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: const Color.fromRGBO(39, 40, 44, 2)),
-                        child: ,
-                      ),*/
+
                         TextField(
                           minLines: 4,
                           keyboardType: TextInputType.multiline,

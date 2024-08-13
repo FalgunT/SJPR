@@ -3,7 +3,7 @@ import 'lineitem_detail_model.dart';
 class LineItemList {
   bool? status;
   String? message;
-  int? totalCount;
+  String? totalCount;
   List<LineItemListData>? data;
 
   LineItemList({this.status, this.message, this.totalCount, this.data});
