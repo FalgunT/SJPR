@@ -254,22 +254,7 @@ class ApiServices extends ApiClient {
   }
 
   Future<CommonModelClass?> insertLineItemDetail(
-      String invoiceId,
-      String desc,
-      String quantity,
-      String unitPrice,
-      String totalAmount,
-      String name,
-      String taxRate) async {
-    Map<String, String> body = {
-      'scanned_invoice_id': invoiceId,
-      'description': desc,
-      'quantity': quantity,
-      'unit_price': unitPrice,
-      'total_amount': totalAmount,
-      'name': name,
-      'tax_rate': taxRate,
-    };
+      Map<String, String> body) async {
     var response = await posts(ApiClient.insertLineItemDetail,
         headers: getLogoutHeader(), body: body, isBackground: true);
     if (response != null) {

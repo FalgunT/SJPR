@@ -93,16 +93,8 @@ class ApiRepositoryIml extends ApiRepository {
   }
 
   @override
-  Future<CommonModelClass?> insertLineItemDetail(
-      String invoiceId,
-      String desc,
-      String quantity,
-      String unitPrice,
-      String totalAmount,
-      String name,
-      String taxRate) async {
-    return _apiServices.insertLineItemDetail(
-        invoiceId, desc, quantity, unitPrice, totalAmount, name, taxRate);
+  Future<CommonModelClass?> insertLineItemDetail (Map<String, String> json) async {
+    return _apiServices.insertLineItemDetail(json);
   }
 
   @override
@@ -234,14 +226,7 @@ abstract class ApiRepository {
 
   Future<LineItemDetailApiResponse?> getLineItemDetail(String lineItemId);
 
-  Future<CommonModelClass?> insertLineItemDetail(
-      String invoiceId,
-      String desc,
-      String quantity,
-      String unitPrice,
-      String totalAmount,
-      String name,
-      String taxRate);
+  Future<CommonModelClass?> insertLineItemDetail(Map<String, String> json);
 
   Future<CommonModelClass?> updateLineItemDetail(Map<String, String> json);
 

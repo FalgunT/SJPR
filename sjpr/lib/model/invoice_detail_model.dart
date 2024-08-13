@@ -57,6 +57,8 @@ class InvoiceDetailData {
 
   String? date;
 
+  InvoiceDetailData.empty();
+
   InvoiceDetailData(
       {this.userId,
       this.scanInvoice,
@@ -116,6 +118,13 @@ class InvoiceDetailData {
     publish_to_id = json['publish_to_id'];
     scanned_currency_id = json['scanned_currency_id'];
     payment_method_id = json['payment_method_id'];
+  }
+
+  get isObjectEmpty {
+    if (this.invoiceId == null || this.id == null) {
+      return true;
+    }
+    return false;
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{

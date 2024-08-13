@@ -40,13 +40,15 @@ class LineItem {
   String unitPrice = "0.0";
   String taxRate = "0.0";
   String totalAmount = "0.0";
-  String categoryId = "-1";
-  String productId = "-1";
-  String customerId = "-1";
-  String classId = "-1";
-  String locationId = "-1";
-  String taxRateId = "-1";
   String netAmount = "0.0";
+  String categoryId = "";
+  String productId = "";
+  String customerId = "";
+  String classId = "";
+  String locationId = "";
+  String taxRateId = "";
+  String currencyId = "";
+
   String datetime = "";
 
   LineItem({
@@ -64,6 +66,7 @@ class LineItem {
     required this.classId,
     required this.locationId,
     required this.taxRateId,
+    required this.currencyId,
     required this.netAmount,
     required this.datetime,
   });
@@ -89,6 +92,7 @@ class LineItem {
       classId: json['class_id'],
       locationId: json['location_id'],
       taxRateId: json['tax_rate_id'],
+      currencyId: json['scanned_currency_id'],
       netAmount: json['net_amount'],
       datetime: json['datetime'],
     );
@@ -110,6 +114,7 @@ class LineItem {
       'class_id': classId,
       'location_id': locationId,
       'tax_rate_id': taxRateId,
+      'scanned_currency_id': currencyId,
       'net_amount': netAmount,
       'datetime': datetime,
     };

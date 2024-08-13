@@ -5,28 +5,28 @@ import 'package:flutter/widgets.dart';
 import 'package:sjpr/model/category_list_model.dart';
 import 'package:sjpr/screen/lineitems/line_items_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
+import 'package:sjpr/widgets/AddNewItemDialog.dart';
+import 'package:sjpr/widgets/CommonBottomSheetDialog.dart';
 import 'package:sjpr/widgets/common_button.dart';
 import 'package:sjpr/model/api_response_class.dart' as itemclass;
+import 'package:sjpr/widgets/delete_confirmation_dialog.dart';
 
+import '../../common/AppEnums.dart';
 import '../../common/common_toast.dart';
 import '../../utils/textinput_utils.dart';
 import '../../widgets/expandable_radio_list.dart';
 import '../../widgets/radio_button_list.dart';
 
-enum SheetType {
-  category,
-  product,
-  itemclass,
-  location,
-  customer,
-  taxrate,
-  none
-}
-
 class LineItemsDetailScreen extends StatefulWidget {
-  final String id;
+  final String invoice_id;
+  final String lineitem_id;
+  final String currencySign;
 
-  const LineItemsDetailScreen({super.key, required this.id});
+  const LineItemsDetailScreen(
+      {super.key,
+      required this.invoice_id,
+      required this.lineitem_id,
+      required this.currencySign});
 
   @override
   State<LineItemsDetailScreen> createState() => _LineItemsDetailScreenState();
@@ -34,6 +34,7 @@ class LineItemsDetailScreen extends StatefulWidget {
 
 class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
   LineItemsBloc bloc = LineItemsBloc();
+  final _focusNode = FocusNode();
 
   @override
   initState() {
@@ -98,6 +99,8 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                         color: const Color.fromRGBO(44, 45, 51, 1),
                       ),
                       child: TextField(
+                        focusNode: _focusNode,
+                        onEditingComplete: () => _focusNode.unfocus(),
                         controller: bloc.txtController,
                         maxLines: 5,
                         style: TextStyle(color: textColor, fontSize: 16),
@@ -117,12 +120,21 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                               title: "Category",
                               value: value,
                               onTap: () {
-                                bloc.selectedValue = 0;
-                                singleSelectBottomSheet(
+                                /*singleSelectBottomSheet(
                                     context: context,
                                     list: bloc.categoryList,
                                     title: "Category",
-                                    bottomSheetType: SheetType.category);
+                                    bottomSheetType: SheetType.category);*/
+                                CommonBottomSheetDialog(
+                                    context: context,
+                                    list: bloc.categoryList,
+                                    title: "Category",
+                                    ItemId: getCategoryId(),
+                                    bottomSheetType: SheetType.category,
+                                    Addf: () {},
+                                    onItemSelected: (id, name) {
+                                      SetName(id, name, SheetType.category);
+                                    }).Show();
                               },
                               context: context);
                         }),
@@ -133,12 +145,25 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                               title: "Product/Service",
                               value: value,
                               onTap: () {
-                                bloc.selectedValue = 0;
-                                singleSelectBottomSheet(
+                                //bloc.selectedValue = 0;
+                                /*  singleSelectBottomSheet(
                                     context: context,
                                     list: bloc.productList,
                                     title: "Product/Service",
-                                    bottomSheetType: SheetType.product);
+                                    bottomSheetType: SheetType.product);*/
+
+                                CommonBottomSheetDialog(
+                                    context: context,
+                                    list: bloc.productList,
+                                    title: "Product/Service",
+                                    ItemId: getId(SheetType.product),
+                                    bottomSheetType: SheetType.product,
+                                    Addf: (String v) {
+                                      bloc.addProductService(context, v);
+                                    },
+                                    onItemSelected: (id, name) {
+                                      SetName(id, name, SheetType.product);
+                                    }).Show();
                               },
                               context: context);
                         }),
@@ -149,12 +174,18 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                               title: "Class",
                               value: value,
                               onTap: () {
-                                bloc.selectedValue = 0;
-                                singleSelectBottomSheet(
+                                CommonBottomSheetDialog(
                                     context: context,
                                     list: bloc.classList,
                                     title: "Class",
-                                    bottomSheetType: SheetType.itemclass);
+                                    ItemId: getId(SheetType.itemclass),
+                                    bottomSheetType: SheetType.itemclass,
+                                    Addf: (String v) {
+                                      bloc.addClass(context, v);
+                                    },
+                                    onItemSelected: (id, name) {
+                                      SetName(id, name, SheetType.itemclass);
+                                    }).Show();
                               },
                               context: context);
                         }),
@@ -165,12 +196,18 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                               title: "Location",
                               value: value,
                               onTap: () {
-                                bloc.selectedValue = 0;
-                                singleSelectBottomSheet(
+                                CommonBottomSheetDialog(
                                     context: context,
                                     list: bloc.locationList,
                                     title: "Location",
-                                    bottomSheetType: SheetType.location);
+                                    ItemId: getId(SheetType.location),
+                                    bottomSheetType: SheetType.location,
+                                    Addf: (String v) {
+                                      bloc.addlocation(context, v);
+                                    },
+                                    onItemSelected: (id, name) {
+                                      SetName(id, name, SheetType.location);
+                                    }).Show();
                               },
                               context: context);
                         }),
@@ -181,12 +218,18 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                               title: "Customer",
                               value: value,
                               onTap: () {
-                                bloc.selectedValue = 0;
-                                singleSelectBottomSheet(
+                                CommonBottomSheetDialog(
                                     context: context,
                                     list: bloc.customerList,
                                     title: "Customer",
-                                    bottomSheetType: SheetType.customer);
+                                    ItemId: getId(SheetType.customer),
+                                    bottomSheetType: SheetType.customer,
+                                    Addf: (String v) {
+                                      bloc.addCustomer(context, v);
+                                    },
+                                    onItemSelected: (id, name) {
+                                      SetName(id, name, SheetType.customer);
+                                    }).Show();
                               },
                               context: context);
                         }),
@@ -194,55 +237,129 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                         title: "Quantity",
                         value: bloc.lineitemdetail.value.quantity,
                         onTap: () {
-                          _showAddProductDialog(
-                              "Edit Quantity", 'Enter Quantity', 'Quantity',
-                              isAmt: true, type: SheetType.none);
+                          AddNewItemDialog(
+                              isAmt: true,
+                              context: context,
+                              title: 'Edit Quantity',
+                              hint: 'Enter Quantity',
+                              label: 'Quantity',
+                              oldValue: bloc.lineitemdetail.value.quantity,
+                              type: SheetType.none,
+                              onPressed: (String v) {
+                                debugPrint('F() called--->, $v');
+                                bloc.lineitemdetail.value.quantity = v;
+                                setState(() {});
+                              });
                         },
                         context: context),
                     commonRowWidget(
-                        title: "Unit price ",
+                        isAmt: true,
+                        title: "Unit price",
                         value: bloc
                             .getFormetted(bloc.lineitemdetail.value.unitPrice),
                         onTap: () {
-                          _showAddProductDialog("Edit Unit price ",
-                              'Enter Unit price ', 'Unit price ',
-                              isAmt: true, type: SheetType.none);
+                          AddNewItemDialog(
+                              isAmt: true,
+                              context: context,
+                              title: "Edit Unit price",
+                              hint: 'Enter Unit price',
+                              label: 'Unit price${getCurrency()}',
+                              oldValue: bloc.getFormetted(
+                                  bloc.lineitemdetail.value.unitPrice),
+                              type: SheetType.none,
+                              onPressed: (String v) {
+                                debugPrint('F() called--->, $v');
+                                bloc.lineitemdetail.value.unitPrice = v;
+                                setState(() {});
+                              });
                         },
                         context: context),
                     commonRowWidget(
+                        isAmt: true,
                         title: "Net Amount",
                         value: bloc
                             .getFormetted(bloc.lineitemdetail.value.netAmount),
                         onTap: () {
-                          _showAddProductDialog("Edit Net Amount",
-                              'Enter Net Amount', 'Net Amount',
-                              isAmt: true, type: SheetType.none);
+                          AddNewItemDialog(
+                              isAmt: true,
+                              context: context,
+                              title: "Edit Net Amount",
+                              hint: 'Enter Net Amount',
+                              label: 'Net Amount${getCurrency()}',
+                              oldValue: bloc.getFormetted(
+                                  bloc.lineitemdetail.value.netAmount),
+                              type: SheetType.none,
+                              onPressed: (String v) {
+                                debugPrint('F() called--->, $v');
+                                bloc.lineitemdetail.value.netAmount = v;
+                                setState(() {});
+                              });
                         },
                         context: context),
-                    /*commonRowWidget(
-                        title: "Tax rate",
-                        value: bloc
-                            .getFormetted(bloc.lineitemdetail.value.taxRate),
-                        onTap: () {},
-                        context: context),*/
+                    ValueListenableBuilder(
+                        valueListenable: bloc.selectedValueTaxRate,
+                        builder: (context, value, _) {
+                          return commonRowWidget(
+                              title: "Tax rate",
+                              value: value,
+                              onTap: () {
+                                CommonBottomSheetDialog(
+                                    context: context,
+                                    list: bloc.taxRateList,
+                                    title: "Tax rate",
+                                    ItemId: getId(SheetType.taxrate),
+                                    bottomSheetType: SheetType.taxrate,
+                                    Addf: () {},
+                                    onItemSelected: (id, name) {
+                                      SetName(id, name, SheetType.taxrate);
+                                    }).Show();
+                              },
+                              context: context);
+                        }),
+
+                    /**/
                     commonRowWidget(
+                        isAmt: true,
                         title: "Tax Amount",
                         value: bloc
                             .getFormetted(bloc.lineitemdetail.value.taxRate),
                         onTap: () {
-                          _showAddProductDialog("Edit Tax Amount",
-                              'Enter Tax Amount', 'Tax Amount',
-                              isAmt: true, type: SheetType.none);
+                          AddNewItemDialog(
+                              isAmt: true,
+                              context: context,
+                              title: "Edit Tax Amount",
+                              hint: 'Enter Tax Amount',
+                              label: 'Tax Amount${getCurrency()}',
+                              oldValue: bloc.getFormetted(
+                                  bloc.lineitemdetail.value.taxRate),
+                              type: SheetType.none,
+                              onPressed: (String v) {
+                                debugPrint('F() called--->, $v');
+                                bloc.lineitemdetail.value.taxRate = v;
+                                setState(() {});
+                              });
                         },
                         context: context),
                     commonRowWidget(
+                        isAmt: true,
                         title: "Total Amount",
                         value: bloc.getFormetted(
                             bloc.lineitemdetail.value.totalAmount),
                         onTap: () {
-                          _showAddProductDialog("Edit Total Amount",
-                              'Enter Total Amount', 'Total Amount',
-                              isAmt: true, type: SheetType.none);
+                          AddNewItemDialog(
+                              isAmt: true,
+                              context: context,
+                              title: "Edit Total Amount",
+                              hint: 'Enter Total Amount',
+                              label: 'Total Amount${getCurrency()})',
+                              oldValue: bloc.getFormetted(
+                                  bloc.lineitemdetail.value.totalAmount),
+                              type: SheetType.none,
+                              onPressed: (String v) {
+                                debugPrint('F() called--->, $v');
+                                bloc.lineitemdetail.value.totalAmount = v;
+                                setState(() {});
+                              });
                         },
                         context: context),
                     CommonButton(
@@ -254,10 +371,27 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                         onPressed: () async {
                           bloc.lineitemdetail.value.description =
                               bloc.txtController.text;
+                          bloc.lineitemdetail.value.name =
+                              bloc.lineitemdetail.value.name.isEmpty
+                                  ? "LineItem"
+                                  : bloc.lineitemdetail.value.name;
+                          //bool lineCat = false, lineProduct = false;
+                          bool res = await bloc.updateLineItem(context);
+
                           if (isValid()) {
-                            bool res = await bloc.updateLineItem(context);
-                            if (res) {
-                              Navigator.pop(context, res);
+                            if (widget.lineitem_id.isNotEmpty) {
+                              //update
+                              if (res) {
+                                Navigator.pop(context, res);
+                              }
+                            } else {
+                              //insert
+                              bloc.lineitemdetail.value.invoiceId =
+                                  widget.invoice_id;
+                              bool res = await bloc.insertLineItem(context);
+                              if (res) {
+                                Navigator.pop(context, res);
+                              }
                             }
                           }
                         })
@@ -275,129 +409,17 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
     );
   }
 
-  singleSelectBottomSheet({
-    required context,
-    required list,
-    required title,
-    required bottomSheetType,
-  }) {
-    return showModalBottomSheet(
-        backgroundColor: Colors.black,
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                            color: textColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
-                      ),
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          bottomSheetType != SheetType.category
-                              ? OutlinedButton.icon(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _showAddProductDialog("Add $title",
-                                        'Enter $title Name', '$title Name',
-                                        type: bottomSheetType);
-                                  },
-                                  label: const Text(
-                                    "Add",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  icon: const Icon(
-                                    Icons.add,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Center(),
-                          const SizedBox(
-                            width: 16,
-                          ),
-                          IconButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              icon: Icon(
-                                Icons.close,
-                                color: textColor,
-                              ))
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  TextField(
-                    style: TextStyle(color: textColor),
-                    decoration: InputDecoration(
-                        isDense: true,
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: textColor,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(
-                            width: 0,
-                            style: BorderStyle.none,
-                          ),
-                        ),
-                        fillColor: const Color.fromRGBO(44, 45, 51, 1),
-                        filled: true,
-                        hintText: "Search",
-                        hintStyle: TextStyle(color: textColor)),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  bottomSheetType == SheetType.category
-                      ? Expanded(
-                          child: ExpandableRadioList(
-                            catList:
-                                bloc.categoryList as List<CategoryListData>,
-                            f: (id, name) {
-                              debugPrint('--->f() called');
-                              bloc.lineitemdetail.value.categoryId = '$id';
-                              bloc.selectedValueC.value = name;
-                            },
-                            selectedId: getCategoryId(),
-                          ),
-                        )
-                      : Expanded(
-                          child: RadioButtonList1(
-                            items: list,
-                            selectedId: getId(bottomSheetType),
-                            f: (id, name) {
-                              SetName(id, name, bottomSheetType);
-                            },
-                          ),
-                        ),
-                ],
-              ),
-            );
-          });
-        });
-  }
-
   Widget commonRowWidget(
-      {required title, required value, required onTap, required context}) {
+      {required title,
+      required value,
+      required onTap,
+      bool isAmt = false,
+      required context}) {
     return InkWell(
-      onTap: onTap,
+      onTap: () {
+        _focusNode.unfocus();
+        onTap();
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(20),
@@ -417,11 +439,17 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
               ),
             ),
             Expanded(
-              child: Text(
-                value,
-                style: TextStyle(color: textColor, fontSize: 17),
-                textAlign: TextAlign.end,
-              ),
+              child: isAmt
+                  ? Text(
+                      '${widget.currencySign} $value',
+                      style: TextStyle(color: textColor, fontSize: 17),
+                      textAlign: TextAlign.end,
+                    )
+                  : Text(
+                      value,
+                      style: TextStyle(color: textColor, fontSize: 17),
+                      textAlign: TextAlign.end,
+                    ),
             ),
             const SizedBox(
               width: 10,
@@ -436,262 +464,29 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
     );
   }
 
-  String getBottomSheetTitle(int index, SheetType bottomSheetType) {
-    if (bottomSheetType == SheetType.customer) {
-      return bloc.customerList[index].customerName;
-    } else if (bottomSheetType == SheetType.location) {
-      return bloc.locationList[index].location;
-    } else if (bottomSheetType == SheetType.itemclass) {
-      return bloc.classList[index].className;
-    } else if (bottomSheetType == SheetType.product) {
-      return bloc.productList[index].productServicesName!;
-    }
-    return '';
-  }
-
   void _showDeleteConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: listTileBgColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.warning_amber_rounded,
-                    color: Colors.yellow, size: 50),
-                SizedBox(height: 16),
-                Text(
-                  'Delete line',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Are you sure you want to delete this item?',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black, // Background color
-                    backgroundColor: Colors.yellow, // Text color
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  ),
-                  onPressed: () async {
-                    bool res = await bloc.deleteLineItemDetail(
-                        bloc.lineitemdetail.value.id, context);
-                    if (res) {
-                      Navigator.of(context).pop(); // Close the dialog
-                      Navigator.of(context).pop(); // Close the page
-                      // Add your delete logic here
-                    }
-                  },
-                  child: Text(
-                    'Continue to delete',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(fontSize: 16, color: Colors.yellow),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        return DeleteConfirmationDialog(
+          label: 'Delete line',
+          onPressed: () async {
+            bool res = await bloc.deleteLineItemDetail(
+                bloc.lineitemdetail.value.id, context);
+            if (res) {
+              Navigator.of(context).pop(); // Close the dialog
+              Navigator.of(context).pop(); // Close the page
+              // Add your delete logic here
+            }
+          },
         );
       },
     );
   }
 
-  void _showAddProductDialog(String title, String hint, String label,
-      {bool isAmt = false, required SheetType type}) {
-    bloc.eController.text = "";
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctxt) => AlertDialog(
-              backgroundColor: listTileBgColor,
-              insetPadding: const EdgeInsets.all(4),
-              title: Text(
-                title,
-                style: const TextStyle(color: Colors.white),
-              ),
-              content: Builder(
-                builder: (context) {
-                  // Get available height and width of the build area of this widget. Make a choice depending on the size.
-                  var height = MediaQuery.of(context).size.height;
-                  var width = MediaQuery.of(context).size.width;
-
-                  return SizedBox(
-                    width: width - 100,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(
-                          height: 16,
-                        ),
-                        TextField(
-                          style: const TextStyle(color: Colors.white),
-                          autofocus: true,
-                          keyboardType: isAmt
-                              ? const TextInputType.numberWithOptions(
-                                  decimal: true, signed: false)
-                              : TextInputType.text,
-                          inputFormatters: getTextFormatter(isAmt,
-                              isDouble:
-                                  label.contains("Quantity") ? false : true),
-                          decoration: InputDecoration(
-                            filled: false,
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: profileListBgColor, width: 1.0),
-                            ),
-                            enabledBorder: const OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.white, width: 1.0),
-                            ),
-                            hintText: hint,
-                            hintStyle: const TextStyle(color: Colors.white70),
-                            labelText: label,
-                            labelStyle: const TextStyle(color: Colors.white70),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(50)),
-                          ),
-                          controller: bloc.eController,
-                        ),
-                        const SizedBox(
-                          height: 16,
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text(
-                                'Cancel',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 14),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                if (bloc.eController.text.isEmpty) {
-                                  CommonToast.getInstance()?.displayToast(
-                                      message: "Please enter $label",
-                                      bContext: context);
-                                  return;
-                                }
-                                if (isAmt) {
-                                  //update amount field...
-                                  if (label
-                                      .toLowerCase()
-                                      .contains('quantity')) {
-                                    String v = bloc.eController.text;
-                                    bloc.lineitemdetail.value.quantity = v;
-                                  } else if (label
-                                      .toLowerCase()
-                                      .contains('unit price')) {
-                                    String v = bloc
-                                        .getFormetted(bloc.eController.text);
-                                    bloc.lineitemdetail.value.unitPrice = v;
-                                  } else if (label
-                                      .toLowerCase()
-                                      .contains('net amount')) {
-                                    String v = bloc
-                                        .getFormetted(bloc.eController.text);
-                                    bloc.lineitemdetail.value.netAmount = v;
-                                  } else if (label
-                                      .toLowerCase()
-                                      .contains('tax amount')) {
-                                    String v = bloc
-                                        .getFormetted(bloc.eController.text);
-                                    bloc.lineitemdetail.value.taxRate = v;
-                                  } else if (label
-                                      .toLowerCase()
-                                      .contains('total amount')) {
-                                    String v = bloc
-                                        .getFormetted(bloc.eController.text);
-                                    //bloc.selectedTotalAmt.value = v;
-                                    bloc.lineitemdetail.value.totalAmount = v;
-                                  }
-                                  Navigator.pop(context);
-                                  setState(() {});
-                                  return;
-                                } else {
-                                  if (type == SheetType.product) {
-                                    bloc.addProductService(
-                                        context, bloc.eController.text);
-                                  } else if (type == SheetType.itemclass) {
-                                    bloc.addClass(
-                                        context, bloc.eController.text);
-                                  } else if (type == SheetType.location) {
-                                    bloc.addlocation(
-                                        context, bloc.eController.text);
-                                  } else if (type == SheetType.customer) {
-                                    bloc.addCustomer(
-                                        context, bloc.eController.text);
-                                  }
-                                }
-
-                                Navigator.pop(context);
-                              },
-                              child: const Text(
-                                'Save',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 14),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ));
-  }
-
-  getTextFormatter(bool isAmt, {bool isDouble = true}) {
-    List<TextInputFormatter> formatters = [];
-    if (isAmt) {
-      if (isDouble) {
-        formatters.add(
-          FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
-        );
-        formatters.add(DecimalTextInputFormatter(decimalRange: 2));
-      } else {
-        formatters.add(
-          FilteringTextInputFormatter.allow(RegExp(r"[0-9]")),
-        );
-      }
-    } else {
-      formatters.add(FilteringTextInputFormatter.singleLineFormatter);
-    }
-    return formatters;
-  }
-
   Future<void> _init() async {
-    if (widget.id.isNotEmpty) {
-      await bloc.getLineItemDetail(context, widget.id);
+    if (widget.lineitem_id.isNotEmpty) {
+      await bloc.getLineItemDetail(context, widget.lineitem_id);
     }
     bloc.getDetailCategory(context);
     bloc.getProductService(context);
@@ -699,6 +494,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
     bloc.getAllTaxRate(context);
     bloc.getAllClass(context);
     bloc.getAllLocations(context);
+    // bloc.getCurrency(context);
   }
 
   getCategoryId() {
@@ -721,6 +517,8 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
       id = bloc.lineitemdetail.value.locationId;
     } else if (bottomSheetType == SheetType.customer) {
       id = bloc.lineitemdetail.value.customerId;
+    } else if (bottomSheetType == SheetType.taxrate) {
+      id = bloc.lineitemdetail.value.taxRateId;
     }
     if (id.isEmpty) {
       id = '0';
@@ -728,9 +526,31 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
     return int.parse(id);
   }
 
+  void SetName(id, name, bottomSheetType) {
+    if (bottomSheetType == SheetType.product) {
+      bloc.lineitemdetail.value.productId = '$id';
+      bloc.selectedValueP.value = name;
+    } else if (bottomSheetType == SheetType.itemclass) {
+      bloc.lineitemdetail.value.classId = '$id';
+      bloc.selectedValueClass.value = name;
+    } else if (bottomSheetType == SheetType.location) {
+      bloc.lineitemdetail.value.locationId = '$id';
+      bloc.selectedValueL.value = name;
+    } else if (bottomSheetType == SheetType.customer) {
+      bloc.lineitemdetail.value.customerId = '$id';
+      bloc.selectedValueCustomer.value = name;
+    } else if (bottomSheetType == SheetType.taxrate) {
+      bloc.lineitemdetail.value.taxRateId = '$id';
+      bloc.selectedValueTaxRate.value = name;
+    } else if (bottomSheetType == SheetType.category) {
+      bloc.lineitemdetail.value.categoryId = '$id';
+      bloc.selectedValueC.value = name;
+    }
+  }
+
   bool isValid() {
     String catid = bloc.lineitemdetail.value.categoryId ?? "";
-    if (catid == "") {
+    /*if (catid == "") {
       CommonToast.getInstance()?.displayToast(
           message: "Category field is required", bContext: context);
       return false;
@@ -740,7 +560,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
       CommonToast.getInstance()?.displayToast(
           message: "Product/Service field is required", bContext: context);
       return false;
-    }
+    }*/
     String tid = bloc.lineitemdetail.value.classId ?? "";
     if (tid == "") {
       CommonToast.getInstance()
@@ -780,19 +600,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
     return true;
   }
 
-  void SetName(id, name, bottomSheetType) {
-    if (bottomSheetType == SheetType.product) {
-      bloc.lineitemdetail.value.productId = '$id';
-      bloc.selectedValueP.value = name;
-    } else if (bottomSheetType == SheetType.itemclass) {
-      bloc.lineitemdetail.value.classId = '$id';
-      bloc.selectedValueClass.value = name;
-    } else if (bottomSheetType == SheetType.location) {
-      bloc.lineitemdetail.value.locationId = '$id';
-      bloc.selectedValueL.value = name;
-    } else if (bottomSheetType == SheetType.customer) {
-      bloc.lineitemdetail.value.customerId = '$id';
-      bloc.selectedValueCustomer.value = name;
-    }
+  getCurrency() {
+    return widget.currencySign;
   }
 }

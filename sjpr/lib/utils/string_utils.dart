@@ -56,4 +56,5 @@ class StringUtils {
   static const String mode1 = "Single";
   static const String mode2 = "Multiple";
   static const String mode3 = "Combine";
+  static const String noinvoice = "No Invoice Found";
 }

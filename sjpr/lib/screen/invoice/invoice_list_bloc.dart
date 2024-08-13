@@ -27,10 +27,9 @@ class InvoiceBloc extends BlocBase {
         CommonToast.getInstance()?.displayToast(
             message: getInvoiceListResponse.message!, bContext: context);
       }
-      /*  if (getInvoiceListResponse.status == true) {
-
-      } else {}*/
-      invoiceListStreamController.sink.add(getInvoiceListResponse);
+      if (getInvoiceListResponse.status == true) {
+        invoiceListStreamController.sink.add(getInvoiceListResponse);
+      } else {}
     }
   }
 

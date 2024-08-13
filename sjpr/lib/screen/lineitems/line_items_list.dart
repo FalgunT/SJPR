@@ -1,31 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sjpr/model/lineitem_list_model.dart';
-import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
 import 'package:sjpr/screen/lineitems/line_items_detail.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/image_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
+import 'line_item_list_bloc.dart';
 
 class LineItemsListScreen extends StatefulWidget {
   final String id;
+  final String currencySign;
 
-  const LineItemsListScreen({super.key, required this.id});
+  const LineItemsListScreen(
+      {super.key, required this.id, required this.currencySign});
 
   @override
   State<LineItemsListScreen> createState() => _LineItemsListScreenState();
 }
 
-class _LineItemsListScreenState extends State<LineItemsListScreen>
-    implements Updater {
-  late InvoiceDetailBloc bloc;
+class _LineItemsListScreenState extends State<LineItemsListScreen> {
+  late LineItemListBloc bloc;
+
 
   @override
   void initState() {
     super.initState();
-    bloc = InvoiceDetailBloc(update: this);
+    bloc = LineItemListBloc();
     bloc.getLineItemList(context, widget.id);
-
   }
 
   @override
@@ -40,177 +41,92 @@ class _LineItemsListScreenState extends State<LineItemsListScreen>
             color: Colors.white,
           ),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pop(context);
           },
         ),
       ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: WillPopScope(
+          onWillPop: () async {
+            Navigator.pop(context);
+            return false;
+          },
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Line Items",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: activeTxtColor,
-                      fontSize: 24),
-                ),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LineItemsDetailScreen(
-                                  id: "",
-                                )));
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    height: 40,
-                    width: 100,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: backGroundColor,
-                        border: Border.all(color: activeTxtColor, width: 2)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Line Items",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
                           color: activeTxtColor,
-                          size: 16,
-                        ),
-                        Text(
-                          "Add",
-                          style: TextStyle(
-                              color: activeTxtColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16),
-                        ),
-                      ],
+                          fontSize: 24),
                     ),
+                    InkWell(
+                      onTap: () async {
+                        await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LineItemsDetailScreen(
+                                      lineitem_id: "",
+                                      invoice_id: widget.id,
+                                      currencySign: widget.currencySign,
+                                    ))).then((response) {
+                        //  bloc.result = response;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 10, right: 10),
+                        height: 40,
+                        width: 100,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: backGroundColor,
+                            border:
+                                Border.all(color: activeTxtColor, width: 2)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add,
+                              color: activeTxtColor,
+                              size: 16,
+                            ),
+                            Text(
+                              "Add",
+                              style: TextStyle(
+                                  color: activeTxtColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Expanded(
+                  child: ValueListenableBuilder(
+                    valueListenable: bloc.lineItemListData,
+                    builder: (context, value, child) {
+                      return getView(value);
+                    },
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: StreamBuilder<List<LineItemListData>?>(
-                  stream: bloc.lineItemListStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Container();
-                    }
-                    if (snapshot.data != null && snapshot.data!.isNotEmpty) {
-                      var lineItemList = snapshot.data;
-                      return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: lineItemList?.length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: listTileBgColor,
-                              ),
-                              child: ListTile(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              LineItemsDetailScreen(
-                                                id: lineItemList![index].id ?? "",
-                                              ))).then((response) async {
-                                    bloc.getLineItemList(context, widget.id);
-                                  });
-                                },
-                                dense: true,
-                                contentPadding:
-                                    const EdgeInsets.only(left: 10, right: 10),
-                                title: Text(
-                                  (lineItemList?[index].name != null &&
-                                          lineItemList![index].name!.isNotEmpty)
-                                      ? lineItemList[index].name!
-                                      : "Line Item $index",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: textColor),
-                                ),
-                                subtitle: Text(
-                                  lineItemList?[index].description ??
-                                      "Category name",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: textColor),
-                                ),
-                                trailing: SizedBox(
-                                  width: 100,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      Text(
-                                        lineItemList?[index]
-                                                .totalAmount
-                                                .toString() ??
-                                            "",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: textColor),
-                                      ),
-                                      const SizedBox(
-                                        width: 4,
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        color: textColor,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          });
-                    }
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            SvgImages.folder,
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Text(
-                            StringUtils.noLineItems,
-                            style: TextStyle(color: Colors.white, fontSize: 20),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-            ),
-            const Divider(
+                const SizedBox(
+                  height: 20,
+                ),
+                /*const Divider(
               thickness: 4,
               color: Color.fromRGBO(44, 45, 51, 1),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            GestureDetector(
+            ),*/
+                /* GestureDetector(
               onTap: () {
                 summeryBottomSheet(context: context);
               },
@@ -318,16 +234,103 @@ class _LineItemsListScreenState extends State<LineItemsListScreen>
             ),
             const SizedBox(
               height: 20,
-            )
-          ],
-        ),
-      ),
+            )*/
+              ],
+            ),
+          )),
     );
   }
 
-  @override
-  updateWidget() {
-    setState(() {});
+
+  Widget getView(List<LineItemListData> value) {
+    return value.isEmpty
+        ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  SvgImages.folder,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Text(
+                  StringUtils.noLineItems,
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ],
+            ),
+          )
+        : ListView.builder(
+            shrinkWrap: true,
+            itemCount: value.length,
+            itemBuilder: (context, index) {
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: listTileBgColor,
+                ),
+                child: ListTile(
+                  onTap: () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => LineItemsDetailScreen(
+                                  currencySign: widget.currencySign,
+                                  invoice_id: widget.id,
+                                  lineitem_id: value[index].id ?? "",
+                                ))).then((response) async {
+                      bloc.getLineItemList(context, widget.id);
+                    });
+                  },
+                  dense: true,
+                  contentPadding: const EdgeInsets.only(left: 10, right: 10),
+                  title: Text(
+                    (value[index].name != null && value[index].name!.isNotEmpty)
+                        ? value[index].name!
+                        : "Line Item $index",
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: textColor),
+                  ),
+                  subtitle: Text(
+                    value[index].description ?? "Category name",
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: textColor),
+                  ),
+                  trailing: SizedBox(
+                    width: 100,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          widget.currencySign +
+                                  value[index].totalAmount.toString() ??
+                              "",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: textColor),
+                        ),
+                        const SizedBox(
+                          width: 4,
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: textColor,
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            });
   }
 }
 

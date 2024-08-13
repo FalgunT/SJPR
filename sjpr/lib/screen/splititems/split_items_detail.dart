@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sjpr/model/split_list_model.dart';
@@ -18,7 +19,7 @@ class SplitItemsDetailScreen extends StatefulWidget {
 }
 
 class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
-    implements Updater {
+    {
   SplitItemsBloc bloc = SplitItemsBloc();
   late InvoiceDetailBloc blocID;
   String selectedValue = "";
@@ -41,9 +42,11 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
 
   @override
   void initState() {
-    /*  if (widget.id.isNotEmpty) {
+    */
+/*  if (widget.id.isNotEmpty) {
       bloc.getSplitItemDetail(context, widget.id);
-    }*/
+    }*//*
+
     blocID = InvoiceDetailBloc(update: this);
     if (widget.splitListItemData != null) {
       splitItemDetail = widget.splitListItemData!;
@@ -85,14 +88,16 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
                         color: activeTxtColor,
                         fontSize: 24),
                   ),
-                  /*   CommonButton(
+                  */
+/*   CommonButton(
                       textFontSize: 16,
                       height: 30,
                       content: "Delete",
                       bgColor: backGroundColor,
                       textColor: activeTxtColor,
                       outlinedBorderColor: activeTxtColor,
-                      onPressed: () {})*/
+                      onPressed: () {})*//*
+
                 ],
               ),
               const SizedBox(
@@ -108,8 +113,10 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
                   title: "Total Amount",
                   value: '${splitItemDetail?.totalAmount ?? 0.00}',
                   flag: 1),
-              /*   commonRowWidget(
-                  title: "Tax", value: "0.00", onTap: () {}, context: context),*/
+              */
+/*   commonRowWidget(
+                  title: "Tax", value: "0.00", onTap: () {}, context: context),*//*
+
               commonRowWidget(context,
                   title: "Total Tax Amount",
                   value: '${splitItemDetail?.totalAmount ?? 0.00}',
@@ -238,11 +245,13 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
     return InkWell(
       onTap: () {
         if (flag == 0) {
-          /*  singleSelectBottomSheet(
+          */
+/*  singleSelectBottomSheet(
               context: context,
               list: categoryList,
               title: "Category",
-              bottomSheetType: "category");*/
+              bottomSheetType: "category");*//*
+
           _showPicker(context, flag, title, isAdd: isAdd);
         }
         if (flag == 1 || flag == 2) {
@@ -324,8 +333,10 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
                             OutlinedButton.icon(
                               onPressed: () {
                                 Navigator.pop(context);
-                                /*_showAddProductDialog("Add Product/Service",
-                                    'Enter product name', 'Product Name');*/
+                                */
+/*_showAddProductDialog("Add Product/Service",
+                                    'Enter product name', 'Product Name');*//*
+
                               },
                               label: const Text(
                                 "Add",
@@ -416,3 +427,4 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
     setState(() {});
   }
 }
+*/

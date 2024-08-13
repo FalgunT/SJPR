@@ -10,11 +10,11 @@ import 'package:sjpr/model/product_list_model.dart';
 
 import '../../model/api_response_costomer.dart';
 import '../../model/api_response_location.dart';
+import '../../model/api_response_taxrate.dart';
+import '../../model/currency_model.dart';
 
 class LineItemsBloc extends BlocBase {
   TextEditingController txtController = TextEditingController();
-  TextEditingController eController = TextEditingController();
-  int selectedValue = 0;
 
   ValueNotifier<LineItem> lineitemdetail =
       ValueNotifier<LineItem>(LineItem.empty());
@@ -23,21 +23,17 @@ class LineItemsBloc extends BlocBase {
   ValueNotifier<String> selectedValueP = ValueNotifier<String>("None");
   ValueNotifier<String> selectedValueClass = ValueNotifier<String>("None");
   ValueNotifier<String> selectedValueL = ValueNotifier<String>("None");
+  //ValueNotifier<String> selectedValueCur = ValueNotifier<String>("");
   ValueNotifier<String> selectedValueCustomer = ValueNotifier<String>("None");
-
-  // ValueNotifier<String> selectedTotalAmt = ValueNotifier<String>("0.00");
-  //ValueNotifier<String> selectedTaxAmt = ValueNotifier<String>("0.00");
-  //ValueNotifier<String> selectedTaxRate = ValueNotifier<String>("0.00");
-  //ValueNotifier<String> selectedNetAmt = ValueNotifier<String>("0.00");
-  // ValueNotifier<String> selectedUnitPrice = ValueNotifier<String>("0.00");
-  //ValueNotifier<String> selectedQuatity = ValueNotifier<String>("0");
+  ValueNotifier<String> selectedValueTaxRate = ValueNotifier<String>("None");
 
   List categoryList = [];
   List<ProductServicesListData> productList = [];
   List<CData> classList = [];
   List<Record1> locationList = [];
   List<Customer> customerList = [];
-  List taxRateList = [];
+  List<DataItem> taxRateList = [];
+  //List<CurrencyModel> currencyList = [];
 
   Future getLineItemDetail(BuildContext context, String lineItemId) async {
     var getLineItemListResponse = await AppComponentBase.getInstance()
@@ -93,6 +89,7 @@ class LineItemsBloc extends BlocBase {
       );
       if (isAdd) {
         selectedValueP.value = productList.last.productServicesName ?? 'None';
+        lineitemdetail.value.productId = productList.last.id!;
       }
     }
   }
@@ -193,21 +190,37 @@ class LineItemsBloc extends BlocBase {
     var getResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
-        .getAllCustomer();
+        .getAllTaxRate();
     if (getResponse != null) {
       taxRateList = getResponse.data;
-      /* taxRateList.forEach(
+      taxRateList.forEach(
         (element) {
-          if (element.id == lineitemdetail?.taxRateId) {
-            selectedTaxRate.value = element;
+          if (element.id == lineitemdetail.value.taxRateId) {
+            selectedValueTaxRate.value = element.taxRate;
           }
         },
       );
       if (isAdd) {
-        selectedTaxRate.value = taxRateList.last;
-      }*/
+        selectedValueTaxRate.value = taxRateList.last.taxRate;
+        lineitemdetail.value.taxRateId = taxRateList.last.id;
+      }
     }
   }
+
+  /*Future getCurrency(BuildContext context) async {
+    var getCategoryListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .getCurrencyList();
+    if (getCategoryListResponse != null) {
+      currencyList = getCategoryListResponse;
+      for (var element in currencyList) {
+        if (element.id == lineitemdetail.value.currencyId) {
+          selectedValueCur.value = element.currency_sign!;
+        }
+      }
+    }
+  }*/
 
   @override
   void dispose() {}
@@ -217,6 +230,28 @@ class LineItemsBloc extends BlocBase {
         ?.getApiInterface()
         .getApiRepository()
         .updateLineItemDetail(lineitemdetail.value.toJson());
+    if (getResponse != null) {
+      if (getResponse.error != null && getResponse.error!.isNotEmpty) {
+        CommonToast.getInstance()
+            ?.displayToast(message: getResponse.error!, bContext: context);
+      }
+      if (getResponse.message != null && getResponse.message!.isNotEmpty) {
+        CommonToast.getInstance()
+            ?.displayToast(message: getResponse.message!, bContext: context);
+      }
+
+      if (getResponse.status == true) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  insertLineItem(BuildContext context) async {
+    var getResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .insertLineItemDetail(lineitemdetail.value.toJson());
     if (getResponse != null) {
       if (getResponse.error != null && getResponse.error!.isNotEmpty) {
         CommonToast.getInstance()

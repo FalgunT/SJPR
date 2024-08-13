@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sjpr/model/split_list_model.dart';
-import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
 import 'package:sjpr/screen/splititems/split_items_bloc.dart';
 import 'package:sjpr/screen/splititems/split_items_detail.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/image_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
 import 'package:sjpr/widgets/common_button.dart';
-
+/*
 class SplitItemsListScreen extends StatefulWidget {
   final String id;
   const SplitItemsListScreen({super.key, required this.id});
@@ -16,8 +15,7 @@ class SplitItemsListScreen extends StatefulWidget {
   State<SplitItemsListScreen> createState() => _SplitItemsListScreenState();
 }
 
-class _SplitItemsListScreenState extends State<SplitItemsListScreen>
-    implements Updater {
+class _SplitItemsListScreenState extends State<SplitItemsListScreen> {
   late SplitItemsBloc bloc;
 
   @override
@@ -134,7 +132,7 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen>
                                 ),
                               ],
                               child: ListTile(
-                                /*  onTap: () {
+  onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -143,7 +141,8 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen>
                                                 splitListItemData:
                                                     splitItemList?[index],
                                               )));
-                                },*/
+                                },
+
                                 dense: true,
                                 contentPadding:
                                     const EdgeInsets.only(left: 10, right: 10),
@@ -179,13 +178,14 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen>
                                     ),
                                   ],
                                 ),
-                                /*    trailing: SizedBox(
+    trailing: SizedBox(
                                   //width: 100,
                                   child: Icon(
                                     Icons.arrow_forward_ios,
                                     color: textColor,
                                   ),
-                                ),*/
+                                ),
+
                               ),
                             );
                           }),
@@ -343,4 +343,4 @@ Widget commonRowWidget(
       ),
     ),
   );
-}
+}*/
