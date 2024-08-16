@@ -32,17 +32,27 @@ class SplitList {
 
 class SplitListData {
   String? id;
+
   String? scannedInvoiceId;
+
   String? categoryId;
+
   String? totalAmount;
-  String? taxAmount;
+
+  String? taxAmount = '0.0';
+
+  String? action;
+
+  bool? isSelected;
 
   SplitListData(
       {this.id,
       this.scannedInvoiceId,
       this.categoryId,
       this.totalAmount,
-      this.taxAmount});
+      this.taxAmount,
+      this.action,
+      this.isSelected});
 
   SplitListData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -50,15 +60,20 @@ class SplitListData {
     categoryId = json['category_id'];
     totalAmount = json['total_amount'];
     taxAmount = json['tax_amount'];
+    action = json['action'];
+    isSelected = json['isSelected'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['scanned_invoice_id'] = this.scannedInvoiceId;
-    data['category_id'] = this.categoryId;
-    data['total_amount'] = this.totalAmount;
-    data['tax_amount'] = this.taxAmount;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['scanned_invoice_id'] = scannedInvoiceId;
+    data['category_id'] = categoryId;
+    data['total_amount'] = totalAmount;
+    data['tax_amount'] = taxAmount;
+    data['action'] = action;
+    data['isSelected'] = isSelected;
+
     return data;
   }
 }

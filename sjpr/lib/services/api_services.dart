@@ -166,6 +166,20 @@ class ApiServices extends ApiClient {
     return null;
   }
 
+  Future<InvoiceList?> getArchiveList(String dt, int isPurchase ) async {
+    Map<String, String> body = {
+      'updated_date': dt,
+      'is_purchase': '$isPurchase',
+    };
+    var response = await posts(ApiClient.getArchiveList,
+        headers: getLogoutHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data = InvoiceList.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+
   Future<InvoiceDetail?> getInvoiceDetail(String id) async {
     var response = await gets("${ApiClient.getInvoiceDetail}/$id",
         headers: getLogoutHeader(), isBackground: true);
@@ -221,6 +235,30 @@ class ApiServices extends ApiClient {
       'invoice_file_id': invid,
     };
     var response = await posts(ApiClient.cancelInvoice,
+        headers: getLogoutHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+  Future<CommonModelClass?> MovetoInbox(String invid) async {
+    Map<String, String> body = {
+      'invoice_file_id': invid,
+    };
+    var response = await posts(ApiClient.movetoInbox,
+        headers: getLogoutHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+  Future<CommonModelClass?> DeleteInvoice(String invid) async {
+    Map<String, String> body = {
+      'invoice_file_id': invid,
+    };
+    var response = await posts(ApiClient.deleteInvoice,
         headers: getLogoutHeader(), body: body, isBackground: true);
     if (response != null) {
       var data = CommonModelClass.fromJson(json.decode(response));

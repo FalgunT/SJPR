@@ -4,61 +4,18 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:popover/popover.dart';
 import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail.dart';
+import 'package:sjpr/screen/invoice/invoice_detail_read_only.dart';
 import 'package:sjpr/screen/invoice/invoice_list_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/image_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
+import 'package:sjpr/widgets/delete_confirmation_dialog.dart';
+import 'package:sjpr/widgets/empty_item_widget.dart';
 import 'custom_camera.dart';
-
-class ServicesModel {
-  String? name;
-  String? date;
-  String? price;
-  String? status;
-
-  ServicesModel({
-    this.date,
-    this.price,
-    this.status,
-    this.name,
-  });
-}
-
-List<ServicesModel> archiveList = [
-  ServicesModel(
-    name: "Amazon",
-    date: "22th feb,2024",
-    price: "\u{20AC} 628.10",
-    status: "Published 17/12",
-  ),
-  ServicesModel(
-    name: "London Expert",
-    date: "16th feb,2024",
-    price: "\u{20AC} 38.10",
-    status: "Published 13/12",
-  ),
-  ServicesModel(
-    name: "Ebay",
-    date: "19th feb,2024",
-    price: "\u{20AC} 517.16",
-    status: "Published 05/12",
-  ),
-  ServicesModel(
-    name: "Google Services",
-    date: "25th feb,2024",
-    price: "\u{20AC} 518.16",
-    status: "Published 24/11",
-  ),
-  ServicesModel(
-    name: "Space Dinner",
-    date: "20th f/eb,2024",
-    price: "\u{20AC} 518.16",
-    status: "Published 21/11",
-  )
-];
 
 class InvoiceListScreen extends StatefulWidget {
   const InvoiceListScreen({super.key});
@@ -70,11 +27,26 @@ class InvoiceListScreen extends StatefulWidget {
 class _InvoiceListScreenState extends State<InvoiceListScreen>
     with TickerProviderStateMixin {
   final InvoiceBloc bloc = InvoiceBloc();
+  late TabController _tabController;
 
   @override
   void initState() {
-    bloc.getInvoiceList(context);
+    _init();
+
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+
+    // Listen for tab changes
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        print('Selected Tab: ${_tabController.index}');
+      }
+    });
+  }
+
+  void _init() {
+    bloc.getInvoiceList(context);
+    bloc.getArchiveList(context);
   }
 
   @override
@@ -168,42 +140,38 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
             const SizedBox(
               height: 20,
             ),
-            StreamBuilder<InvoiceList?>(
-                stream: bloc.invoiceListStream,
-                builder: (context, snapshot) {
-                  return DefaultTabController(
-                    length: 2,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: const Color.fromRGBO(39, 40, 44, 1),
-                          ),
-                          child: TabBar(
-                              unselectedLabelColor: appTheme.textColor,
-                              dividerColor: appTheme.backGroundColor,
-                              indicatorSize: TabBarIndicatorSize.tab,
-                              indicatorPadding: const EdgeInsets.all(5),
-                              labelColor: const Color.fromRGBO(182, 147, 52, 1),
-                              indicatorColor: appTheme.backGroundColor,
-                              indicator: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: appTheme.backGroundColor),
-                              tabs: const [Text("Inbox"), Text("Archive")]),
-                        ),
-                        SizedBox(
-                          height: MediaQuery.sizeOf(context).height * 0.6,
-                          child: TabBarView(children: [
-                            inboxListView(snapshot),
-                            archiveListView(snapshot)
-                          ]),
-                        )
-                      ],
+            DefaultTabController(
+              length: 2,
+              child: Column(
+                children: [
+                  Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: const Color.fromRGBO(39, 40, 44, 1),
                     ),
-                  );
-                })
+                    child: TabBar(
+                        controller: _tabController,
+                        unselectedLabelColor: appTheme.textColor,
+                        dividerColor: appTheme.backGroundColor,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        indicatorPadding: const EdgeInsets.all(5),
+                        labelColor: const Color.fromRGBO(182, 147, 52, 1),
+                        indicatorColor: appTheme.backGroundColor,
+                        indicator: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: appTheme.backGroundColor),
+                        tabs: const [Text("Inbox"), Text("Archive")]),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.6,
+                    child: TabBarView(
+                        controller: _tabController,
+                        children: [inboxListView(), archiveListView()]),
+                  )
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -235,227 +203,209 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
     return result.files;
   }
 
-  Widget archiveListView(AsyncSnapshot<InvoiceList?> snapshot) {
-    if (!snapshot.hasData) {
-      return Container();
-    }
-    if (snapshot.data != null &&
-        snapshot.data!.archiveData != null &&
-        snapshot.data!.archiveData!.isNotEmpty) {
-      return ListView.builder(
-          padding: const EdgeInsets.only(top: 20, bottom: 20),
-          shrinkWrap: true,
-          itemCount: snapshot.data!.archiveData!.length,
-          itemBuilder: (BuildContext context, int index) {
-            var listData = snapshot.data!.archiveData!;
-            if (listData.isNotEmpty) {
-              return InkWell(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => InvoiceDetailScreen(
-                                id: listData[index].id!,
-                              )));
-                },
-                child: Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: listTileBgColor,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                listData[index].supplierName ?? "",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
-                              Text(
-                                listData[index].date ?? '',
-                                style: const TextStyle(color: Colors.white),
-                              )
-                            ],
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              (listData[index].totalAmount == null ||
-                                      listData[index].totalAmount!.isEmpty)
-                                  ? "N/A"
-                                  : '${listData[index].currency ?? ""} ${listData[index].totalAmount ?? ""}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                            Text(
-                              listData[index].readStatus ?? "",
-                              style: const TextStyle(color: Colors.blue),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Icon(
-                          Icons.arrow_forward_ios,
-                          color: Colors.white,
-                        )
-                      ],
-                    )),
-              );
-            }
-          });
-    }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SvgPicture.asset(
-          SvgImages.folder,
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        const Text(
-          StringUtils.emptyArchive,
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        const Text(
-          StringUtils.archiveText,
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        )
-      ],
+  Widget archiveListView() {
+    return ValueListenableBuilder(
+      valueListenable: bloc.archiveListData,
+      builder: (context, value, child) {
+        return value.isEmpty
+            ? getEmptyWidget(StringUtils.emptyArchive, StringUtils.archiveText)
+            : ListView.builder(
+                padding: const EdgeInsets.only(top: 20, bottom: 20),
+                shrinkWrap: true,
+                itemCount: value.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var listData = value[index];
+                  return getChild(listData);
+                });
+      },
     );
   }
 
-  Widget inboxListView(AsyncSnapshot<InvoiceList?> snapshot) {
-    if (!snapshot.hasData) {
-      return Container();
-    }
-    if (snapshot.data != null &&
-        snapshot.data!.data != null &&
-        snapshot.data!.data!.isNotEmpty) {
-      return ListView.builder(
-          padding: const EdgeInsets.only(top: 20, bottom: 20),
-          shrinkWrap: true,
-          itemCount: snapshot.data!.data!.length,
-          itemBuilder: (BuildContext context, int index) {
-            var listData = snapshot.data!.data!;
-            if (listData.isNotEmpty) {
-              return InkWell(
-                onTap: () async {
-                  await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => InvoiceDetailScreen(
-                                id: listData[index].id!,
-                              ))).then((onValue) {
-                    if (onValue) {
-                      bloc.getInvoiceList(context);
-                    }
-                  });
-                },
-                child: Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: listTileBgColor,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                listData[index].supplierName ?? "",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
-                              Text(
-                                listData[index].date ?? '',
-                                style: const TextStyle(color: Colors.white),
-                              )
-                            ],
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              (listData[index].totalAmount == null ||
-                                      listData[index].totalAmount!.isEmpty)
-                                  ? "N/A"
-                                  : '${listData[index].currency ?? ""} ${listData[index].totalAmount ?? ""}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                            Text(
-                              listData[index].readStatus == "1"
-                                  ? "To review"
-                                  : "Canceled",
-                              style: TextStyle(
-                                  color: listData[index].readStatus == "1"
-                                      ? Colors.green
-                                      : listData[index].readStatus == "Canceled"
-                                          ? Colors.red
-                                          : Colors.amber),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Icon(
-                          Icons.arrow_forward_ios,
-                          color: Colors.white,
-                        )
-                      ],
-                    )),
-              );
-            }
-          });
-    }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SvgPicture.asset(
-          SvgImages.folder,
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        const Text(
-          StringUtils.emptyInbox,
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        const Text(
-          StringUtils.tapToCreateNewExpense,
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        )
-      ],
+  Widget inboxListView() {
+    return ValueListenableBuilder(
+      valueListenable: bloc.inboxListData,
+      builder: (context, value, child) {
+        return value.isEmpty
+            ? getEmptyWidget(
+                StringUtils.emptyInbox, StringUtils.tapToCreateNewExpense)
+            : ListView.builder(
+                padding: const EdgeInsets.only(top: 20, bottom: 20),
+                shrinkWrap: true,
+                itemCount: value.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var listData = value[index];
+                  return getChild(listData);
+                });
+      },
     );
+  }
+
+  getEmptyWidget(String title, String details) {
+    return EmptyItemWidget(title: title, detail: details);
+  }
+
+  getChild(InvoiceListData listData) {
+    return InkWell(
+      onTap: () async {
+        if (_tabController.index == 1) {
+          _showListDialog(listData);
+          return;
+        }
+
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => InvoiceDetailScreen(
+                      id: listData.id!,
+                    ))).then((onValue) {
+          if (onValue) {
+            _init();
+          }
+        });
+      },
+      child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: listTileBgColor,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      listData.supplierName ?? "",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    Text(
+                      listData.date ?? '',
+                      style: const TextStyle(color: Colors.white),
+                    )
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    (listData.totalAmount == null ||
+                            listData.totalAmount!.isEmpty)
+                        ? "N/A"
+                        : '${listData.currency ?? ""} ${listData.totalAmount ?? ""}',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                  Text(
+                    bloc.getInvoiceStatus(listData.readStatus!),
+                    style: TextStyle(
+                        color: listData.readStatus == "4"
+                            ? Colors.red
+                            : Colors.green),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white,
+              )
+            ],
+          )),
+    );
+  }
+
+  void _showListDialog(InvoiceListData listData) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          backgroundColor: listTileBgColor,
+          title: const Text(
+            'Choose an option',
+            style: TextStyle(color: Colors.white),
+          ),
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () async {
+                Navigator.pop(context, 'Option 1');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => InvoiceDetailReadOnlyScreen(
+                              id: listData.id!,
+                            )));
+              },
+              child: getOptionChild(
+                  Icons.remove_red_eye_outlined, 'View Invoice Detail'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, 'Option 2');
+
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return DeleteConfirmationDialog(
+                      label: 'Delete Invoice',
+                      onPressed: () async {
+                        bool res = await bloc.DeleteInvoice(listData.id!);
+                        if (res) {
+                          //refresh page...
+                          _init();
+                        }
+                      },
+                    );
+                  },
+                );
+              },
+              child: getOptionChild(Icons.delete_forever, 'Delete Invoice'),
+            ),
+            listData.readStatus == '4'
+                ? SimpleDialogOption(
+                    onPressed: () async {
+                      Navigator.pop(context, 'Option 3');
+                      bool res = await bloc.MovetoInbox(listData.id!);
+                      if (res) {
+                        //refresh page...
+                        _init();
+                      }
+                    },
+                    child: getOptionChild(
+                        Icons.move_to_inbox_outlined, 'Move to Inbox'),
+                  )
+                : Center(),
+          ],
+        );
+      },
+    );
+  }
+
+  getOptionChild(IconData icon, String text) {
+    return Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.start,
+          children: [
+            Icon(
+              icon,
+              size: 24,
+              color: Colors.white,
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            Text(
+              text,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ],
+        ));
   }
 
   void _showPicker(BuildContext context) {

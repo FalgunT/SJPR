@@ -38,6 +38,9 @@ class InvoiceDetailBloc extends BlocBase {
 
   ValueNotifier<bool> hideCat = ValueNotifier<bool>(false);
   ValueNotifier<bool> hideProd = ValueNotifier<bool>(false);
+  ValueNotifier<bool> switchVal = ValueNotifier<bool>(true);
+
+
 
   Future getInvoiceDetail(BuildContext context, String id) async {
     var getInvoiceDetailResponse = await AppComponentBase.getInstance()

@@ -48,6 +48,8 @@ dependencies:
   pdf_render: ^1.4.10
   pie_chart: ^5.4.0
   shared_preferences: ^2.2.3
+  popover: ^0.3.0+1
+
 
 dev_dependencies:
   flutter_test:

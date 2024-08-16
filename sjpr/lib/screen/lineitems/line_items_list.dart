@@ -5,6 +5,7 @@ import 'package:sjpr/screen/lineitems/line_items_detail.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/image_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
+import 'package:sjpr/widgets/empty_item_widget.dart';
 import 'line_item_list_bloc.dart';
 
 class LineItemsListScreen extends StatefulWidget {
@@ -20,7 +21,6 @@ class LineItemsListScreen extends StatefulWidget {
 
 class _LineItemsListScreenState extends State<LineItemsListScreen> {
   late LineItemListBloc bloc;
-
 
   @override
   void initState() {
@@ -75,7 +75,7 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                                       invoice_id: widget.id,
                                       currencySign: widget.currencySign,
                                     ))).then((response) {
-                        //  bloc.result = response;
+                          //  bloc.result = response;
                         });
                       },
                       child: Container(
@@ -241,27 +241,9 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
     );
   }
 
-
   Widget getView(List<LineItemListData> value) {
     return value.isEmpty
-        ? Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  SvgImages.folder,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Text(
-                  StringUtils.noLineItems,
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-              ],
-            ),
-          )
+        ? EmptyItemWidget(title: StringUtils.noLineItems, detail: "")
         : ListView.builder(
             shrinkWrap: true,
             itemCount: value.length,

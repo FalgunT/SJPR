@@ -8,12 +8,14 @@ import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
 import 'package:sjpr/screen/lineitems/line_items_list.dart';
 import 'package:sjpr/widgets/common_button.dart';
+import 'package:sjpr/widgets/empty_item_widget.dart';
 import '../../common/AppEnums.dart';
 import '../../utils/color_utils.dart';
 import '../../utils/image_utils.dart';
 import '../../utils/string_utils.dart';
 import '../../widgets/AddNewItemDialog.dart';
 import '../../widgets/CommonBottomSheetDialog.dart';
+import '../splititems/split_items_list.dart';
 
 class InvoiceDetailScreen extends StatefulWidget {
   final String id;
@@ -57,7 +59,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         backgroundColor: appTheme.backGroundColor,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context,false);
+            Navigator.pop(context, false);
           },
           icon: Icon(
             Icons.arrow_back_ios,
@@ -70,22 +72,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           valueListenable: bloc.invoiceDetailData,
           builder: (BuildContext context, value, Widget? child) {
             return value.isObjectEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          SvgImages.folder,
-                        ),
-                        spacer(),
-                        const Text(
-                          StringUtils.noinvoice,
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                      ],
-                    ),
-                  )
+                ? EmptyItemWidget(title: StringUtils.noinvoice, detail: "")
                 : Container(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -105,10 +92,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               onTap: () async {
                                 //set flag cancel ...
                                 //and update the invoice..
-                               bool res =  await bloc.CancelInvoice();
-                               if(res) {
-                                 Navigator.pop(context,res);
-                               }
+                                bool res = await bloc.CancelInvoice();
+                                if (res) {
+                                  Navigator.pop(context, res);
+                                }
                               },
                               child: Container(
                                 padding:
@@ -155,12 +142,20 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                              ('${bloc.selectedValueCurSign.value} ${bloc.invoiceDetailData.value.netAmount ?? ""}'),
-                              style: TextStyle(
-                                  color: appTheme.textColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold),
+                            ValueListenableBuilder(
+                              valueListenable: bloc.selectedValueCurSign,
+                              builder: (context, value1, child) {
+                                return Expanded(
+                                  child: Text(
+                                    '$value1 ${bloc.invoiceDetailData.value.totalAmount ?? ""}',
+                                    style: TextStyle(
+                                        color: appTheme.textColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                );
+                              },
                             )
                           ],
                         ),
@@ -179,7 +174,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               ),
                             ),
                             const Text(
-                              "To review",
+                              "" /*+ bloc.invoiceDetailData.value.read_*/,
                               style: TextStyle(
                                 color: Colors.green,
                                 fontSize: 18,
@@ -296,7 +291,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         commonRowWidget(context,
                             title: "Total",
                             value:
-                                '${bloc.invoiceDetailData.value.totalAmount ?? 0.00}',
+                                '${bloc.invoiceDetailData.value.netAmount ?? 0.00}',
                             isNumber: true, onTap: () {
                           AddNewItemDialog(
                               isAmt: true,
@@ -305,12 +300,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               hint: 'Enter Total Amount',
                               label: 'Total Amount${bloc.getCurrencySign()}',
                               oldValue: bloc.getFormetted(
-                                  bloc.invoiceDetailData.value.totalAmount ??
+                                  bloc.invoiceDetailData.value.netAmount ??
                                       "0.00"),
                               type: SheetType.none,
                               onPressed: (String v) {
                                 debugPrint('F() called--->, $v');
-                                bloc.invoiceDetailData.value.totalAmount = v;
+                                bloc.invoiceDetailData.value.netAmount = v;
                                 setState(() {});
                               });
                         }),
@@ -340,7 +335,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             title: "Tax Total",
                             isNumber: true,
                             value:
-                                '${bloc.invoiceDetailData.value.netAmount ?? 0.00}',
+                                '${bloc.invoiceDetailData.value.totalAmount ?? 0.00}',
                             onTap: () {
                           AddNewItemDialog(
                               isAmt: true,
@@ -349,16 +344,15 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               hint: 'Enter Tax Total',
                               label: 'Tax Total${bloc.getCurrencySign()}',
                               oldValue: bloc.getFormetted(
-                                  bloc.invoiceDetailData.value.netAmount ??
+                                  bloc.invoiceDetailData.value.totalAmount ??
                                       "0.00"),
                               type: SheetType.none,
                               onPressed: (String v) {
                                 debugPrint('F() called--->, $v');
-                                bloc.invoiceDetailData.value.netAmount = v;
+                                bloc.invoiceDetailData.value.totalAmount = v;
                                 setState(() {});
                               });
                         }),
-
                         ValueListenableBuilder(
                           valueListenable: bloc.selectedValuePM,
                           builder: (context, value, child) {
@@ -399,7 +393,38 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             });
                           },
                         ),
-
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: appTheme.listTileBgColor,
+                          ),
+                          child: ValueListenableBuilder(
+                            valueListenable: bloc.switchVal,
+                            builder: (context, value, child) {
+                              return Row(
+                                children: [
+                                  Expanded(
+                                      child: Text(
+                                    value ? "Paid" : "Unpaid",
+                                    style: TextStyle(
+                                        color: appTheme.textColor,
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                                  CupertinoSwitch(
+                                    value: value,
+                                    onChanged: (bb) {
+                                      bloc.switchVal.value = bb;
+                                    },
+                                    activeColor: appTheme.activeTxtColor,
+                                  )
+                                ],
+                              );
+                            },
+                          ),
+                        ),
                         TextField(
                           minLines: 4,
                           keyboardType: TextInputType.multiline,
@@ -432,7 +457,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     bloc.invoiceDetailData.value.toJson(),
                                     context);
                                 if (res) {
-                                  Navigator.pop(context,res);
+                                  Navigator.pop(context, res);
                                 }
                               }
                             })
@@ -561,8 +586,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => LineItemsListScreen(
+                          builder: (context) => SplitItemsListScreen(
                                 currencySign: bloc.selectedValueCurSign.value,
+                                totalAmount: '2500',
+//bloc.invoiceDetailData.value.totalAmount
+                                totalTaxAmount: '200',
+//bloc.invoiceDetailData.value.totalTaxAmount,
                                 id: bloc.invoiceDetailData.value.id ?? "",
                               )));
                 },

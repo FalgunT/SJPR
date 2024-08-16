@@ -177,6 +177,13 @@ class ApiRepositoryIml extends ApiRepository {
     return _apiServices.getSplitItemList(invoiceId);
   }
 
+
+  @override
+  Future<CommonModelClass?> updateSplitItemList(
+      List<SplitListData> lstSplitListDataRequest) {
+    return _apiServices.updateSplitItemList(lstSplitListDataRequest);
+  }
+
   @override
   Future<CommonModelClass?> insertSplitItemDetail(
     String invoiceId,
@@ -192,6 +199,24 @@ class ApiRepositoryIml extends ApiRepository {
   Future<CommonModelClass?> CancelInvoic(String id) {
     return _apiServices.CancelInvoice(id);
   }
+  @override
+  Future<CommonModelClass?> MovetoInbox(String id) {
+    return _apiServices.MovetoInbox(id);
+  }
+
+
+  @override
+  Future<CommonModelClass?> DeleteInvoice(String id) {
+    return _apiServices.DeleteInvoice(id);
+  }
+
+  @override
+  Future<InvoiceList?> getArchiveList(String dt, int isPurchase) {
+    return _apiServices.getArchiveList(dt, isPurchase);
+  }
+
+
+
 }
 
 abstract class ApiRepository {
@@ -210,9 +235,15 @@ abstract class ApiRepository {
 
   Future<InvoiceList?> getInvoiceList();
 
+  Future<InvoiceList?> getArchiveList(String dt, int isPurchase);
+
   Future<InvoiceDetail?> getInvoiceDetail(String id);
 
   Future<CommonModelClass?> CancelInvoic(String id);
+
+  Future<CommonModelClass?> MovetoInbox(String id);
+  Future<CommonModelClass?> DeleteInvoice(String id);
+
 
   Future<CategoryList?> getCategoryList();
 
@@ -258,6 +289,11 @@ abstract class ApiRepository {
 
   Future<SplitList?> getSplitItemList(String invoiceId);
 
+  Future<CommonModelClass?> updateSplitItemList(
+      List<SplitListData> lstSplitListDataRequest);
+
   Future<CommonModelClass?> insertSplitItemDetail(String invoiceId,
       String categoryId, String totalAmount, String totalTaxAmount);
+
+
 }

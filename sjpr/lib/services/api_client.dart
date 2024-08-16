@@ -36,13 +36,15 @@ class ApiClient {
   static String profile = "$baseUrl/profile";
   static String uploadInvoice = "$baseUrl/scaninvoice";
   static String getInvoiceList = "$baseUrl/invoices";
+  static String getArchiveList= "$baseUrl/invoices/archive";
   static String getInvoiceDetail = "$baseUrl/invoicedata";
   static String getCategoryList = "$baseUrl/getcategory";
   static String getProductList = "$baseUrl/getproductservices";
   static String getTypeList = "$baseUrl/detailstype";
   static String getOwnedByList = "$baseUrl/getownedby";
-
   static String cancelInvoice = '$baseUrl/move/to/archive';
+  static String movetoInbox = '$baseUrl/move/to/inbox';
+  static String deleteInvoice = '$baseUrl/scanned/invoice/delete';
   static String addProduct = "$baseUrl/addproductservices";
   static String getCurrencyList = "$baseUrl/getcurrencylist";
   static String getPaymentMethods = "$baseUrl/getpaymentmethod";
