@@ -38,7 +38,7 @@ class ApiServices extends ApiClient {
         headers: getLoginHeader(), body: body, isBackground: true);
     if (response != null) {
       var data = Login.fromJson(json.decode(response));
-      if (data != null && data.result != null && data.status == true) {
+      if (data.result != null && data.status == true) {
         ApiClient.logoutHeaderValue = data.result!.token!;
         await AppComponentBase.getInstance()
             ?.getSharedPreference()
@@ -97,12 +97,10 @@ class ApiServices extends ApiClient {
       }
     }
 
-    if (invoice != null) {
-      request.files.add(await http.MultipartFile.fromPath(
-        'upload_invoice',
-        invoice.path ?? "",
-      ));
-    }
+    request.files.add(await http.MultipartFile.fromPath(
+      'upload_invoice',
+      invoice.path,
+    ));
     //request.headers.addAll(getLogoutHeader());
     var response = await postsMultipart(
       request,
@@ -138,7 +136,7 @@ class ApiServices extends ApiClient {
     for (int i = 0; i < invoices.length; i++) {
       request.files.add(await http.MultipartFile.fromPath(
         'upload_invoice[]',
-        invoices[i].capture.path ?? "",
+        invoices[i].capture.path,
       ));
     }
 
@@ -177,8 +175,6 @@ class ApiServices extends ApiClient {
     }
     return null;
   }
-
-
 
   Future<CategoryList?> getCategoryList() async {
     CategoryList? responseData;
@@ -466,6 +462,17 @@ class ApiServices extends ApiClient {
     var response = await posts(ApiClient.postAddLocation,
         headers: getLogoutHeader(), body: body, isBackground: true);*/
     var response = await gets("${ApiClient.getSplitItemList}$invoiceId",
+        headers: getLogoutHeader(), isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+
+  Future<CommonModelClass?> updateSplitItemList(
+      List<SplitListData> lstSplitListDataRequest) async {
+    var response = await posts(ApiClient.updateSplitItemDetail,
         headers: getLogoutHeader(), isBackground: true);
     if (response != null) {
       var data = CommonModelClass.fromJson(json.decode(response));

@@ -1,57 +1,45 @@
-/*
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sjpr/common/AppEnums.dart';
+import 'package:sjpr/common/common_toast.dart';
 import 'package:sjpr/model/split_list_model.dart';
+import 'package:sjpr/screen/catch_invoice/review_page.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
 import 'package:sjpr/screen/splititems/split_items_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/textinput_utils.dart';
-import 'package:sjpr/widgets/check_box.dart';
+import 'package:sjpr/widgets/AddNewItemDialog.dart';
+import 'package:sjpr/widgets/CommonBottomSheetDialog.dart';
 import 'package:sjpr/widgets/common_button.dart';
-import 'package:sjpr/widgets/radio_button.dart';
+import 'package:sjpr/widgets/expandable_radio_list.dart';
 
 class SplitItemsDetailScreen extends StatefulWidget {
+  final String currencySign;
   final SplitListData? splitListItemData;
-  const SplitItemsDetailScreen({super.key, required this.splitListItemData});
+  const SplitItemsDetailScreen(
+      {super.key, required this.splitListItemData, required this.currencySign});
 
   @override
   State<SplitItemsDetailScreen> createState() => _SplitItemsDetailScreenState();
 }
 
-class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
-    {
-  SplitItemsBloc bloc = SplitItemsBloc();
+class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
+  SplitItemsBloc bloc = SplitItemsBloc.getInstance();
+  TextEditingController eController = TextEditingController();
   late InvoiceDetailBloc blocID;
   String selectedValue = "";
   String categoryValue = "";
-  SplitListData? splitItemDetail;
-  ValueNotifier<String> selectedValueC = ValueNotifier<String>("");
-
-  final TextEditingController _eController = TextEditingController();
-  List categoryList = [
-    "None",
-    "Accumulated Depreciation",
-    "Ask My Accountant",
-    "Buildings and Improvements",
-    "Business Licenses and Permits",
-    "Charitable Contributions",
-    "Computer and Internet Expenses",
-    "Counting Education",
-    "Depreciation Expense"
-  ];
 
   @override
   void initState() {
-    */
-/*  if (widget.id.isNotEmpty) {
-      bloc.getSplitItemDetail(context, widget.id);
-    }*//*
+    bloc.getDetailCategory(context);
 
-    blocID = InvoiceDetailBloc(update: this);
+    blocID = InvoiceDetailBloc();
     if (widget.splitListItemData != null) {
-      splitItemDetail = widget.splitListItemData!;
+      bloc.splitItemDetail.value = widget.splitListItemData!;
     } else {
-      splitItemDetail = SplitListData();
+      bloc.splitItemDetail.value = SplitListData();
+      bloc.selectedValueC = ValueNotifier<String>("None");
     }
     super.initState();
   }
@@ -88,39 +76,80 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
                         color: activeTxtColor,
                         fontSize: 24),
                   ),
-                  */
-/*   CommonButton(
+                  /*   CommonButton(
                       textFontSize: 16,
                       height: 30,
                       content: "Delete",
                       bgColor: backGroundColor,
                       textColor: activeTxtColor,
                       outlinedBorderColor: activeTxtColor,
-                      onPressed: () {})*//*
-
+                      onPressed: () {})*/
                 ],
               ),
               const SizedBox(
                 height: 20,
               ),
               ValueListenableBuilder(
-                  valueListenable: selectedValueC,
+                  valueListenable: bloc.selectedValueC,
                   builder: (context, value, _) {
-                    return commonRowWidget(context,
-                        title: "Category", value: value, flag: 0);
+                    return commonRowWidget(
+                      title: "Category",
+                      value: value,
+                      onTap: () {
+                        CommonBottomSheetDialog(
+                            context: context,
+                            list: bloc.categoryList,
+                            title: "Category",
+                            ItemId: getCategoryId(),
+                            bottomSheetType: SheetType.category,
+                            Addf: () {},
+                            onItemSelected: (id, name) {
+                              SetName(id, name, SheetType.category);
+                            }).Show();
+                      },
+                    );
                   }),
-              commonRowWidget(context,
-                  title: "Total Amount",
-                  value: '${splitItemDetail?.totalAmount ?? 0.00}',
-                  flag: 1),
-              */
-/*   commonRowWidget(
-                  title: "Tax", value: "0.00", onTap: () {}, context: context),*//*
-
-              commonRowWidget(context,
+              commonRowWidget(
+                title: "Total Amount",
+                value: bloc
+                    .getFormatted(bloc.splitItemDetail.value.totalAmount ?? ""),
+                onTap: () {
+                  AddNewItemDialog(
+                      isAmt: true,
+                      context: context,
+                      title: "Edit Total Amount",
+                      hint: 'Enter Total Amount',
+                      label: 'Total Amount${widget.currencySign}',
+                      oldValue: bloc.getFormatted(
+                          bloc.splitItemDetail.value.totalAmount ?? "0.00"),
+                      type: SheetType.none,
+                      onPressed: (String v) {
+                        debugPrint('F() called--->, $v');
+                        bloc.splitItemDetail.value.totalAmount = v;
+                        setState(() {});
+                      });
+                },
+              ),
+              commonRowWidget(
                   title: "Total Tax Amount",
-                  value: '${splitItemDetail?.totalAmount ?? 0.00}',
-                  flag: 2),
+                  value: bloc
+                      .getFormatted(bloc.splitItemDetail.value.taxAmount ?? ""),
+                  onTap: () {
+                    AddNewItemDialog(
+                        isAmt: true,
+                        context: context,
+                        title: "Edit Tax Amount",
+                        hint: 'Enter Tax Amount',
+                        label: 'Tax Amount${widget.currencySign}',
+                        oldValue: bloc.getFormatted(
+                            bloc.splitItemDetail.value.taxAmount ?? "0.00"),
+                        type: SheetType.none,
+                        onPressed: (String v) {
+                          debugPrint('F() called--->, $v');
+                          bloc.splitItemDetail.value.taxAmount = v;
+                          setState(() {});
+                        });
+                  }),
               const SizedBox(
                 height: 20,
               ),
@@ -130,7 +159,25 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
                   bgColor: buttonBgColor,
                   textColor: buttonTextColor,
                   outlinedBorderColor: buttonBgColor,
-                  onPressed: () {})
+                  onPressed: () {
+                    if (isValid()) {
+                      if (bloc.splitItemDetail.value.id != null &&
+                          bloc.splitItemDetail.value.id!.isNotEmpty) {
+                        bloc.updateSplitItem(bloc.splitItemDetail.value);
+                        CommonToast.getInstance()?.displayToast(
+                            message:
+                                'Split Item updated Locally. Please Click on "Save" to keep it permanent',
+                            bContext: context);
+                      } else {
+                        bloc.addSplitItem(bloc.splitItemDetail.value);
+                        CommonToast.getInstance()?.displayToast(
+                            message:
+                                'Split Item added Locally. Please Click on "Save" to keep it permanent',
+                            bContext: context);
+                      }
+                      Navigator.pop(context);
+                    }
+                  })
             ],
           ),
         ),
@@ -165,14 +212,39 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
                             fontWeight: FontWeight.bold,
                             fontSize: 20),
                       ),
-                      IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            color: textColor,
-                          ))
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              /*_showAddProductDialog("Add $title",
+                                  'Enter $title Name', '$title Name',
+                                  type: bottomSheetType);*/
+                            },
+                            label: const Text(
+                              "Add",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            icon: const Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 16,
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(
+                                Icons.close,
+                                color: textColor,
+                              ))
+                        ],
+                      ),
                     ],
                   ),
                   const SizedBox(
@@ -202,37 +274,16 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
                     height: 5,
                   ),
                   Expanded(
-                    child: ListView.builder(
-                        itemCount: list.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return RadioListTile(
-                            activeColor: activeTxtColor,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            contentPadding: const EdgeInsets.only(
-                                left: 6, right: 0, bottom: 0, top: 0),
-                            title: Text(
-                              list[index],
-                              style: TextStyle(
-                                  color: selectedValue == list[index]
-                                      ? activeTxtColor
-                                      : textColor),
-                            ),
-                            value: list[index],
-                            groupValue: selectedValue,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedValue = value;
-                                if (bottomSheetType == "category") {
-                                  categoryValue = selectedValue;
-                                }
-                              });
-                              selectedValueC.value = categoryValue;
-                            },
-                          );
-                        }),
-                  ),
+                    child: ExpandableRadioList(
+                      catList: bloc.categoryList,
+                      f: (id, name) {
+                        debugPrint('--->f() called');
+                        /* bloc.lineitemdetail.value.categoryId = '$id';
+                        bloc.selectedValueC.value = name;*/
+                      },
+                      selectedId: getCategoryId(),
+                    ),
+                  )
                 ],
               ),
             );
@@ -240,160 +291,44 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
         });
   }
 
-  Widget commonRowWidget(BuildContext context,
-      {required title, required value, required int flag, isAdd = false}) {
-    return InkWell(
-      onTap: () {
-        if (flag == 0) {
-          */
-/*  singleSelectBottomSheet(
-              context: context,
-              list: categoryList,
-              title: "Category",
-              bottomSheetType: "category");*//*
-
-          _showPicker(context, flag, title, isAdd: isAdd);
-        }
-        if (flag == 1 || flag == 2) {
-          //total, tax, taxtotal edit option
-          String title = flag == 9
-              ? 'Edit Total Amount'
-              : flag == 10
-                  ? 'Edit Tax Amount'
-                  : 'Edit Tax Total';
-          String label = flag == 9
-              ? 'Edit Total Amount'
-              : flag == 10
-                  ? 'Edit Tax Amount'
-                  : 'Edit Tax Total';
-          String hint = label;
-
-          return;
-        }
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: listTileBgColor,
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                    color: textColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            Expanded(
-              child: Text(
-                value,
-                style: TextStyle(color: textColor, fontSize: 17),
-                textAlign: TextAlign.end,
-              ),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: textColor,
-            )
-          ],
-        ),
-      ),
-    );
+  getCategoryId() {
+    String catid = '0';
+    if ((bloc.splitItemDetail.value.categoryId ?? "").isEmpty) {
+      catid = '0';
+    } else {
+      catid = bloc.splitItemDetail.value.categoryId ?? "0";
+    }
+    return int.parse(catid);
   }
 
-  Future<void> _showPicker(BuildContext context, int flag, String title,
-      {isAdd = false}) async {
-    var list = await blocID.getCheckBoxList(flag);
-    debugPrint('CheckBoxList:--->$list');
-    showModalBottomSheet(
-        backgroundColor: textFieldBgColor,
-        isDismissible: false,
-        isScrollControlled: true,
-        context: context,
-        builder: (BuildContext bc) {
-          return Padding(
-            padding: EdgeInsets.fromLTRB(
-                16, 16, 16, MediaQuery.of(context).viewInsets.bottom),
-            child: Wrap(
-              children: <Widget>[
-                ListTile(
-                  trailing: isAdd
-                      ? Wrap(
-                          alignment: WrapAlignment.center,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            OutlinedButton.icon(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                */
-/*_showAddProductDialog("Add Product/Service",
-                                    'Enter product name', 'Product Name');*//*
+  void SetName(id, name, bottomSheetType) {
+    if (bottomSheetType == SheetType.category) {
+      bloc.splitItemDetail.value.categoryId = '$id';
+      bloc.selectedValueC.value = name;
+    }
+  }
 
-                              },
-                              label: const Text(
-                                "Add",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              icon: const Icon(
-                                Icons.add,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 16,
-                            ),
-                            getCloseButton()
-                          ],
-                        )
-                      : getCloseButton(),
-                  title: Text(
-                    title,
-                    style: TextStyle(color: textColor, fontSize: 18),
-                  ),
-                ),
-                const SizedBox(
-                  height: 24,
-                ),
-                flag == 0
-                    ? CheckBoxList(
-                        selectedCategoryIndex: blocID.selectedCategoryIndex,
-                        items: list,
-                        f: (index, l) {
-                          debugPrint('--->f() called');
-                          blocID.selectedCategoryIndex = index;
-                          blocID.selectedData = l;
-                          debugPrint(
-                              '--->Result: ${blocID.selectedData.toString()}');
-                        },
-                      )
-                    : RadioButtonList(
-                        items: list,
-                        f: (selected) {
-                          CheckBoxItem item = selected;
-                          if (flag == 1) {
-                            for (var value in blocID.pList) {
-                              if (value.id == item.itemId) {
-                                blocID.selectedPData = value;
-                                debugPrint(
-                                    '--->Result: ${blocID.selectedPData.toString()}');
-                                break;
-                              }
-                            }
-                          }
-                        },
-                      ),
-              ],
-            ),
-          );
-        });
+  bool isValid() {
+    String catId = bloc.splitItemDetail.value.categoryId ?? "";
+    if (catId == "") {
+      CommonToast.getInstance()?.displayToast(
+          message: "Category field is required", bContext: context);
+      return false;
+    }
+    String total =
+        (bloc.splitItemDetail.value.totalAmount ?? "").replaceAll(',', '');
+    if (total.isEmpty || (double.parse(total) == 0.0)) {
+      CommonToast.getInstance()?.displayToast(
+          message: "Total Amount field is required", bContext: context);
+      return false;
+    }
+    String tax = bloc.splitItemDetail.value.taxAmount ?? "";
+    if (tax.isEmpty) {
+      CommonToast.getInstance()?.displayToast(
+          message: "Tax Amount field is required", bContext: context);
+      return false;
+    }
+    return true;
   }
 
   getTextFormatter(bool isAmt) {
@@ -421,10 +356,4 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen>
       ),
     );
   }
-
-  @override
-  updateWidget() {
-    setState(() {});
-  }
 }
-*/

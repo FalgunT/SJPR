@@ -1,28 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sjpr/common/common_toast.dart';
 import 'package:sjpr/model/split_list_model.dart';
 import 'package:sjpr/screen/splititems/split_items_bloc.dart';
 import 'package:sjpr/screen/splititems/split_items_detail.dart';
 import 'package:sjpr/utils/color_utils.dart';
-import 'package:sjpr/utils/image_utils.dart';
-import 'package:sjpr/utils/string_utils.dart';
 import 'package:sjpr/widgets/common_button.dart';
-/*
+import 'package:sjpr/widgets/delete_confirmation_dialog.dart';
+
 class SplitItemsListScreen extends StatefulWidget {
   final String id;
-  const SplitItemsListScreen({super.key, required this.id});
+  final String currencySign;
+  final String? totalAmount;
+  final String? totalTaxAmount;
+  const SplitItemsListScreen(
+      {super.key,
+      required this.id,
+      required this.currencySign,
+      required this.totalAmount,
+      required this.totalTaxAmount});
   @override
   State<SplitItemsListScreen> createState() => _SplitItemsListScreenState();
 }
 
 class _SplitItemsListScreenState extends State<SplitItemsListScreen> {
-  late SplitItemsBloc bloc;
-
+  SplitItemsBloc bloc = SplitItemsBloc.getInstance();
+  bool? multipleSelected = false;
+  var remainingTotalAmount = 0.0;
+  var remainingTotalTaxAmount = 0.0;
   @override
   void initState() {
-    bloc = SplitItemsBloc();
-    bloc.getSplitItemList(context, "142"); //widget.id);
+    getData();
     super.initState();
+  }
+
+  void getData() async {
+    await bloc.getDetailCategory(context);
+    await bloc.getSplitItemList(context, "142"); //widget.id);
   }
 
   @override
@@ -42,287 +55,499 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen> {
         ),
       ),
       body: Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(12),
+        child: ListView(
+          shrinkWrap: true,
+          physics: const AlwaysScrollableScrollPhysics(),
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Split Items",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: activeTxtColor,
-                      fontSize: 24),
-                ),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SplitItemsDetailScreen(
-                                  splitListItemData: null,
-                                )));
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    height: 40,
-                    width: 100,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: backGroundColor,
-                        border: Border.all(color: activeTxtColor, width: 2)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+            StreamBuilder<List<SplitListData>?>(
+                stream: bloc.splitItemListStream,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container();
+                  }
+                  if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(
-                          Icons.add,
-                          color: activeTxtColor,
-                          size: 16,
-                        ),
-                        Text(
-                          "Add",
-                          style: TextStyle(
-                              color: activeTxtColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: StreamBuilder<List<SplitListData>?>(
-                  stream: bloc.splitItemListStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Container();
-                    }
-                    if (snapshot.data != null && snapshot.data!.isNotEmpty) {
-                      var splitItemList = snapshot.data;
-                      return ListView(
-                        children: ListTile.divideTiles(
-                          context: context,
-                          tiles: List.generate(splitItemList?.length ?? 0,
-                              (index) {
-                            return SlideMenu(
-                              menuItems: <Widget>[
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () {
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Split Items",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: activeTxtColor,
+                                      fontSize: 24),
+                                ),
+                                InkWell(
+                                  onTap: () {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 SplitItemsDetailScreen(
-                                                  splitListItemData:
-                                                      splitItemList?[index],
+                                                  currencySign:
+                                                      widget.currencySign,
+                                                  splitListItemData: null,
                                                 )));
                                   },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () {},
-                                ),
-                              ],
-                              child: ListTile(
-  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              SplitItemsDetailScreen(
-                                                splitListItemData:
-                                                    splitItemList?[index],
-                                              )));
-                                },
-
-                                dense: true,
-                                contentPadding:
-                                    const EdgeInsets.only(left: 10, right: 10),
-                                title: Text(
-                                  (splitItemList?[index].categoryId != null &&
-                                          splitItemList![index]
-                                              .categoryId!
-                                              .isNotEmpty)
-                                      ? splitItemList[index].categoryId!
-                                      : "Line Item $index",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: textColor),
-                                ),
-                                subtitle: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Total Amount : ${splitItemList?[index].totalAmount ?? ""}',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: textColor),
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 10, right: 10),
+                                    height: 40,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: backGroundColor,
+                                        border: Border.all(
+                                            color: activeTxtColor, width: 2)),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.add,
+                                          color: activeTxtColor,
+                                          size: 16,
+                                        ),
+                                        Text(
+                                          "Add",
+                                          style: TextStyle(
+                                              color: activeTxtColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16),
+                                        ),
+                                      ],
                                     ),
-                                    Text(
-                                      'Total Tax Amount : ${splitItemList?[index].taxAmount ?? ""}',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: textColor),
-                                    ),
-                                  ],
-                                ),
-    trailing: SizedBox(
-                                  //width: 100,
-                                  child: Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: textColor,
                                   ),
                                 ),
+                              ],
+                            ),
+                            multipleSelected!
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          _showDeleteConfirmationDialog(
+                                              context, true, SplitListData());
+                                        },
+                                        child: Container(
+                                          //margin: const EdgeInsets.all(10),
+                                          padding: const EdgeInsets.only(
+                                              left: 10, right: 10),
+                                          height: 40,
+                                          width: 150,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              color: backGroundColor,
+                                              border: Border.all(
+                                                  color: activeTxtColor,
+                                                  width: 2)),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "Delete Multiple",
+                                                style: TextStyle(
+                                                    color: activeTxtColor,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Container(),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            ValueListenableBuilder(
+                                valueListenable: bloc.splitItemListLocal,
+                                builder: (context, value, _) {
+                                  remainingTotalAmount = 0.0;
+                                  remainingTotalTaxAmount = 0.0;
+                                  for (var element in value) {
+                                    element.totalAmount =
+                                        (element.totalAmount ?? "0")
+                                            .replaceAll(',', '');
+                                    element.taxAmount =
+                                        (element.taxAmount ?? "0")
+                                            .replaceAll(',', '');
 
-                              ),
-                            );
-                          }),
-                        ).toList(),
-                      );
-                    }
+                                    remainingTotalAmount += double.parse(
+                                        element.totalAmount ?? "0");
+                                    remainingTotalTaxAmount +=
+                                        double.parse(element.taxAmount ?? "0");
+                                  }
+                                  remainingTotalAmount = double.parse(
+                                          (widget.totalAmount ?? "0")
+                                              .replaceAll(',', '')) -
+                                      remainingTotalAmount;
+                                  remainingTotalTaxAmount = double.parse(
+                                          (widget.totalTaxAmount ?? "0")
+                                              .replaceAll(',', '')) -
+                                      remainingTotalTaxAmount;
+                                  return Column(
+                                    children: [
+                                      Table(
+                                        columnWidths: const {
+                                          0: FlexColumnWidth(1.5),
+                                          1: FlexColumnWidth(3.5),
+                                          2: FlexColumnWidth(2),
+                                          3: FlexColumnWidth(2),
+                                          4: FlexColumnWidth(1.25),
+                                          /* 5: FlexColumnWidth(1.25),*/
+                                        },
+                                        children: [
+                                          TableRow(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                border: const Border(
+                                                    bottom: BorderSide(
+                                                        color: Colors.black,
+                                                        width: 4)),
+                                                color: listTileBgColor,
+                                              ),
+                                              children: [
+                                                Center(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 10),
+                                                    child: Text(
+                                                      "",
+                                                      style: TextStyle(
+                                                        color: textColor,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      vertical: 10,
+                                                      horizontal: 4),
+                                                  child: Text(
+                                                    "Category",
+                                                    textAlign: TextAlign.start,
+                                                    style: TextStyle(
+                                                      color: textColor,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 10),
+                                                    child: Text(
+                                                      "Total Amount",
+                                                      style: TextStyle(
+                                                        color: textColor,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 10),
+                                                    child: Text(
+                                                      "Tax Amount",
+                                                      style: TextStyle(
+                                                        color: textColor,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 10,
+                                                        horizontal: 4),
+                                                    child: Text(
+                                                      "",
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        color: textColor,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                /*   Center(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.symmetric(
+                                                          vertical: 10),
+                                                      child: Text(
+                                                        "Delete",
+                                                        style: TextStyle(
+                                                          color: textColor,
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),*/
+                                              ]),
+                                          for (var item in value)
+                                            getTableRows(item, value),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0, vertical: 16),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.45,
+                                              child: Text(
+                                                "Remaining Total Amount  :  ",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w700,
+                                                    color: activeTxtColor,
+                                                    fontSize: 20),
+                                              ),
+                                            ),
+                                            /*  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.35,
+                                  ),*/
+                                            SizedBox(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.25,
+                                              child: Text(
+                                                bloc.getFormatted(
+                                                    remainingTotalAmount
+                                                        .toString()),
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    color: textColor,
+                                                    fontSize: 18),
+                                              ),
+                                            ),
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.2,
+                                              child: Text(
+                                                bloc.getFormatted(
+                                                    remainingTotalTaxAmount
+                                                        .toString()),
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    color: textColor,
+                                                    fontSize: 18),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        CommonButton(
+                            textFontSize: 16,
+                            content: "Save",
+                            bgColor: buttonBgColor,
+                            textColor: buttonTextColor,
+                            outlinedBorderColor: buttonBgColor,
+                            onPressed: () {
+                              if (remainingTotalAmount == 0.0 &&
+                                  remainingTotalTaxAmount == 0.0) {
+                                bloc.updateSplitItemList(context);
+                              } else {
+                                CommonToast.getInstance()?.displayToast(
+                                    message:
+                                        "The total amount of insert and update actions does not match the invoice total amount.",
+                                    bContext: context);
+                              }
+                            })
+                      ],
+                    );
+                  } else {
                     return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            SvgImages.folder,
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Text(
-                            StringUtils.noLineItems,
-                            style: TextStyle(color: Colors.white, fontSize: 20),
-                          ),
-                        ],
+                      child: Text(
+                        "No Records found",
+                        style: TextStyle(
+                            color: textColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
                       ),
                     );
-                  }),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            CommonButton(
-                textFontSize: 16,
-                content: "Save",
-                bgColor: buttonBgColor,
-                textColor: buttonTextColor,
-                outlinedBorderColor: buttonBgColor,
-                onPressed: () {})
+                  }
+                }),
           ],
         ),
       ),
     );
   }
 
-  @override
-  updateWidget() {
-    setState(() {});
-  }
-}
-
-class SlideMenu extends StatefulWidget {
-  final Widget child;
-  final List<Widget> menuItems;
-
-  const SlideMenu({super.key, required this.child, required this.menuItems});
-
-  @override
-  _SlideMenuState createState() => _SlideMenuState();
-}
-
-class _SlideMenuState extends State<SlideMenu>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  initState() {
-    super.initState();
-    _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
-  }
-
-  @override
-  dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final animation =
-        Tween(begin: const Offset(0.0, 0.0), end: const Offset(-0.35, 0.0))
-            .animate(CurveTween(curve: Curves.decelerate).animate(_controller));
-
-    return GestureDetector(
-      onHorizontalDragUpdate: (data) {
-        // we can access context.size here
-        setState(() {
-          _controller.value -= (data.primaryDelta! / context.size!.width);
-        });
-      },
-      onHorizontalDragEnd: (data) {
-        if (data.primaryVelocity! > 2500) {
-          _controller
-              .animateTo(.0); //close menu on fast swipe in the right direction
-        } else if (_controller.value >= .5 || data.primaryVelocity! < -2500) //
-        {
-          // fully open if dragged a lot to left or on fast swipe to left
-          _controller.animateTo(1.0);
-        } else // close if none of above
-        {
-          _controller.animateTo(.0);
-        }
-      },
-      child: Stack(
-        children: <Widget>[
-          SlideTransition(position: animation, child: widget.child),
-          Positioned.fill(
-            child: LayoutBuilder(
-              builder: (context, constraint) {
-                return AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return Stack(
-                      children: <Widget>[
-                        Positioned(
-                          right: .0,
-                          top: .0,
-                          bottom: .0,
-                          width: constraint.maxWidth * animation.value.dx * -1,
-                          child: Container(
-                            color: activeTxtColor,
-                            child: Row(
-                              children: widget.menuItems.map((child) {
-                                return Expanded(
-                                  child: child,
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
+  TableRow getTableRows(
+      SplitListData valueSplitItem, List<SplitListData> value) {
+    return TableRow(
+        decoration: BoxDecoration(
+          //borderRadius: BorderRadius.circular(8),
+          border: Border(
+              /* right: BorderSide(
+                                                color: listTileBgColor, width: 2),*/
+              bottom: BorderSide(color: listTileBgColor, width: 2)),
+          color: Colors.black,
+        ),
+        children: [
+          Center(
+            child: Checkbox(
+                value: valueSplitItem.isSelected ?? false,
+                activeColor: activeTxtColor,
+                checkColor: buttonTextColor,
+                onChanged: (value1) {
+                  var isAnySelected = false;
+                  setState(() {
+                    for (var element in value) {
+                      if (element.id == valueSplitItem.id) {
+                        element.isSelected = value1;
+                      }
+                      if (element.isSelected == true) {
+                        isAnySelected = true;
+                      }
+                    }
+                    multipleSelected = isAnySelected;
+                  });
+                }),
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10, right: 8, bottom: 10),
+              child: Text(
+                //splitItem.categoryId ?? "",
+                "${bloc.getCategoryNameFromId(valueSplitItem.categoryId ?? "") ?? ""}test test test etdlkskjf jkdj ",
+                style: TextStyle(color: textColor, fontSize: 16),
+              ),
             ),
-          )
-        ],
-      ),
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10, right: 8, bottom: 10),
+              child: Text(
+                bloc.getFormatted(valueSplitItem.totalAmount ?? ""),
+                style: TextStyle(color: textColor, fontSize: 16),
+              ),
+            ),
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Text(
+                bloc.getFormatted(valueSplitItem.taxAmount ?? ""),
+                style: TextStyle(color: textColor, fontSize: 16),
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.edit,
+                  color: activeTxtColor,
+                ),
+                iconSize: 20,
+                padding: EdgeInsets.zero,
+                splashRadius: 0.5,
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SplitItemsDetailScreen(
+                                currencySign: widget.currencySign,
+                                splitListItemData: valueSplitItem,
+                              )));
+                },
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.delete,
+                  color: activeTxtColor,
+                ),
+                iconSize: 20,
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                splashRadius: 1,
+                onPressed: () {
+                  _showDeleteConfirmationDialog(context, false, valueSplitItem);
+                },
+              ),
+            ],
+          ),
+        ]);
+  }
+
+  void _showDeleteConfirmationDialog(
+      BuildContext context, bool isMultiple, SplitListData valueSplitItem) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DeleteConfirmationDialog(
+          label: 'Delete Split',
+          onPressed: () {
+            if (isMultiple) {
+              bloc.deleteMultipleSplitItems();
+            } else {
+              bloc.deleteSplitItem(valueSplitItem);
+            }
+            Navigator.pop(context);
+            setState(() {
+              multipleSelected = false;
+            });
+          },
+        );
+      },
     );
   }
 }
@@ -343,4 +568,4 @@ Widget commonRowWidget(
       ),
     ),
   );
-}*/
+}

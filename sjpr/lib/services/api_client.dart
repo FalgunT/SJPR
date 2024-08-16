@@ -66,6 +66,7 @@ class ApiClient {
 
   static String getSplitItemList = "$baseUrl/invoice/split/list/";
   static String insertSplitItemDetail = "$baseUrl/invoice/split/insert";
+  static String updateSplitItemDetail = "$baseUrl/invoice/split/update";
 
   static final RegExp nameRegExp = RegExp('[a-zA-Z]');
 
