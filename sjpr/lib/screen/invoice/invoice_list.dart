@@ -354,6 +354,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                     return DeleteConfirmationDialog(
                       label: 'Delete Invoice',
                       onPressed: () async {
+                        Navigator.pop(context, 'Yes Confirm');
                         bool res = await bloc.DeleteInvoice(listData.id!);
                         if (res) {
                           //refresh page...

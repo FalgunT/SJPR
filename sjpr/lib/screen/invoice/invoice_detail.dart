@@ -241,6 +241,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           },
                         ),
                         commonRowWidget(context,
+                            isClickable: false,
                             title: "Owned by",
                             value: bloc.invoiceDetailData.value.supplierName ??
                                 '-',
@@ -298,7 +299,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               context: context,
                               title: "Edit Total Amount",
                               hint: 'Enter Total Amount',
-                              label: 'Total Amount${bloc.getCurrencySign()}',
+                              label: 'Total Amount ${bloc.getCurrencySign()}',
                               oldValue: bloc.getFormetted(
                                   bloc.invoiceDetailData.value.netAmount ??
                                       "0.00"),
@@ -417,6 +418,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     value: value,
                                     onChanged: (bb) {
                                       bloc.switchVal.value = bb;
+                                      bloc.invoiceDetailData.value.payment_status=bb?'1':'0';
                                     },
                                     activeColor: appTheme.activeTxtColor,
                                   )
@@ -495,7 +497,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 currencySign: bloc.selectedValueCurSign.value,
                                 id: bloc.invoiceDetailData.value.id ?? "",
                               ))).then((_) {
-                    bloc.getLineItemList(context, widget.id);
+                    bloc.getLineItemList(context, bloc.invoiceDetailData.value.id!);
                   });
                 },
                 child: Container(
@@ -566,7 +568,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   }
 
   getSplits() {
-    return bloc.invoiceDetailData.value.line_item_count! == 0
+    return bloc.invoiceDetailData.value.split_item_count! == 0
         ? Center()
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -611,14 +613,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: Text("Consult line items",
+                                    child: Text("Consult Split items",
                                         style: TextStyle(
                                             color: appTheme.textColor,
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold)),
                                   ),
                                   Text(
-                                      '${bloc.invoiceDetailData.value.line_item_count}',
+                                      '${bloc.invoiceDetailData.value.split_item_count}',
                                       style: const TextStyle(
                                         color: Colors.green,
                                         fontSize: 16,

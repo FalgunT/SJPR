@@ -54,6 +54,8 @@ class InvoiceDetailData {
   String? publish_to_id;
   String? payment_method_id;
   String? scanned_currency_id;
+  String? payment_status;
+  int? split_item_count;
 
   String? date;
 
@@ -87,7 +89,9 @@ class InvoiceDetailData {
       this.document_reference,
       this.publish_to_id,
       this.scanned_currency_id,
-      this.payment_method_id});
+      this.payment_method_id,
+      this.split_item_count,
+      this.payment_status});
 
   InvoiceDetailData.fromJson(Map<String, dynamic> json) {
     userId = json['user_id'];
@@ -118,10 +122,12 @@ class InvoiceDetailData {
     publish_to_id = json['publish_to_id'];
     scanned_currency_id = json['scanned_currency_id'];
     payment_method_id = json['payment_method_id'];
+    split_item_count = json['split_item_count'];
+    payment_status = json['payment_status'];
   }
 
   get isObjectEmpty {
-    if (this.invoiceId == null || this.id == null) {
+    if (this.invoiceFileId == null || this.id == null) {
       return true;
     }
     return false;
@@ -155,6 +161,8 @@ class InvoiceDetailData {
         'document_reference': document_reference ?? "",
         'publish_to_id': publish_to_id ?? "",
         'scanned_currency_id': scanned_currency_id ?? "",
-        'payment_method_id': payment_method_id ?? ""
+        'payment_method_id': payment_method_id ?? "",
+        'payment_status': payment_status ?? '',
+        'split_item_count': split_item_count ?? 0,
       };
 }

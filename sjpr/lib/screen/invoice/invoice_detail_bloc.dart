@@ -385,14 +385,14 @@ class InvoiceDetailBloc extends BlocBase {
         return false;
       }
     }
-    if (!hideProd.value) {
+    /*if (!hideProd.value) {
       String pid = invoiceDetailData.value.scanned_product_service_id ?? "";
       if (pid == "") {
         CommonToast.getInstance()?.displayToast(
             message: "Product/Service field is required", bContext: context);
         return false;
       }
-    }
+    }*/
 
     String tid = invoiceDetailData.value.scanned_type_id ?? "";
     if (tid == "") {

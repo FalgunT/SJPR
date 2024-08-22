@@ -601,6 +601,9 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
   }
 
   getCurrency() {
-    return widget.currencySign;
+    if(widget.currencySign.isEmpty){
+      return '';
+    }
+    return ' (${widget.currencySign})';
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_document_scanner/flutter_document_scanner.dart';
 import 'package:sjpr/common/custom_progress.dart';
 import 'package:sjpr/di/app_component_base.dart';
@@ -16,7 +17,11 @@ void main() async {
       ?.getSharedPreference()
       .getUserDetail(key: AppSharedPreference.token);
   if (token != null) ApiClient.logoutHeaderValue = token;
-  runApp(MyApp(token: token));
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(MyApp(token: token));
+  });
+
 }
 
 class MyApp extends StatefulWidget {
@@ -35,21 +40,6 @@ class _MyAppState extends State<MyApp> {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFFBA9E2E)),
         useMaterial3: true,
       ),
