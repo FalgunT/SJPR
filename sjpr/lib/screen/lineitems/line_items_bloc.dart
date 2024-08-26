@@ -247,7 +247,7 @@ class LineItemsBloc extends BlocBase {
     return false;
   }
 
-  insertLineItem(BuildContext context) async {
+  Future<bool> insertLineItem(BuildContext context) async {
     var getResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()

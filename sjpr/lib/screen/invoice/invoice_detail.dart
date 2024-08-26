@@ -541,8 +541,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                       builder: (context) => LineItemsListScreen(
                         currencySign: bloc.selectedValueCurSign.value,
                         id: bloc.invoiceDetailData.value.id ?? "",
-                      ))).then((_) {
-                bloc.getLineItemList(context, bloc.invoiceDetailData.value.id!);
+                      ))).then((_) async {
+                //bloc.getInvoiceDetail(context, widget.id);
+               await bloc.getLineItemList(context, bloc.invoiceDetailData.value.id!);
+               setState(() {
+
+               });
               });
             },
             child: Container(

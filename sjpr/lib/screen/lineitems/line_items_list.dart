@@ -66,17 +66,8 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                           fontSize: 24),
                     ),
                     InkWell(
-                      onTap: () async {
-                        await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LineItemsDetailScreen(
-                                      lineitem_id: "",
-                                      invoice_id: widget.id,
-                                      currencySign: widget.currencySign,
-                                    ))).then((response) {
-                          //  bloc.result = response;
-                        });
+                      onTap: () {
+                        onItemTap(lineitem_id: "");
                       },
                       child: Container(
                         padding: const EdgeInsets.only(left: 10, right: 10),
@@ -256,16 +247,7 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                 ),
                 child: ListTile(
                   onTap: () async {
-                    await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LineItemsDetailScreen(
-                                  currencySign: widget.currencySign,
-                                  invoice_id: widget.id,
-                                  lineitem_id: value[index].id ?? "",
-                                ))).then((response) async {
-                      bloc.getLineItemList(context, widget.id);
-                    });
+                    onItemTap(lineitem_id: value[index].id ?? "");
                   },
                   dense: true,
                   contentPadding: const EdgeInsets.only(left: 10, right: 10),
@@ -302,7 +284,6 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                         const SizedBox(
                           width: 8,
                         ),
-
                         Icon(
                           Icons.arrow_forward_ios,
                           color: textColor,
@@ -311,6 +292,20 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                 ),
               );
             });
+  }
+
+  Future<void> onItemTap({required String lineitem_id}) async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => LineItemsDetailScreen(
+                  lineitem_id: lineitem_id,
+                  invoice_id: widget.id,
+                  currencySign: widget.currencySign,
+                ))).then((response) async {
+      await bloc.getLineItemList(context, widget.id);
+      setState(() {});
+    });
   }
 }
 

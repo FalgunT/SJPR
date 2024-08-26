@@ -351,7 +351,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                               context: context,
                               title: "Edit Total Amount",
                               hint: 'Enter Total Amount',
-                              label: 'Total Amount${getCurrency()})',
+                              label: 'Total Amount${getCurrency()}',
                               oldValue: bloc.getFormetted(
                                   bloc.lineitemdetail.value.totalAmount),
                               type: SheetType.none,
@@ -376,18 +376,16 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                                   ? "LineItem"
                                   : bloc.lineitemdetail.value.name;
                           //bool lineCat = false, lineProduct = false;
-                          bool res = await bloc.updateLineItem(context);
 
                           if (isValid()) {
                             if (widget.lineitem_id.isNotEmpty) {
                               //update
+                              bool res = await bloc.updateLineItem(context);
                               if (res) {
                                 Navigator.pop(context, res);
                               }
                             } else {
                               //insert
-                              bloc.lineitemdetail.value.invoiceId =
-                                  widget.invoice_id;
                               bool res = await bloc.insertLineItem(context);
                               if (res) {
                                 Navigator.pop(context, res);
@@ -475,7 +473,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                 bloc.lineitemdetail.value.id, context);
             if (res) {
               Navigator.of(context).pop(); // Close the dialog
-              Navigator.of(context).pop(); // Close the page
+              Navigator.of(context).pop(res); // Close the page
               // Add your delete logic here
             }
           },
@@ -487,6 +485,8 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
   Future<void> _init() async {
     if (widget.lineitem_id.isNotEmpty) {
       await bloc.getLineItemDetail(context, widget.lineitem_id);
+    }else{
+      bloc.lineitemdetail.value.invoiceId = widget.invoice_id;
     }
     bloc.getDetailCategory(context);
     bloc.getProductService(context);

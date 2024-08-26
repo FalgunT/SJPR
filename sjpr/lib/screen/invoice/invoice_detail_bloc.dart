@@ -70,6 +70,7 @@ class InvoiceDetailBloc extends BlocBase {
     if (getLineItemListResponse != null) {
       bool lineCat = false, lineProduct = false;
       //check for category and product selection on any item
+      invoiceDetailData.value.line_item_count = getLineItemListResponse.data!.length;
       for (int i = 0; i < getLineItemListResponse.data!.length; i++) {
         LineItemListData obj = getLineItemListResponse.data![i];
         if (obj.scannedLineItemCategoryId.isNotEmpty &&
