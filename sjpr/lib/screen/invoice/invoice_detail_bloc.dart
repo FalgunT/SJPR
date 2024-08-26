@@ -27,6 +27,7 @@ class InvoiceDetailBloc extends BlocBase {
   List<CategoryListData> cList = [];
   List<TypeListData> tList = [];
   List<ProductServicesListData> pList = [];
+  ValueNotifier<bool> isWaitingForDetail = ValueNotifier<bool>(true);
 
   ValueNotifier<String> selectedValueC = ValueNotifier<String>("None");
   ValueNotifier<String> selectedValueP = ValueNotifier<String>("None");
@@ -40,9 +41,8 @@ class InvoiceDetailBloc extends BlocBase {
   ValueNotifier<bool> hideProd = ValueNotifier<bool>(false);
   ValueNotifier<bool> switchVal = ValueNotifier<bool>(true);
 
-
-
   Future getInvoiceDetail(BuildContext context, String id) async {
+    isWaitingForDetail.value = true;
     var getInvoiceDetailResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
@@ -53,11 +53,13 @@ class InvoiceDetailBloc extends BlocBase {
         CommonToast.getInstance()?.displayToast(
             message: getInvoiceDetailResponse.message!, bContext: context);
       }
-      if (getInvoiceDetailResponse.status == true) {
+      if (getInvoiceDetailResponse.status == true &&
+          getInvoiceDetailResponse.data != null) {
         invoiceDetailData.value = getInvoiceDetailResponse.data!;
         getLineItemList(context, invoiceDetailData.value.id!);
       }
     }
+    isWaitingForDetail.value = false;
   }
 
   Future getLineItemList(BuildContext context, String invoiceId) async {
@@ -89,6 +91,20 @@ class InvoiceDetailBloc extends BlocBase {
         "PROD": lineProduct,
       };
       Check_Cat_Prod(result);
+    }
+  }
+
+  Future getSplitItemList(BuildContext context, String invoiceId) async {
+    var getLineItemListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .getSplitItemList(invoiceId);
+    if (getLineItemListResponse != null) {
+      /* splitItemListStreamController.sink.add(getLineItemListResponse.data);
+
+      splitItemListToBeUpdated =
+          List<SplitListData>.from(getLineItemListResponse.data!);
+      splitItemListLocal.value = getLineItemListResponse.data!;*/
     }
   }
 

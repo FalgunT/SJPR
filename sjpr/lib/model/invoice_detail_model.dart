@@ -9,8 +9,12 @@ class InvoiceDetail {
   InvoiceDetail.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     message = json['message'];
-    data =
-        json['data'] != null ? InvoiceDetailData.fromJson(json['data']) : null;
+    if (json['data'].runtimeType == List<dynamic>) {
+      json['data'] = null;
+    }
+    data = (json['data'] != null)
+        ? InvoiceDetailData.fromJson(json['data'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -127,7 +131,7 @@ class InvoiceDetailData {
   }
 
   get isObjectEmpty {
-    if (this.invoiceFileId == null || this.id == null) {
+    if (this.invoiceFileId == null || this.id == null || scanInvoice == null) {
       return true;
     }
     return false;

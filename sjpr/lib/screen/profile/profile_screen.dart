@@ -124,6 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ProfileData? profile;
     return Scaffold(
         backgroundColor: profileBgColor,
+        appBar: null,
         body: SingleChildScrollView(
           child: Container(
               padding: const EdgeInsets.all(20),
@@ -160,7 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         return Column(
                           children: [
                             const SizedBox(
-                              height: 100,
+                              height: 120,
                             ),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,7 +342,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           Transform.scale(
                                             scale: 0.8,
                                             child: CupertinoSwitch(
-                                              activeColor: listTileBgColor,
+                                              activeTrackColor: listTileBgColor,
                                               thumbColor: activeTxtColor,
                                               value: true,
                                               onChanged: (bool value) {},
@@ -373,7 +374,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           Transform.scale(
                                             scale: 0.8,
                                             child: CupertinoSwitch(
-                                              activeColor: listTileBgColor,
+                                              activeTrackColor: listTileBgColor,
                                               thumbColor: activeTxtColor,
                                               value: true,
                                               onChanged: (bool value) {

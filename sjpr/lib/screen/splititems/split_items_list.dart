@@ -367,7 +367,7 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen> {
                                                     fontSize: 18),
                                               ),
                                             ),
-                                            Container(
+                                            SizedBox(
                                               width: MediaQuery.of(context)
                                                       .size
                                                       .width *

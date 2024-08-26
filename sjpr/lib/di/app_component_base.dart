@@ -8,9 +8,9 @@ class AppComponentBase extends AppComponentBaseRepository {
   final NetworkManager _networkManager = NetworkManager();
   final ApiInterface _apiInterface = ApiInterface();
   final AppSharedPreference _sharedPreference = AppSharedPreference();
-  final StreamController<bool> _progressDialogStreamController =
+  StreamController<bool> _progressDialogStreamController =
       StreamController.broadcast();
-  final StreamController<bool> _disableWidgetStreamController =
+  StreamController<bool> _disableWidgetStreamController =
       StreamController.broadcast();
   Stream<bool> get progressDialogStream =>
       _progressDialogStreamController.stream;
@@ -35,10 +35,16 @@ class AppComponentBase extends AppComponentBaseRepository {
   }
 
   showProgressDialog(bool value) {
+    if (_progressDialogStreamController.isClosed) {
+      _progressDialogStreamController = StreamController.broadcast();
+    }
     _progressDialogStreamController.sink.add(value);
   }
 
   disableWidget(bool value) {
+    if (_disableWidgetStreamController.isClosed) {
+      _disableWidgetStreamController = StreamController.broadcast();
+    }
     _disableWidgetStreamController.sink.add(value);
   }
 

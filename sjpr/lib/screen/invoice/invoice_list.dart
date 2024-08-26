@@ -32,7 +32,6 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
   @override
   void initState() {
     _init();
-
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
 
@@ -205,39 +204,48 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
 
   Widget archiveListView() {
     return ValueListenableBuilder(
-      valueListenable: bloc.archiveListData,
-      builder: (context, value, child) {
-        return value.isEmpty
-            ? getEmptyWidget(StringUtils.emptyArchive, StringUtils.archiveText)
-            : ListView.builder(
-                padding: const EdgeInsets.only(top: 20, bottom: 20),
-                shrinkWrap: true,
-                itemCount: value.length,
-                itemBuilder: (BuildContext context, int index) {
-                  var listData = value[index];
-                  return getChild(listData);
-                });
-      },
-    );
+        valueListenable: bloc.isWaitingArchive,
+        builder: (context, value1, child) {
+          return ValueListenableBuilder(
+            valueListenable: bloc.archiveListData,
+            builder: (context, value, child) {
+              return (value1 == false && value.isEmpty)
+                  ? getEmptyWidget(
+                      StringUtils.emptyArchive, StringUtils.archiveText)
+                  : ListView.builder(
+                      padding: const EdgeInsets.only(top: 20, bottom: 20),
+                      shrinkWrap: true,
+                      itemCount: value.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var listData = value[index];
+                        return getChild(listData);
+                      });
+            },
+          );
+        });
   }
 
   Widget inboxListView() {
     return ValueListenableBuilder(
-      valueListenable: bloc.inboxListData,
-      builder: (context, value, child) {
-        return value.isEmpty
-            ? getEmptyWidget(
-                StringUtils.emptyInbox, StringUtils.tapToCreateNewExpense)
-            : ListView.builder(
-                padding: const EdgeInsets.only(top: 20, bottom: 20),
-                shrinkWrap: true,
-                itemCount: value.length,
-                itemBuilder: (BuildContext context, int index) {
-                  var listData = value[index];
-                  return getChild(listData);
-                });
-      },
-    );
+        valueListenable: bloc.isWaitingInbox,
+        builder: (context, value1, child) {
+          return ValueListenableBuilder(
+            valueListenable: bloc.inboxListData,
+            builder: (context, value, child) {
+              return (value1 == false && value.isEmpty)
+                  ? getEmptyWidget(
+                      StringUtils.emptyInbox, StringUtils.tapToCreateNewExpense)
+                  : ListView.builder(
+                      padding: const EdgeInsets.only(top: 20, bottom: 20),
+                      shrinkWrap: true,
+                      itemCount: value.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var listData = value[index];
+                        return getChild(listData);
+                      });
+            },
+          );
+        });
   }
 
   getEmptyWidget(String title, String details) {
@@ -251,17 +259,18 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
           _showListDialog(listData);
           return;
         }
-
-        await Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => InvoiceDetailScreen(
-                      id: listData.id!,
-                    ))).then((onValue) {
-          if (onValue) {
-            _init();
-          }
-        });
+        if (listData.readStatus == "1") {
+          await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => InvoiceDetailScreen(
+                        id: listData.id!,
+                      ))).then((onValue) {
+            if (onValue) {
+              _init();
+            }
+          });
+        }
       },
       child: Container(
           margin: const EdgeInsets.only(bottom: 10),
@@ -355,7 +364,8 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                       label: 'Delete Invoice',
                       onPressed: () async {
                         Navigator.pop(context, 'Yes Confirm');
-                        bool res = await bloc.DeleteInvoice(listData.id!);
+                        bool res =
+                            await bloc.DeleteInvoice(listData.id!, context);
                         if (res) {
                           //refresh page...
                           _init();

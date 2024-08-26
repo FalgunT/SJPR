@@ -166,7 +166,7 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future<InvoiceList?> getArchiveList(String dt, int isPurchase ) async {
+  Future<InvoiceList?> getArchiveList(String dt, int isPurchase) async {
     Map<String, String> body = {
       'updated_date': dt,
       'is_purchase': '$isPurchase',
@@ -185,6 +185,7 @@ class ApiServices extends ApiClient {
         headers: getLogoutHeader(), isBackground: true);
     if (response != null) {
       var data = InvoiceDetail.fromJson(json.decode(response));
+
       return data;
     }
     return null;
@@ -242,6 +243,7 @@ class ApiServices extends ApiClient {
     }
     return null;
   }
+
   Future<CommonModelClass?> MovetoInbox(String invid) async {
     Map<String, String> body = {
       'invoice_file_id': invid,
@@ -254,6 +256,7 @@ class ApiServices extends ApiClient {
     }
     return null;
   }
+
   Future<CommonModelClass?> DeleteInvoice(String invid) async {
     Map<String, String> body = {
       'invoice_file_id': invid,

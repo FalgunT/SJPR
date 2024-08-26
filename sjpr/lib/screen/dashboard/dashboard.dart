@@ -224,6 +224,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       padding: const EdgeInsets.all(12),
                       mainAxisSpacing: 20.0,
                       crossAxisSpacing: 20.0,
+                      physics: const ScrollPhysics(),
                       shrinkWrap: true,
                       children: List.generate(dashboardItems.length, (index) {
                         return GestureDetector(

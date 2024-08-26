@@ -20,42 +20,45 @@ class InvoiceBloc extends BlocBase {
 
   ValueNotifier<List<InvoiceListData>> inboxListData =
       ValueNotifier<List<InvoiceListData>>([]);
-
+  ValueNotifier<bool> isWaitingInbox = ValueNotifier<bool>(true);
+  ValueNotifier<bool> isWaitingArchive = ValueNotifier<bool>(true);
   ValueNotifier<List<InvoiceListData>> archiveListData =
       ValueNotifier<List<InvoiceListData>>([]);
 
   Future getInvoiceList(BuildContext context) async {
+    isWaitingInbox.value = true;
     var getInvoiceListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
         .getInvoiceList();
     if (getInvoiceListResponse != null) {
-      if (getInvoiceListResponse.message != null) {
-        CommonToast.getInstance()?.displayToast(
-            message: getInvoiceListResponse.message!, bContext: context);
-      }
       if (getInvoiceListResponse.status == true) {
         inboxListData.value = getInvoiceListResponse.data!;
         // invoiceListStreamController.sink.add(getInvoiceListResponse);
+      } else if (getInvoiceListResponse.message != null) {
+        CommonToast.getInstance()?.displayToast(
+            message: getInvoiceListResponse.message!, bContext: context);
       }
     }
+    isWaitingInbox.value = false;
   }
 
   Future getArchiveList(BuildContext context) async {
+    isWaitingArchive.value = true;
     var getInvoiceListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
         .getArchiveList('', 0);
     if (getInvoiceListResponse != null) {
-      if (getInvoiceListResponse.message != null) {
-        CommonToast.getInstance()?.displayToast(
-            message: getInvoiceListResponse.message!, bContext: context);
-      }
       if (getInvoiceListResponse.status == true) {
         archiveListData.value = getInvoiceListResponse.data!;
         //invoiceArcListStreamController.sink.add(getInvoiceListResponse);
-      } else {}
+      } else if (getInvoiceListResponse.message != null) {
+        CommonToast.getInstance()?.displayToast(
+            message: getInvoiceListResponse.message!, bContext: context);
+      }
     }
+    isWaitingArchive.value = false;
   }
 
   Future uploadInvoice(BuildContext context, XFile invoice) async {
@@ -107,12 +110,16 @@ class InvoiceBloc extends BlocBase {
     return false;
   }
 
-  DeleteInvoice(String id) async {
+  DeleteInvoice(String id, BuildContext context) async {
     var getResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
         .DeleteInvoice(id);
     if (getResponse != null) {
+      if (getResponse.message != null) {
+        CommonToast.getInstance()
+            ?.displayToast(message: getResponse.message!, bContext: context);
+      }
       return getResponse.status;
     }
     return false;
@@ -135,6 +142,4 @@ class InvoiceBloc extends BlocBase {
     }
     return 'Unknown';
   }
-
-
 }
