@@ -103,7 +103,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               },
                               child: Container(
                                 padding: const EdgeInsets.only(
-                                    left: 10, right: 10),
+                                    left: 8, right: 8),
                                 height: 40,
                                 width: 100,
                                 decoration: BoxDecoration(
