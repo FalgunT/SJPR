@@ -285,11 +285,10 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                         fontWeight: FontWeight.w400,
                         color: textColor),
                   ),
-                  trailing: SizedBox(
-                    width: 100,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                  trailing: Wrap(
+                      //Wrap - place in row if space, otherwise wrap
+                      direction: Axis.horizontal,
+                      alignment: WrapAlignment.spaceBetween,
                       children: [
                         Text(
                           widget.currencySign +
@@ -297,19 +296,18 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                               "",
                           style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
                               color: textColor),
                         ),
                         const SizedBox(
-                          width: 4,
+                          width: 8,
                         ),
+
                         Icon(
                           Icons.arrow_forward_ios,
                           color: textColor,
                         )
-                      ],
-                    ),
-                  ),
+                      ]),
                 ),
               );
             });

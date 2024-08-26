@@ -342,7 +342,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           Transform.scale(
                                             scale: 0.8,
                                             child: CupertinoSwitch(
-                                              activeTrackColor: listTileBgColor,
+                                              activeColor: listTileBgColor,
                                               thumbColor: activeTxtColor,
                                               value: true,
                                               onChanged: (bool value) {},
@@ -374,7 +374,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           Transform.scale(
                                             scale: 0.8,
                                             child: CupertinoSwitch(
-                                              activeTrackColor: listTileBgColor,
+                                              activeColor: listTileBgColor,
                                               thumbColor: activeTxtColor,
                                               value: true,
                                               onChanged: (bool value) {

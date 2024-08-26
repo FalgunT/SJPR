@@ -47,4 +47,5 @@ class SvgImages {
   static String multiple = 'lib/assets/multiple.svg';
   static String combine = 'lib/assets/combine.svg';
   static String single = 'lib/assets/single.svg';
+  static String comingsoon = 'lib/assets/commingsoon.svg';
 }

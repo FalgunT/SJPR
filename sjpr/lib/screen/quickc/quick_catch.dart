@@ -7,6 +7,7 @@ import 'package:sjpr/utils/string_utils.dart';
 import 'package:sjpr/screen/dashboard/dashboard.dart';
 import 'package:sjpr/screen/dashboard/dashboard_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:sjpr/widgets/comming_soon_dialog.dart';
 
 class QuickCatch extends StatefulWidget {
   const QuickCatch({super.key});
@@ -19,6 +20,7 @@ class _QuickCatchState extends State<QuickCatch> with TickerProviderStateMixin {
   final DashboardBloc bloc = DashboardBloc.getInstance();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<QuickCatchItems> quickCatchItems = [];
+
   @override
   void initState() {
     super.initState();
@@ -185,6 +187,13 @@ class _QuickCatchState extends State<QuickCatch> with TickerProviderStateMixin {
                                           switch (index) {
                                             case 0:
                                               if (index1 == 0) {
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return const CommingSoonDialog();
+                                                  },
+                                                );
                                               } else {
                                                 Navigator.push(
                                                   context,
@@ -197,34 +206,91 @@ class _QuickCatchState extends State<QuickCatch> with TickerProviderStateMixin {
                                               break;
                                             case 1:
                                               if (index1 == 0) {
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return const CommingSoonDialog();
+                                                  },
+                                                );
                                               } else {
-                                                Navigator.push(
+                                                /* Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) {
                                                     return const InvoiceListScreen();
                                                   }),
+                                                );*/
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return const CommingSoonDialog();
+                                                  },
                                                 );
                                               }
                                               break;
                                             case 2:
-                                              Navigator.push(
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return const CommingSoonDialog();
+                                                },
+                                              );
+
+                                              /*Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) {
                                                   return const ExportDataScreen();
                                                 }),
-                                              );
+                                              );*/
                                               break;
                                             case 3:
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return const CommingSoonDialog();
+                                                },
+                                              );
                                               break;
                                             case 4:
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return const CommingSoonDialog();
+                                                },
+                                              );
                                               break;
                                             case 5:
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return const CommingSoonDialog();
+                                                },
+                                              );
                                               break;
                                             case 6:
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return const CommingSoonDialog();
+                                                },
+                                              );
                                               break;
                                             case 7:
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return const CommingSoonDialog();
+                                                },
+                                              );
                                               break;
                                             default:
                                               break;
@@ -308,5 +374,6 @@ class _QuickCatchState extends State<QuickCatch> with TickerProviderStateMixin {
 class QuickCatchItems {
   String? title;
   List<DashboardItems>? dashboardItems;
+
   QuickCatchItems(this.title, {required this.dashboardItems});
 }

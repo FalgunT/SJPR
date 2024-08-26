@@ -535,8 +535,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
   }
 
   getLines() {
-    return bloc.invoiceDetailData.value.line_item_count! == 0
-        ? Center()
+    int count = bloc.invoiceDetailData.value.line_item_count ?? 0;
+    return count == 0
+        ? const Center()
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -630,8 +631,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
   }
 
   getSplits() {
-    return bloc.invoiceDetailData.value.line_item_count! == 0
-        ? Center()
+    int count = bloc.invoiceDetailData.value.split_item_count ?? 0;
+    return count == 0
+        ? const Center()
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -671,7 +673,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: Text("Consult line items",
+                                    child: Text("Consult split items",
                                         style: TextStyle(
                                             color: appTheme.textColor,
                                             fontSize: 16,
