@@ -1,3 +1,4 @@
+/*
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
@@ -217,10 +218,12 @@ class _CustomCameraState extends State<CustomCamera> {
                       flex: 1,
                       child: IconButton(
                         onPressed: () async {
-                          /*   final path = join(
+                          */
+/*   final path = join(
                             (await getTemporaryDirectory()).path,
                             '${DateTime.now()}.jpg',
-                          );*/
+                          );*//*
+
                           if (mode == 1) {
                             cModels = [];
                           }
@@ -276,7 +279,9 @@ class _CustomCameraState extends State<CustomCamera> {
         context: context,
         builder: (context) {
           return StatefulBuilder(builder: (BuildContext context,
-              StateSetter setSheetState /*You can rename this!*/) {
+              StateSetter setSheetState */
+/*You can rename this!*//*
+) {
             return Padding(
                 padding: EdgeInsets.fromLTRB(
                     20, 20, 20, MediaQuery.of(context).viewInsets.bottom),
@@ -353,3 +358,4 @@ class CamaraResponse {
 
   CamaraResponse({required this.models, required this.mode});
 }
+*/

@@ -8,6 +8,8 @@ import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/screen/invoice/custom_camera.dart';
 import 'package:sjpr/screen/invoice/invoice_list.dart';
 
+import 'custom_camera2.dart';
+
 class InvoiceBloc extends BlocBase {
   // StreamController mainStreamController = StreamController.broadcast();
   // Stream get mainStream => mainStreamreamController.stream;
@@ -61,7 +63,9 @@ class InvoiceBloc extends BlocBase {
     isWaitingArchive.value = false;
   }
 
-  Future uploadInvoice(BuildContext context, XFile invoice) async {
+ /*
+ old
+ Future uploadInvoice(BuildContext context, XFile invoice) async {
     var getInvoiceListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
@@ -77,10 +81,40 @@ class InvoiceBloc extends BlocBase {
       }
     }
   }
+  uploadMultiInvoice(BuildContext context, List<CaptureModel> captures,
+      String uploadMode) async {
+    var getInvoiceListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .uploadMultiInvoice(invoice: captures, uploadMode: uploadMode);
+    if (getInvoiceListResponse != null &&
+        getInvoiceListResponse.status == true) {
+      //invoiceListStreamController.sink.add(getInvoiceListResponse.data!);
+    }
+    if (getInvoiceListResponse != null) {
+      if (getInvoiceListResponse.message != null) {
+        CommonToast.getInstance()?.displayToast(
+            message: getInvoiceListResponse.message!, bContext: context);
+      }
+    }
+  }*/
 
-  @override
-  void dispose() {}
-
+  Future uploadInvoice(BuildContext context, String path) async {
+    var getInvoiceListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .uploadInvoice(invoicepath: path);
+    if (getInvoiceListResponse != null &&
+        getInvoiceListResponse.status == true) {
+      //invoiceListStreamController.sink.add(getInvoiceListResponse.data!);
+    }
+    if (getInvoiceListResponse != null) {
+      if (getInvoiceListResponse.message != null) {
+        CommonToast.getInstance()?.displayToast(
+            message: getInvoiceListResponse.message!, bContext: context);
+      }
+    }
+  }
   uploadMultiInvoice(BuildContext context, List<CaptureModel> captures,
       String uploadMode) async {
     var getInvoiceListResponse = await AppComponentBase.getInstance()
@@ -142,4 +176,7 @@ class InvoiceBloc extends BlocBase {
     }
     return 'Unknown';
   }
+
+  @override
+  void dispose() {}
 }

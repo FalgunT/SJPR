@@ -27,4 +27,16 @@ class AppSharedPreference {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value);
   }
+
+  Future getPictureInstructionStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool stringValue = prefs.getBool("PictureInstructionStatus")??false;
+    return stringValue;
+  }
+
+
+  Future setPictureInstructionStatus({ required bool value}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('PictureInstructionStatus', value);
+  }
 }

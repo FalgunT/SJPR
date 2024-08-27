@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sjpr/screen/invoice/custom_camera.dart';
 
-class ImageStack extends StatelessWidget {
+/*class ImageStack extends StatelessWidget {
   late List<CaptureModel> widgets = [];
 
   ImageStack({super.key, required this.widgets});
@@ -31,4 +31,4 @@ class ImageStack extends StatelessWidget {
     }
     return positioned;
   }
-}
+}*/

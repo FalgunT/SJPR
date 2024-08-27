@@ -20,7 +20,9 @@ import 'package:sjpr/services/api_services.dart';
 
 import '../model/api_response_costomer.dart';
 import '../model/payment_methods.dart';
-import '../screen/invoice/custom_camera.dart';
+import '../screen/invoice/custom_camera2.dart';
+
+//import '../screen/invoice/custom_camera.dart';
 
 class ApiRepositoryIml extends ApiRepository {
   final ApiServices _apiServices = ApiServices();
@@ -40,9 +42,24 @@ class ApiRepositoryIml extends ApiRepository {
     return _apiServices.profile();
   }
 
-  @override
+  /*
+ old
+
+ @override
   Future<CommonModelClass?> uploadInvoice({required XFile invoice}) {
     return _apiServices.uploadInvoice(invoice: invoice);
+  }
+
+  @override
+  Future<CommonModelClass?> uploadMultiInvoice(
+      {required List<CaptureModel> invoice, required String uploadMode}) {
+    return _apiServices.uploadMultiInvoice(
+        invoices: invoice, uploadMode: uploadMode);
+  }*/
+
+  @override
+  Future<CommonModelClass?> uploadInvoice({required String invoicepath}) {
+    return _apiServices.uploadInvoice(invoicepath: invoicepath);
   }
 
   @override
@@ -177,7 +194,6 @@ class ApiRepositoryIml extends ApiRepository {
     return _apiServices.getSplitItemList(invoiceId);
   }
 
-
   @override
   Future<CommonModelClass?> updateSplitItemList(
       List<SplitListData> lstSplitListDataRequest) {
@@ -199,11 +215,11 @@ class ApiRepositoryIml extends ApiRepository {
   Future<CommonModelClass?> CancelInvoic(String id) {
     return _apiServices.CancelInvoice(id);
   }
+
   @override
   Future<CommonModelClass?> MovetoInbox(String id) {
     return _apiServices.MovetoInbox(id);
   }
-
 
   @override
   Future<CommonModelClass?> DeleteInvoice(String id) {
@@ -214,9 +230,6 @@ class ApiRepositoryIml extends ApiRepository {
   Future<InvoiceList?> getArchiveList(String dt, int isPurchase) {
     return _apiServices.getArchiveList(dt, isPurchase);
   }
-
-
-
 }
 
 abstract class ApiRepository {
@@ -228,7 +241,14 @@ abstract class ApiRepository {
 
   Future<CommonModelClass?> addProduct({required String pName});
 
+  /*
+  old
   Future<CommonModelClass?> uploadInvoice({required XFile invoice});
+
+  Future<CommonModelClass?> uploadMultiInvoice(
+      {required List<CaptureModel> invoice, required String uploadMode});*/
+
+  Future<CommonModelClass?> uploadInvoice({required String invoicepath});
 
   Future<CommonModelClass?> uploadMultiInvoice(
       {required List<CaptureModel> invoice, required String uploadMode});
@@ -242,8 +262,8 @@ abstract class ApiRepository {
   Future<CommonModelClass?> CancelInvoic(String id);
 
   Future<CommonModelClass?> MovetoInbox(String id);
-  Future<CommonModelClass?> DeleteInvoice(String id);
 
+  Future<CommonModelClass?> DeleteInvoice(String id);
 
   Future<CategoryList?> getCategoryList();
 
@@ -294,6 +314,4 @@ abstract class ApiRepository {
 
   Future<CommonModelClass?> insertSplitItemDetail(String invoiceId,
       String categoryId, String totalAmount, String totalTaxAmount);
-
-
 }

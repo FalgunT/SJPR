@@ -26,7 +26,8 @@ import 'package:http/http.dart' as http;
 import '../di/app_shared_preferences.dart';
 import '../model/api_response_class.dart';
 import '../model/api_response_costomer.dart';
-import '../screen/invoice/custom_camera.dart';
+import '../screen/invoice/custom_camera2.dart';
+//import '../screen/invoice/custom_camera.dart';
 
 class ApiServices extends ApiClient {
   Future<Login?> login(String email, String password) async {
@@ -70,8 +71,8 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future<CommonModelClass?> uploadInvoice({required XFile invoice}) async {
-    /*  if (ApiClient.bearerToken.isEmpty) {
+  /*Future<CommonModelClass?> uploadInvoice({required XFile invoice}) async {
+    *//*  if (ApiClient.bearerToken.isEmpty) {
       var tokenValue = await AppComponentBase.getInstance()
           ?.getApiInterface()
           .getApiRepository()
@@ -81,7 +82,7 @@ class ApiServices extends ApiClient {
           ApiClient.bearerToken = tokenValue.accessToken!;
         }
       }
-    }*/
+    }*//*
     AppComponentBase.getInstance()?.showProgressDialog(true);
     AppComponentBase.getInstance()?.disableWidget(true);
     var result = invoice.path.split('.');
@@ -154,7 +155,96 @@ class ApiServices extends ApiClient {
       return data;
     }
     return null;
+  }*/
+
+//new Engine function***************
+  Future<CommonModelClass?> uploadInvoice({required String invoicepath}) async {
+    /*  if (ApiClient.bearerToken.isEmpty) {
+      var tokenValue = await AppComponentBase.getInstance()
+          ?.getApiInterface()
+          .getApiRepository()
+          .token();
+      if (tokenValue != null && tokenValue.accessToken != null) {
+        if (tokenValue.accessToken!.isNotEmpty) {
+          ApiClient.bearerToken = tokenValue.accessToken!;
+        }
+      }
+    }*/
+    AppComponentBase.getInstance()?.showProgressDialog(true);
+    AppComponentBase.getInstance()?.disableWidget(true);
+    var result = invoicepath.split('.');
+    var mimeType = result.last;
+    Map body = {"invoice_type": mimeType, "upload_mode": "single"};
+    //String jsonString = json.encode(body);
+    var request =
+    http.MultipartRequest("POST", Uri.parse(ApiClient.uploadInvoice));
+    for (var entry in body.entries) {
+      request.fields[entry.key] = entry.value;
+      if (kDebugMode) {
+        print(entry.value);
+      }
+    }
+
+    request.files.add(await http.MultipartFile.fromPath(
+      'upload_invoice',
+      invoicepath,
+    ));
+    //request.headers.addAll(getLogoutHeader());
+    var response = await postsMultipart(
+      request,
+      headers: getLogoutHeader(),
+      encoding: Encoding.getByName('utf-8'),
+      isBackground: true,
+    );
+    AppComponentBase.getInstance()?.showProgressDialog(false);
+    AppComponentBase.getInstance()?.disableWidget(false);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
   }
+
+  Future<CommonModelClass?> uploadMultiInvoice(
+      {required List<CaptureModel> invoices,
+        required String uploadMode}) async {
+    AppComponentBase.getInstance()?.showProgressDialog(true);
+    AppComponentBase.getInstance()?.disableWidget(true);
+
+    Map body = {"invoice_type": 'pdf', "upload_mode": uploadMode};
+    //String jsonString = json.encode(body);
+    var request =
+    http.MultipartRequest("POST", Uri.parse(ApiClient.uploadInvoice));
+    for (var entry in body.entries) {
+      request.fields[entry.key] = entry.value;
+      if (kDebugMode) {
+        print(entry.value);
+      }
+    }
+    for (int i = 0; i < invoices.length; i++) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'upload_invoice[]',
+        invoices[i].capturePath,
+      ));
+    }
+
+    //request.headers.addAll(getLogoutHeader());
+    var response = await postsMultipart(
+      request,
+      headers: getLogoutHeader(),
+      encoding: Encoding.getByName('utf-8'),
+      isBackground: true,
+    );
+    AppComponentBase.getInstance()?.showProgressDialog(false);
+    AppComponentBase.getInstance()?.disableWidget(false);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+
+  //Ends here *********************
 
   Future<InvoiceList?> getInvoiceList() async {
     var response = await gets(ApiClient.getInvoiceList,

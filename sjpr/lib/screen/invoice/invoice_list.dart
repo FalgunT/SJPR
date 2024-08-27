@@ -4,7 +4,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:popover/popover.dart';
 import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail.dart';
@@ -16,6 +15,7 @@ import 'package:sjpr/utils/string_utils.dart';
 import 'package:sjpr/widgets/delete_confirmation_dialog.dart';
 import 'package:sjpr/widgets/empty_item_widget.dart';
 import 'custom_camera.dart';
+import 'custom_camera2.dart';
 
 class InvoiceListScreen extends StatefulWidget {
   const InvoiceListScreen({super.key});
@@ -420,7 +420,9 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
   }
 
   void _showPicker(BuildContext context) {
-    showModalBottomSheet(
+
+    _imgFromCamera(context);
+    /*showModalBottomSheet(
         backgroundColor: listTileBgColor,
         isScrollControlled: true,
         context: context,
@@ -527,10 +529,32 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
               ],
             ),
           );
-        });
+        });*/
   }
 
+
   Future<void> _imgFromCamera(BuildContext context) async {
+    //Navigator.of(context).pop();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return const PictureCapture();
+      }),
+    ).then((response) async {
+      if (response.models.isNotEmpty) {
+        debugPrint('Mode--->${response.mode}');
+        //  var file = XFile(invoice.path!, name: invoice.name, bytes: invoice.bytes, length: invoice.size);
+        if (response.mode == 1) {
+          await bloc.uploadInvoice(context, response.models[0].capturePath);
+        } else {
+          await bloc.uploadMultiInvoice(context, response.models,
+              response.mode == 2 ? 'multiple' : "combine");
+        }
+        bloc.getInvoiceList(context);
+      }
+    });
+  }
+  /*Future<void> _imgFromCamera(BuildContext context) async {
     Navigator.of(context).pop();
     Navigator.push(
       context,
@@ -549,8 +573,8 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
         bloc.getInvoiceList(context);
       }
     });
-  }
-
+  }*/
+/*
   Future<void> _imgFromGallery(BuildContext context, int mode) async {
     List<PlatformFile>? invoices = await _pickFile(mode);
     if (invoices != null) {
@@ -577,7 +601,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
             context, models, mode == 2 ? 'multiple' : "combine");
       }
 
-      /*final picker = ImagePicker();
+      *//*final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
@@ -585,7 +609,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
       File imageFile = File(pickedFile.path);
       // Process the image file
       print('Image selected: ${imageFile.path}');
-    }*/
+    }*//*
     }
-  }
+  }*/
 }
