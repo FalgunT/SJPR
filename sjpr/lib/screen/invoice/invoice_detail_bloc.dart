@@ -423,6 +423,12 @@ class InvoiceDetailBloc extends BlocBase {
           message: "Due Date field is required", bContext: context);
       return false;
     }
+    String invid = invoiceDetailData.value.invoiceId ?? "";
+    if (invid == "") {
+      CommonToast.getInstance()?.displayToast(
+          message: "Invoice Number field is required", bContext: context);
+      return false;
+    }
     String curid = invoiceDetailData.value.scanned_currency_id ?? "";
     if (curid == "") {
       CommonToast.getInstance()?.displayToast(
