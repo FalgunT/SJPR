@@ -125,6 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 bottomSheet(BuildContext context) {
+
   final appTheme = AppTheme.of(context);
   LoginBloc loginBloc = LoginBloc();
   loginBloc.initData();
@@ -133,86 +134,90 @@ bottomSheet(BuildContext context) {
       isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
-        return Padding(
-          padding: EdgeInsets.fromLTRB(
-              20, 20, 20, MediaQuery.of(context).viewInsets.bottom),
-          /*   padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context)
-                  .viewInsets
-                  .bottom), */ // Add bottom padding to avoid keyboard overlap
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.35,
-            child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "Login to your account",
-                          style: TextStyle(
-                              color: appTheme.textColor, fontSize: 18),
+        return Wrap(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                  20, 20, 20, 24),
+              /*   padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context)
+                      .viewInsets
+                      .bottom), */ // Add bottom padding to avoid keyboard overlap
+              child: Form(
+                key: formKey,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Login to your account",
+                            style: TextStyle(
+                                color: appTheme.textColor, fontSize: 18),
+                          ),
                         ),
-                      ),
-                      IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            color: appTheme.textColor,
-                          ))
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  CommonTextField(
-                    controller: loginBloc.emailController,
-                    hintText: "Enter your Email address",
-                    validation: (String? val) {
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(val!)) {
-                        return 'This Email Format is not valid.';
-                      }
-                      if (val.isEmpty) {
-                        return 'This field can\'t be empty';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  CommonTextField(
-                    controller: loginBloc.passwordController,
-                    hintText: "Enter your password",
-                    isPassword: true,
-                    validation: (String? val) {
-                      if (val == null || val.isEmpty) {
-                        return 'This field can\'t be empty';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  CommonButton(
-                      content: "Login",
-                      bgColor: appTheme.buttonBgColor,
-                      textColor: appTheme.buttonTextColor,
-                      outlinedBorderColor: appTheme.buttonBgColor,
-                      onPressed: () async {
-                        if (formKey.currentState!.validate()) {
-                          loginBloc.login(context, true);
+                        IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(
+                              Icons.close,
+                              color: appTheme.textColor,
+                            ))
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    CommonTextField(
+                      controller: loginBloc.emailController,
+                      hintText: "Enter your Email address",
+                      validation: (String? val) {
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(val!)) {
+                          return 'This Email Format is not valid.';
                         }
-                      })
-                ],
+                        if (val.isEmpty) {
+                          return 'This field can\'t be empty';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    CommonTextField(
+                      controller: loginBloc.passwordController,
+                      hintText: "Enter your password",
+                      isPassword: true,
+                      validation: (String? val) {
+                        if (val == null || val.isEmpty) {
+                          return 'This field can\'t be empty';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    CommonButton(
+                        content: "Login",
+                        bgColor: appTheme.buttonBgColor,
+                        textColor: appTheme.buttonTextColor,
+                        outlinedBorderColor: appTheme.buttonBgColor,
+                        onPressed: () async {
+                          if (formKey.currentState!.validate()) {
+                            loginBloc.login(context, true);
+                          }
+                        }),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
+          ],
         );
       });
 }
