@@ -443,9 +443,10 @@ class InvoiceDetailBloc extends BlocBase {
     }
     String tax = invoiceDetailData.value.totalTaxAmount ?? "";
     if (tax.isEmpty) {
-      CommonToast.getInstance()
-          ?.displayToast(message: "Tax  field is required", bContext: context);
-      return false;
+      invoiceDetailData.value.totalTaxAmount="0";
+      // CommonToast.getInstance()
+      //     ?.displayToast(message: "Tax  field is required", bContext: context);
+      // return false;
     }
     String net = invoiceDetailData.value.netAmount ?? "";
     if (net.isEmpty) {

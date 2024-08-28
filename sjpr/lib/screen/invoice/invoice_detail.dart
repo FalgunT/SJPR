@@ -294,10 +294,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     title: "Edit Invoice Number",
                                     hint: 'Enter Invoice Number',
                                     label: 'Invoice Number',
-                                    oldValue: bloc
-                                        .invoiceDetailData
-                                        .value
-                                        .invoiceId ??
+                                    oldValue: bloc.invoiceDetailData.value
+                                            .invoiceId ??
                                         "",
                                     type: SheetType.none,
                                     onPressed: (String v) {
@@ -307,7 +305,6 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                       setState(() {});
                                     });
                               }),
-
                               ValueListenableBuilder(
                                 valueListenable: bloc.selectedValueCur,
                                 builder: (context, value, child) {
@@ -334,7 +331,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               commonRowWidget(context,
                                   title: "Total",
                                   value:
-                                      '${bloc.invoiceDetailData.value.netAmount ?? 0.00}',
+                                  bloc.getFormetted(bloc
+                                      .invoiceDetailData
+                                      .value
+                                      .netAmount ??
+                                      "0.00"),
                                   isNumber: true, onTap: () {
                                 AddNewItemDialog(
                                     isAmt: true,
@@ -360,7 +361,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                   title: "Tax",
                                   isNumber: true,
                                   value:
-                                      '${bloc.invoiceDetailData.value.totalTaxAmount ?? 0.00}',
+                                  bloc.getFormetted(bloc
+                                      .invoiceDetailData
+                                      .value
+                                      .totalTaxAmount ??
+                                      "0.00"),
                                   onTap: () {
                                 AddNewItemDialog(
                                     isAmt: true,
@@ -385,9 +390,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               commonRowWidget(context,
                                   title: "Tax Total",
                                   isNumber: true,
-                                  value:
-                                      '${bloc.invoiceDetailData.value.totalAmount ?? 0.00}',
-                                  onTap: () {
+                                  value: bloc.getFormetted(bloc
+                                          .invoiceDetailData
+                                          .value
+                                          .totalAmount ??
+                                      "0.00"), onTap: () {
                                 AddNewItemDialog(
                                     isAmt: true,
                                     context: context,
