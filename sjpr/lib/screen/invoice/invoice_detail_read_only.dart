@@ -303,6 +303,32 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                                           .dueDate, onTap: () {
                                     _selectDate(context, 5);
                                   }),
+
+                                  commonRowWidget(context,
+                                      isClickable: false,
+                                      title: "Invoice Number",
+                                      value: bloc.invoiceDetailData.value.invoiceId,
+                                      onTap: () {
+                                        AddNewItemDialog(
+                                            isAmt: false,
+                                            context: context,
+                                            title: "Edit Invoice Number",
+                                            hint: 'Enter Invoice Number',
+                                            label: 'Invoice Number',
+                                            oldValue: bloc
+                                                .invoiceDetailData
+                                                .value
+                                                .invoiceId ??
+                                                "",
+                                            type: SheetType.none,
+                                            onPressed: (String v) {
+                                              debugPrint('F() called--->, $v');
+                                              bloc.invoiceDetailData.value.invoiceId =
+                                                  v;
+                                              setState(() {});
+                                            });
+                                      }),
+
                                   ValueListenableBuilder(
                                     valueListenable: bloc.selectedValueCur,
                                     builder: (context, value, child) {
