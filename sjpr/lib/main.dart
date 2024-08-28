@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_document_scanner/flutter_document_scanner.dart';
+import 'package:sjpr/common/app_session.dart';
 import 'package:sjpr/common/custom_progress.dart';
 import 'package:sjpr/di/app_component_base.dart';
 import 'package:sjpr/di/app_shared_preferences.dart';
@@ -8,15 +9,21 @@ import 'package:sjpr/screen/auth/login_screen.dart';
 import 'package:sjpr/screen/dashboard/dashboard.dart';
 import 'package:sjpr/services/api_client.dart';
 
-late List<CameraDescription> cameras;
+//late List<CameraDescription> cameras;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    AppSession.getInstance()?.clearCache();
+  } catch (e) {
+    print(e);
+  }
   AppComponentBase.getInstance()?.initialiseNetworkManager();
-  cameras = await availableCameras();
+  //cameras = await availableCameras();
   var token = await AppComponentBase.getInstance()
       ?.getSharedPreference()
       .getUserDetail(key: AppSharedPreference.token);
   if (token != null) ApiClient.logoutHeaderValue = token;
+
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(MyApp(token: token));

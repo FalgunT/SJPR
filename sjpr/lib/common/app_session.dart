@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -44,6 +46,23 @@ class AppSession {
       }
     } catch (e) {
       print('Error clearing cache: $e');
+    }
+  }
+
+  Future<bool> deleteFile(String path) async {
+    try {
+      final file = File(path);
+      if (await file.exists()) {
+        await file.delete();
+        print('File deleted: $path');
+        return true;
+      } else {
+        print('File not found: $path');
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      return false;
     }
   }
 }
