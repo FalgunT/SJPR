@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 Color backGroundColor = Colors.black;
 Color textColor = Colors.white;
-Color activeTxtColor = const Color.fromRGBO(182, 147, 52, 1);
+Color activeTxtColor = const Color.fromRGBO(186, 158, 46, 1);
 Color buttonTextColor = Colors.black;
-Color buttonBgColor = const Color.fromRGBO(182, 147, 52, 1);
+Color buttonBgColor = const Color.fromRGBO(186, 158, 46, 1);
 Color listTileBgColor = const Color(0xFF2C2D33);
 Color redColor = const Color(0xFFD22B2B);
 

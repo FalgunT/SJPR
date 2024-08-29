@@ -322,72 +322,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(
                               height: 20,
                             ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                      padding: const EdgeInsets.all(15),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          color: profileListBgColor),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                              width: MediaQuery.sizeOf(context)
+                            IntrinsicHeight(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                        padding: const EdgeInsets.all(15),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                            color: profileListBgColor),
+                                        child: Row(
+                                          children: [
+                                            const Expanded(
+                                                /* width: MediaQuery.sizeOf(context)
+                                                        .width *
+                                                    0.2,*/
+                                                child: Text("Open on Camera")),
+                                            Transform.scale(
+                                              scale: 0.8,
+                                              child: CupertinoSwitch(
+                                                activeColor: listTileBgColor,
+                                                thumbColor: activeTxtColor,
+                                                value: true,
+                                                onChanged: (bool value) {},
+                                              ),
+                                            )
+                                          ],
+                                        )),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                            color: profileListBgColor),
+                                        padding: const EdgeInsets.all(15),
+                                        child: Row(
+                                          children: [
+                                            const Expanded(
+                                              /* width: MediaQuery.sizeOf(context)
                                                       .width *
-                                                  0.2,
-                                              child:
-                                                  const Text("Open on Camera")),
-                                          Transform.scale(
-                                            scale: 0.8,
-                                            child: CupertinoSwitch(
-                                              activeColor: listTileBgColor,
-                                              thumbColor: activeTxtColor,
-                                              value: true,
-                                              onChanged: (bool value) {},
+                                                  0.2,*/
+                                              child: Text(
+                                                "Save to Gallery",
+                                              ),
                                             ),
-                                          )
-                                        ],
-                                      )),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                  child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          color: profileListBgColor),
-                                      padding: const EdgeInsets.all(15),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: MediaQuery.sizeOf(context)
-                                                    .width *
-                                                0.2,
-                                            child: const Text(
-                                              "Save to Gallery",
-                                            ),
-                                          ),
-                                          Transform.scale(
-                                            scale: 0.8,
-                                            child: CupertinoSwitch(
-                                              activeColor: listTileBgColor,
-                                              thumbColor: activeTxtColor,
-                                              value: true,
-                                              onChanged: (bool value) {
-                                                // setState(() {
-                                                //   switchValue = value;
-                                                // });
-                                              },
-                                            ),
-                                          )
-                                        ],
-                                      )),
-                                ),
-                              ],
+                                            Transform.scale(
+                                              scale: 0.8,
+                                              child: CupertinoSwitch(
+                                                activeColor: listTileBgColor,
+                                                thumbColor: activeTxtColor,
+                                                value: true,
+                                                onChanged: (bool value) {
+                                                  // setState(() {
+                                                  //   switchValue = value;
+                                                  // });
+                                                },
+                                              ),
+                                            )
+                                          ],
+                                        )),
+                                  ),
+                                ],
+                              ),
                             ),
                             /*const SizedBox(
                       height: 20,

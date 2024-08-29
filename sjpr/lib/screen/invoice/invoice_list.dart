@@ -12,6 +12,7 @@ import 'package:sjpr/screen/invoice/invoice_list_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/image_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
+import 'package:sjpr/widgets/custom_camera_modes.dart';
 import 'package:sjpr/widgets/delete_confirmation_dialog.dart';
 import 'package:sjpr/widgets/empty_item_widget.dart';
 import 'custom_camera.dart';
@@ -390,7 +391,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                     child: getOptionChild(
                         Icons.move_to_inbox_outlined, 'Move to Inbox'),
                   )
-                : Center(),
+                : const Center(),
           ],
         );
       },
@@ -399,7 +400,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
 
   getOptionChild(IconData icon, String text) {
     return Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Wrap(
           crossAxisAlignment: WrapCrossAlignment.start,
           children: [
@@ -420,7 +421,6 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
   }
 
   void _showPicker(BuildContext context) {
-
     _imgFromCamera(context);
     /*showModalBottomSheet(
         backgroundColor: listTileBgColor,
@@ -459,7 +459,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                 ExpansionTile(
                   iconColor: Colors.white,
                   collapsedIconColor: Colors.white,
-                  shape: Border(),
+                  shape: const Border(),
                   initiallyExpanded: true,
                   leading: Icon(Icons.photo_library, color: textColor),
                   title: Text(
@@ -532,7 +532,6 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
         });*/
   }
 
-
   Future<void> _imgFromCamera(BuildContext context) async {
     //Navigator.of(context).pop();
     Navigator.push(
@@ -594,14 +593,14 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
               name: invoices[0].name,
               bytes: invoices[0].bytes,
               length: invoices[0].size);
-          models.add(
-              CaptureModel(capture: file, widget: Center(), isSelect: false));
+          models.add(CaptureModel(
+              capture: file, widget: const Center(), isSelect: false));
         }
         await bloc.uploadMultiInvoice(
             context, models, mode == 2 ? 'multiple' : "combine");
       }
 
-      *//*final picker = ImagePicker();
+      */ /*final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
@@ -609,7 +608,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
       File imageFile = File(pickedFile.path);
       // Process the image file
       print('Image selected: ${imageFile.path}');
-    }*//*
+    }*/ /*
     }
   }*/
 }

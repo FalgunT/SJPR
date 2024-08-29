@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -323,18 +322,20 @@ class _PictureCaptureState extends State<PictureCapture> {
         isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
-          return const CustomCameraModes();
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: const CustomCameraModes(),
+          );
         });
   }
 
   Future<void> _removeselected(CaptureModel model) async {
     //delete the file from storage..
-   bool? res =  await AppSession.getInstance()?.deleteFile(model.capturePath);
-   if(res!){
-     cModels.remove(model);
-     setState(() {});
-   }
-
+    bool? res = await AppSession.getInstance()?.deleteFile(model.capturePath);
+    if (res!) {
+      cModels.remove(model);
+      setState(() {});
+    }
   }
 
   Future<void> performAction() async {
@@ -393,7 +394,10 @@ class _PictureCaptureState extends State<PictureCapture> {
                   ),
                 )
               : ListTile(
-                  leading: Text('\u2022',style: TextStyle(color: Colors.white70,fontSize: 32),),
+                  leading: Text(
+                    '\u2022',
+                    style: TextStyle(color: Colors.white70, fontSize: 32),
+                  ),
                   title: Text(
                     instructions[index],
                     style: TextStyle(color: Colors.white),
@@ -406,9 +410,13 @@ class _PictureCaptureState extends State<PictureCapture> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_outlined,size: 140,color: Colors.white70,),
+            Icon(
+              Icons.image_outlined,
+              size: 140,
+              color: Colors.white70,
+            ),
             Padding(
-              padding: EdgeInsets.only(left: 16.0,right: 16),
+              padding: EdgeInsets.only(left: 16.0, right: 16),
               child: Text(
                 textAlign: TextAlign.center,
                 "No image found. Please select a mode and start capturing the invoice(s).",

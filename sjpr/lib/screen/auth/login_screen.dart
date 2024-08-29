@@ -125,7 +125,6 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 bottomSheet(BuildContext context) {
-
   final appTheme = AppTheme.of(context);
   LoginBloc loginBloc = LoginBloc();
   loginBloc.initData();
@@ -134,11 +133,14 @@ bottomSheet(BuildContext context) {
       isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
+        final bottom = EdgeInsets.fromViewPadding(
+                WidgetsBinding.instance.window.viewInsets,
+                WidgetsBinding.instance.window.devicePixelRatio)
+            .bottom;
         return Wrap(
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(
-                  20, 20, 20, 24),
+              padding: EdgeInsets.fromLTRB(20, 20, 20, bottom),
               /*   padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context)
                       .viewInsets

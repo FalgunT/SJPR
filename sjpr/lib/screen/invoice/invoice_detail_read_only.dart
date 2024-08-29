@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
 import 'package:sjpr/screen/lineitems/line_items_list.dart';
+import 'package:sjpr/screen/splititems/split_items_list.dart';
 import 'package:sjpr/widgets/common_button.dart';
 import '../../common/AppEnums.dart';
 import '../../utils/color_utils.dart';
@@ -75,9 +76,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
               return ValueListenableBuilder(
                 valueListenable: bloc.invoiceDetailData,
                 builder: (BuildContext context, value, Widget? child) {
-                  return (value1 == false && value.isObjectEmpty)
-                      ? EmptyItemWidget(
-                          title: StringUtils.noinvoice, detail: "")
+                  return value.isObjectEmpty
+                      ? value1 == false
+                          ? EmptyItemWidget(
+                              title: StringUtils.noinvoice, detail: "")
+                          : Container()
                       : Container(
                           padding: const EdgeInsets.all(16),
                           child: Column(
@@ -303,32 +306,28 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                                           .dueDate, onTap: () {
                                     _selectDate(context, 5);
                                   }),
-
                                   commonRowWidget(context,
                                       isClickable: false,
                                       title: "Invoice Number",
-                                      value: bloc.invoiceDetailData.value.invoiceId,
-                                      onTap: () {
-                                        AddNewItemDialog(
-                                            isAmt: false,
-                                            context: context,
-                                            title: "Edit Invoice Number",
-                                            hint: 'Enter Invoice Number',
-                                            label: 'Invoice Number',
-                                            oldValue: bloc
-                                                .invoiceDetailData
-                                                .value
+                                      value: bloc.invoiceDetailData.value
+                                          .invoiceId, onTap: () {
+                                    AddNewItemDialog(
+                                        isAmt: false,
+                                        context: context,
+                                        title: "Edit Invoice Number",
+                                        hint: 'Enter Invoice Number',
+                                        label: 'Invoice Number',
+                                        oldValue: bloc.invoiceDetailData.value
                                                 .invoiceId ??
-                                                "",
-                                            type: SheetType.none,
-                                            onPressed: (String v) {
-                                              debugPrint('F() called--->, $v');
-                                              bloc.invoiceDetailData.value.invoiceId =
-                                                  v;
-                                              setState(() {});
-                                            });
-                                      }),
-
+                                            "",
+                                        type: SheetType.none,
+                                        onPressed: (String v) {
+                                          debugPrint('F() called--->, $v');
+                                          bloc.invoiceDetailData.value
+                                              .invoiceId = v;
+                                          setState(() {});
+                                        });
+                                  }),
                                   ValueListenableBuilder(
                                     valueListenable: bloc.selectedValueCur,
                                     builder: (context, value, child) {
@@ -658,96 +657,100 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
 
   getSplits() {
     int count = bloc.invoiceDetailData.value.split_item_count ?? 0;
-    return count == 0
-        ? const Center()
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "Split Items",
-                  style: TextStyle(
-                      color: appTheme.activeTxtColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            "Split Items",
+            style: TextStyle(
+                color: appTheme.activeTxtColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold),
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => SplitItemsListScreen(
+                          currencySign: bloc.selectedValueCurSign.value,
+                          totalAmount: bloc.invoiceDetailData.value.totalAmount,
+//bloc.invoiceDetailData.value.totalAmount
+                          totalTaxAmount:
+                              bloc.invoiceDetailData.value.totalTaxAmount,
+//bloc.invoiceDetailData.value.totalTaxAmount,
+                          id: bloc.invoiceDetailData.value.id ?? "",
+                          isReadOnly: true,
+                        )));
+          },
+          child: Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: appTheme.listTileBgColor,
               ),
-              InkWell(
-                onTap: () {
-                  /*Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => LineItemsListScreen(
-                                currencySign: bloc.selectedValueCurSign.value,
-                                id: bloc.invoiceDetailData.value.id ?? "",
-                              )));*/
-                },
-                child: Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: appTheme.listTileBgColor,
-                    ),
-                    child: Row(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text("Consult split items",
-                                        style: TextStyle(
-                                            color: appTheme.textColor,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Text(
-                                      '${bloc.invoiceDetailData.value.line_item_count}',
-                                      style: const TextStyle(
-                                        color: Colors.green,
-                                        fontSize: 16,
-                                      ))
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text("Total",
-                                        style: TextStyle(
-                                          color: appTheme.textColor,
-                                          fontSize: 16,
-                                        )),
-                                  ),
-                                  Text(
-                                      "${bloc.selectedValueCurSign.value} ${bloc.invoiceDetailData.value.totalAmount}",
-                                      style: TextStyle(
-                                          color: appTheme.textColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold))
-                                ],
-                              ),
-                            ],
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text("Consult split items",
+                                  style: TextStyle(
+                                      color: appTheme.textColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                            Text(
+                                '${bloc.invoiceDetailData.value.split_item_count}',
+                                style: const TextStyle(
+                                  color: Colors.green,
+                                  fontSize: 16,
+                                ))
+                          ],
                         ),
                         const SizedBox(
-                          width: 10,
+                          height: 5,
                         ),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          color: appTheme.textColor,
-                        )
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text("Total",
+                                  style: TextStyle(
+                                    color: appTheme.textColor,
+                                    fontSize: 16,
+                                  )),
+                            ),
+                            Text(
+                                "${bloc.selectedValueCurSign.value} ${bloc.invoiceDetailData.value.totalAmount}",
+                                style: TextStyle(
+                                    color: appTheme.textColor,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold))
+                          ],
+                        ),
                       ],
-                    )),
-              ),
-            ],
-          );
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: appTheme.textColor,
+                  )
+                ],
+              )),
+        ),
+      ],
+    );
   }
 
   Widget commonRowWidget(BuildContext context,

@@ -19,7 +19,7 @@ class StringUtils {
   static String myBus = 'My Businesses';
   static String descMyBus = 'Quick Access to list of Businesses';
   static String taxCalc = 'Tax Calculator';
-  static String descTaxCalc = 'Calculate your tex with this option';
+  static String descTaxCalc = 'Calculate your tax with this option';
   static String taxBusInfo = 'Tax and Business Information';
   static String descTaxBusInfo = 'Tips to help you with your businesses';
   static String directorship = 'Directorships/Businesses';
@@ -57,4 +57,5 @@ class StringUtils {
   static const String mode2 = "Multiple";
   static const String mode3 = "Combine";
   static const String noinvoice = "No Invoice Found";
+  static const String noSplitItems = "No Split Items found";
 }

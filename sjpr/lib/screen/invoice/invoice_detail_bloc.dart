@@ -10,6 +10,7 @@ import 'package:sjpr/model/invoice_detail_model.dart';
 import 'package:sjpr/model/lineitem_list_model.dart';
 import 'package:sjpr/model/payment_methods.dart';
 import 'package:sjpr/model/publish_to.dart';
+import 'package:sjpr/model/split_list_model.dart';
 import 'package:sjpr/model/type_list_model.dart';
 
 import '../../common/AppEnums.dart';
@@ -70,7 +71,8 @@ class InvoiceDetailBloc extends BlocBase {
     if (getLineItemListResponse != null) {
       bool lineCat = false, lineProduct = false;
       //check for category and product selection on any item
-      invoiceDetailData.value.line_item_count = getLineItemListResponse.data!.length;
+      invoiceDetailData.value.line_item_count =
+          getLineItemListResponse.data!.length;
       for (int i = 0; i < getLineItemListResponse.data!.length; i++) {
         LineItemListData obj = getLineItemListResponse.data![i];
         if (obj.scannedLineItemCategoryId.isNotEmpty &&
@@ -96,16 +98,28 @@ class InvoiceDetailBloc extends BlocBase {
   }
 
   Future getSplitItemList(BuildContext context, String invoiceId) async {
-    var getLineItemListResponse = await AppComponentBase.getInstance()
+    var getSplitItemListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
         .getSplitItemList(invoiceId);
-    if (getLineItemListResponse != null) {
-      /* splitItemListStreamController.sink.add(getLineItemListResponse.data);
+    if (getSplitItemListResponse != null) {
+      bool lineCat = false, lineProduct = false;
+      //check for category and product selection on any item
+      invoiceDetailData.value.line_item_count =
+          getSplitItemListResponse.data!.length;
+      for (int i = 0; i < getSplitItemListResponse.data!.length; i++) {
+        SplitListData obj = getSplitItemListResponse.data![i];
+        if (obj.categoryId!.isNotEmpty && obj.categoryId != '0') {
+          lineCat = true;
+          break;
+        }
+      }
 
-      splitItemListToBeUpdated =
-          List<SplitListData>.from(getLineItemListResponse.data!);
-      splitItemListLocal.value = getLineItemListResponse.data!;*/
+      Map<dynamic, dynamic> result = {
+        "CAT": lineCat,
+        "PROD": lineProduct,
+      };
+      Check_Cat_Prod(result);
     }
   }
 
@@ -443,7 +457,7 @@ class InvoiceDetailBloc extends BlocBase {
     }
     String tax = invoiceDetailData.value.totalTaxAmount ?? "";
     if (tax.isEmpty) {
-      invoiceDetailData.value.totalTaxAmount="0";
+      invoiceDetailData.value.totalTaxAmount = "0";
       // CommonToast.getInstance()
       //     ?.displayToast(message: "Tax  field is required", bContext: context);
       // return false;

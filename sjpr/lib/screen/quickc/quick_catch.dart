@@ -85,6 +85,7 @@ class _QuickCatchState extends State<QuickCatch> with TickerProviderStateMixin {
               ),
               Container(
                 //height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment(0.50, -3.00),
@@ -126,8 +127,7 @@ class _QuickCatchState extends State<QuickCatch> with TickerProviderStateMixin {
                     ),
                     Container(
                       //height: MediaQuery.of(context).size.height,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 16),
+                      padding: const EdgeInsets.fromLTRB(20, 16, 10, 16),
                       clipBehavior: Clip.antiAlias,
                       decoration: ShapeDecoration(
                         color: Colors.black,
@@ -314,8 +314,12 @@ class _QuickCatchState extends State<QuickCatch> with TickerProviderStateMixin {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Container(
-                                                width: 44,
-                                                height: 44,
+                                                //padding: const EdgeInsets.all(12),
+                                                //width: 22,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    12,
                                                 //clipBehavior: Clip.antiAlias,
                                                 decoration:
                                                     const BoxDecoration(),
@@ -337,13 +341,21 @@ class _QuickCatchState extends State<QuickCatch> with TickerProviderStateMixin {
                                                         .title ??
                                                     "",
                                                 textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: Color(0xFFEEEEEE),
-                                                  fontSize: 12,
+                                                style: TextStyle(
+                                                  color:
+                                                      const Color(0xFFEEEEEE),
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width /
+                                                          30,
                                                   fontFamily: 'Inter',
                                                   fontWeight: FontWeight.w400,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
-                                                maxLines: 2,
+                                                maxLines: 3,
+                                                softWrap: true,
                                               ),
                                             ],
                                           ),
