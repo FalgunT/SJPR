@@ -14,14 +14,14 @@ class CustomCameraModes extends StatelessWidget {
       width: MediaQuery.sizeOf(context).width,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(0),
+          topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
           bottomLeft: Radius.circular(0),
           bottomRight: Radius.circular(0),
         ),
         color: Color.fromRGBO(0, 0, 0, 0.5),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -174,7 +174,7 @@ class CustomCameraModes extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
                       SvgPicture.asset(SvgImages.combine,
                           color: activeTxtColor),

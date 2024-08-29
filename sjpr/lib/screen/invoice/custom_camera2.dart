@@ -301,7 +301,7 @@ class _PictureCaptureState extends State<PictureCapture> {
                 CamaraResponse response =
                     CamaraResponse(models: cModels, mode: mode);
                 Navigator.pop(context, response);
-                setInstructionStatus();
+
               },
               icon: const Icon(
                 Icons.check,
@@ -322,9 +322,9 @@ class _PictureCaptureState extends State<PictureCapture> {
         isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: const CustomCameraModes(),
+          return const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CustomCameraModes(),
           );
         });
   }
@@ -372,6 +372,8 @@ class _PictureCaptureState extends State<PictureCapture> {
 
     setState(() {
       debugPrint('--->W len ${cModels.length}');
+      setInstructionStatus();
+      status = true;
     });
   }
 
