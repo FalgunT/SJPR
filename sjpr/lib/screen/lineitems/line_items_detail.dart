@@ -77,6 +77,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                               color: activeTxtColor,
                               fontSize: 24),
                         ),
+                  widget.lineitem_id.isNotEmpty?
                         CommonButton(
                             textFontSize: 16,
                             height: 30,
@@ -86,7 +87,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                             outlinedBorderColor: activeTxtColor,
                             onPressed: () {
                               _showDeleteConfirmationDialog(context);
-                            })
+                            }):const Center()
                       ],
                     ),
                     Spacer(),
