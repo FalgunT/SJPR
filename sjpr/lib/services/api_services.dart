@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sjpr/di/app_component_base.dart';
@@ -72,7 +73,7 @@ class ApiServices extends ApiClient {
   }
 
   /*Future<CommonModelClass?> uploadInvoice({required XFile invoice}) async {
-    *//*  if (ApiClient.bearerToken.isEmpty) {
+    */ /*  if (ApiClient.bearerToken.isEmpty) {
       var tokenValue = await AppComponentBase.getInstance()
           ?.getApiInterface()
           .getApiRepository()
@@ -82,7 +83,7 @@ class ApiServices extends ApiClient {
           ApiClient.bearerToken = tokenValue.accessToken!;
         }
       }
-    }*//*
+    }*/ /*
     AppComponentBase.getInstance()?.showProgressDialog(true);
     AppComponentBase.getInstance()?.disableWidget(true);
     var result = invoice.path.split('.');
@@ -177,7 +178,7 @@ class ApiServices extends ApiClient {
     Map body = {"invoice_type": mimeType, "upload_mode": "single"};
     //String jsonString = json.encode(body);
     var request =
-    http.MultipartRequest("POST", Uri.parse(ApiClient.uploadInvoice));
+        http.MultipartRequest("POST", Uri.parse(ApiClient.uploadInvoice));
     for (var entry in body.entries) {
       request.fields[entry.key] = entry.value;
       if (kDebugMode) {
@@ -207,14 +208,14 @@ class ApiServices extends ApiClient {
 
   Future<CommonModelClass?> uploadMultiInvoice(
       {required List<CaptureModel> invoices,
-        required String uploadMode}) async {
+      required String uploadMode}) async {
     AppComponentBase.getInstance()?.showProgressDialog(true);
     AppComponentBase.getInstance()?.disableWidget(true);
 
     Map body = {"invoice_type": 'pdf', "upload_mode": uploadMode};
     //String jsonString = json.encode(body);
     var request =
-    http.MultipartRequest("POST", Uri.parse(ApiClient.uploadInvoice));
+        http.MultipartRequest("POST", Uri.parse(ApiClient.uploadInvoice));
     for (var entry in body.entries) {
       request.fields[entry.key] = entry.value;
       if (kDebugMode) {
@@ -272,7 +273,7 @@ class ApiServices extends ApiClient {
 
   Future<InvoiceDetail?> getInvoiceDetail(String id) async {
     var response = await gets("${ApiClient.getInvoiceDetail}/$id",
-        headers: getLogoutHeader(), isBackground: true);
+        headers: getLogoutHeader(), isBackground: false);
     if (response != null) {
       var data = InvoiceDetail.fromJson(json.decode(response));
 
@@ -602,9 +603,13 @@ class ApiServices extends ApiClient {
   }
 
   Future<CommonModelClass?> updateSplitItemList(
-      List<SplitListData> lstSplitListDataRequest) async {
-    var response = await posts(ApiClient.updateSplitItemDetail,
-        headers: getLogoutHeader(), isBackground: true);
+      List<SplitListDataRequest> lstSplitListDataRequest) async {
+    String jsonData =
+        jsonEncode(lstSplitListDataRequest.map((i) => i.toJson()).toList())
+            .toString();
+    debugPrint('request body : $jsonData');
+    var response = await postJson(ApiClient.updateSplitItemDetail,
+        headers: getLogoutHeader(), body: jsonData, isBackground: true);
     if (response != null) {
       var data = CommonModelClass.fromJson(json.decode(response));
       return data;

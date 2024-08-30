@@ -45,7 +45,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
   }
 
   void _init() {
-    bloc.getInvoiceList(context);
+    bloc.getInvoiceList(context, isBackground: false);
     bloc.getArchiveList(context);
   }
 

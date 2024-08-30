@@ -1,3 +1,5 @@
+import 'package:flutter_guid/flutter_guid.dart';
+
 class SplitList {
   bool? status;
   String? message;
@@ -33,6 +35,7 @@ class SplitList {
 class SplitListData {
   String? id;
 
+  Guid? editID;
   String? scannedInvoiceId;
 
   String? categoryId;
@@ -47,6 +50,7 @@ class SplitListData {
 
   SplitListData(
       {this.id,
+      this.editID,
       this.scannedInvoiceId,
       this.categoryId,
       this.totalAmount,
@@ -56,6 +60,7 @@ class SplitListData {
 
   SplitListData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    editID = json['editID'];
     scannedInvoiceId = json['scanned_invoice_id'];
     categoryId = json['category_id'];
     totalAmount = json['total_amount'];
@@ -67,12 +72,58 @@ class SplitListData {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
+    data['editID'] = editID;
     data['scanned_invoice_id'] = scannedInvoiceId;
     data['category_id'] = categoryId;
     data['total_amount'] = totalAmount;
     data['tax_amount'] = taxAmount;
     data['action'] = action;
     data['isSelected'] = isSelected;
+
+    return data;
+  }
+}
+
+class SplitListDataRequest {
+  String? id;
+
+  String? scannedInvoiceId;
+
+  String? categoryId;
+
+  String? totalAmount;
+
+  String? taxAmount = '0.0';
+
+  String? action;
+
+  SplitListDataRequest({
+    this.id,
+    this.scannedInvoiceId,
+    this.categoryId,
+    this.totalAmount,
+    this.taxAmount,
+    this.action,
+  });
+
+  SplitListDataRequest.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    scannedInvoiceId = json['scanned_invoice_id'];
+    categoryId = json['category_id'];
+    totalAmount = json['total_amount'];
+    taxAmount = json['tax_amount'];
+    action = json['action'];
+    ;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['scanned_invoice_id'] = scannedInvoiceId;
+    data['category_id'] = categoryId;
+    data['total_amount'] = totalAmount;
+    data['tax_amount'] = taxAmount;
+    data['action'] = action;
 
     return data;
   }

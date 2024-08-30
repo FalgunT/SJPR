@@ -196,7 +196,7 @@ class ApiRepositoryIml extends ApiRepository {
 
   @override
   Future<CommonModelClass?> updateSplitItemList(
-      List<SplitListData> lstSplitListDataRequest) {
+      List<SplitListDataRequest> lstSplitListDataRequest) {
     return _apiServices.updateSplitItemList(lstSplitListDataRequest);
   }
 
@@ -310,7 +310,7 @@ abstract class ApiRepository {
   Future<SplitList?> getSplitItemList(String invoiceId);
 
   Future<CommonModelClass?> updateSplitItemList(
-      List<SplitListData> lstSplitListDataRequest);
+      List<SplitListDataRequest> lstSplitListDataRequest);
 
   Future<CommonModelClass?> insertSplitItemDetail(String invoiceId,
       String categoryId, String totalAmount, String totalTaxAmount);

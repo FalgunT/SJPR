@@ -330,12 +330,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               ),
                               commonRowWidget(context,
                                   title: "Total",
-                                  value:
-                                  bloc.getFormetted(bloc
-                                      .invoiceDetailData
-                                      .value
-                                      .netAmount ??
-                                      "0.00"),
+                                  value: bloc.getFormetted(
+                                      bloc.invoiceDetailData.value.netAmount ??
+                                          "0.00"),
                                   isNumber: true, onTap: () {
                                 AddNewItemDialog(
                                     isAmt: true,
@@ -360,13 +357,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               commonRowWidget(context,
                                   title: "Tax",
                                   isNumber: true,
-                                  value:
-                                  bloc.getFormetted(bloc
-                                      .invoiceDetailData
-                                      .value
-                                      .totalTaxAmount ??
-                                      "0.00"),
-                                  onTap: () {
+                                  value: bloc.getFormetted(bloc
+                                          .invoiceDetailData
+                                          .value
+                                          .totalTaxAmount ??
+                                      "0.00"), onTap: () {
                                 AddNewItemDialog(
                                     isAmt: true,
                                     context: context,
@@ -390,13 +385,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               commonRowWidget(context,
                                   title: "Tax Total",
                                   isNumber: true,
-                                  value:
-                                  bloc.getFormetted(bloc
-                                      .invoiceDetailData
-                                      .value
-                                      .totalAmount ??
-                                      "0.00"),
-                                  onTap: () {
+                                  value: bloc.getFormetted(bloc
+                                          .invoiceDetailData
+                                          .value
+                                          .totalAmount ??
+                                      "0.00"), onTap: () {
                                 AddNewItemDialog(
                                     isAmt: true,
                                     context: context,
@@ -671,7 +664,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                 MaterialPageRoute(
                     builder: (context) => SplitItemsListScreen(
                           currencySign: bloc.selectedValueCurSign.value,
-                          totalAmount: bloc.invoiceDetailData.value.totalAmount,
+                          totalAmount: bloc.invoiceDetailData.value.netAmount,
 //bloc.invoiceDetailData.value.totalAmount
                           totalTaxAmount:
                               bloc.invoiceDetailData.value.totalTaxAmount,

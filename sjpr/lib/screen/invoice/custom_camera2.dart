@@ -301,7 +301,6 @@ class _PictureCaptureState extends State<PictureCapture> {
                 CamaraResponse response =
                     CamaraResponse(models: cModels, mode: mode);
                 Navigator.pop(context, response);
-
               },
               icon: const Icon(
                 Icons.check,
@@ -318,12 +317,12 @@ class _PictureCaptureState extends State<PictureCapture> {
   bottomSheet(BuildContext context) {
     final appTheme = AppTheme.of(context);
     showModalBottomSheet(
-        backgroundColor: appTheme.listTileBgColor,
+        backgroundColor: appTheme.textFieldBgColor,
         isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
           return const Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(0),
             child: CustomCameraModes(),
           );
         });

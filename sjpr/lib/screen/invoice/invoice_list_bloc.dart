@@ -27,7 +27,8 @@ class InvoiceBloc extends BlocBase {
   ValueNotifier<List<InvoiceListData>> archiveListData =
       ValueNotifier<List<InvoiceListData>>([]);
 
-  Future getInvoiceList(BuildContext context) async {
+  Future getInvoiceList(BuildContext context,
+      {bool isBackground = true}) async {
     isWaitingInbox.value = true;
     var getInvoiceListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
@@ -63,7 +64,7 @@ class InvoiceBloc extends BlocBase {
     isWaitingArchive.value = false;
   }
 
- /*
+  /*
  old
  Future uploadInvoice(BuildContext context, XFile invoice) async {
     var getInvoiceListResponse = await AppComponentBase.getInstance()
@@ -115,6 +116,7 @@ class InvoiceBloc extends BlocBase {
       }
     }
   }
+
   uploadMultiInvoice(BuildContext context, List<CaptureModel> captures,
       String uploadMode) async {
     var getInvoiceListResponse = await AppComponentBase.getInstance()

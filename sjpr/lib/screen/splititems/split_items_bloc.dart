@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_guid/flutter_guid.dart';
 import 'package:intl/intl.dart';
 import 'package:sjpr/common/bloc_provider.dart';
 import 'package:sjpr/di/app_component_base.dart';
@@ -11,7 +12,7 @@ class SplitItemsBloc extends BlocBase {
   StreamController mainStreamController = StreamController.broadcast();
   TextEditingController eController = TextEditingController();
   Stream get mainStream => mainStreamController.stream;
-
+  ValueNotifier<bool> isWaitingForDetail = ValueNotifier<bool>(true);
   Stream<List<SplitListData>?> get splitItemListStream =>
       splitItemListStreamController.stream;
 
@@ -38,7 +39,13 @@ class SplitItemsBloc extends BlocBase {
     return _instance!;
   }
 
+  static SplitItemsBloc getNewInstance() {
+    _instance = SplitItemsBloc();
+    return _instance!;
+  }
+
   Future getSplitItemList(BuildContext context, String invoiceId) async {
+    isWaitingForDetail.value = true;
     var getLineItemListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
@@ -50,17 +57,23 @@ class SplitItemsBloc extends BlocBase {
           List<SplitListData>.from(getLineItemListResponse.data!);
       splitItemListLocal.value = getLineItemListResponse.data!;
     }
+    isWaitingForDetail.value = false;
   }
 
   Future updateSplitItemList(BuildContext context) async {
-    //List<SplitListDataRequest> lstSplitListDataRequest = [];
-    /* for (var element in splitItemListLocal.value) {
+    List<SplitListDataRequest> lstSplitListDataRequest = [];
+    for (var element in splitItemListLocal.value) {
       SplitListDataRequest splitListDataRequest = SplitListDataRequest();
-    }*/
+      splitListDataRequest.id = element.id;
+      splitListDataRequest.categoryId = element.categoryId;
+      splitListDataRequest.totalAmount = element.totalAmount;
+      splitListDataRequest.taxAmount = element.taxAmount;
+      splitListDataRequest.action = element.action;
+    }
     var updateSplitItemListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
-        .updateSplitItemList(splitItemListToBeUpdated);
+        .updateSplitItemList(lstSplitListDataRequest);
     if (updateSplitItemListResponse != null) {}
   }
 
@@ -100,27 +113,44 @@ class SplitItemsBloc extends BlocBase {
 
   addSplitItem(SplitListData item) {
     splitItemListLocal.value = List.from(splitItemListLocal.value)..add(item);
+    item.editID = Guid.newGuid;
     item.action = 'insert';
     splitItemListToBeUpdated.add(item);
   }
 
   updateSplitItem(SplitListData item) {
-    var index =
-        splitItemListLocal.value.indexWhere((element) => element.id == item.id);
-    splitItemListLocal.value.removeAt(index);
-    item.action = 'update';
-    splitItemListLocal.value = List.from(splitItemListLocal.value)
-      ..insert(index, item);
-    //splitItemListToBeUpdated.where((element) => element.id == item.id).first;
-    splitItemListToBeUpdated[splitItemListToBeUpdated
-        .indexWhere((element) => element.id == item.id)] = item;
+    if (item.id != null && item.id!.isNotEmpty) {
+      item.action = 'update';
+      var index = splitItemListLocal.value
+          .indexWhere((element) => element.id == item.id);
+      splitItemListLocal.value.removeAt(index);
+      splitItemListLocal.value = List.from(splitItemListLocal.value)
+        ..insert(index, item);
+      //splitItemListToBeUpdated.where((element) => element.id == item.id).first;
+      splitItemListToBeUpdated[splitItemListToBeUpdated
+          .indexWhere((element) => element.id == item.id)] = item;
+    } else if (item.editID != null && item.editID!.value.isNotEmpty) {
+      var index = splitItemListLocal.value
+          .indexWhere((element) => element.editID == item.editID);
+      splitItemListLocal.value.removeAt(index);
+      splitItemListLocal.value = List.from(splitItemListLocal.value)
+        ..insert(index, item);
+      //splitItemListToBeUpdated.where((element) => element.id == item.id).first;
+      splitItemListToBeUpdated[splitItemListToBeUpdated
+          .indexWhere((element) => element.editID == item.editID)] = item;
+    }
   }
 
   deleteSplitItem(SplitListData item) {
-    item.action = 'delete';
-    splitItemListToBeUpdated[splitItemListToBeUpdated
-        .indexWhere((element) => element.id == item.id)] = item;
-    splitItemListLocal.value.removeWhere((element) => element.id == item.id);
+    if (item.id != null && item.id!.isNotEmpty) {
+      item.action = 'delete';
+      splitItemListToBeUpdated[splitItemListToBeUpdated
+          .indexWhere((element) => element.id == item.id)] = item;
+      splitItemListLocal.value.removeWhere((element) => element.id == item.id);
+    } else if (item.editID != null && item.editID!.value.isNotEmpty) {
+      splitItemListLocal.value
+          .removeWhere((element) => element.editID == item.editID);
+    }
   }
 
   deleteMultipleSplitItems() {
@@ -137,6 +167,7 @@ class SplitItemsBloc extends BlocBase {
     return NumberFormat('##0.00').format(number);
   }
 
+  @override
   @override
   void dispose() {
     _instance?.dispose();

@@ -168,6 +168,13 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
                             message:
                                 'Split Item updated Locally. Please Click on "Save" to keep it permanent',
                             bContext: context);
+                      } else if (bloc.splitItemDetail.value.action != null &&
+                          bloc.splitItemDetail.value.action!.isNotEmpty) {
+                        bloc.updateSplitItem(bloc.splitItemDetail.value);
+                        CommonToast.getInstance()?.displayToast(
+                            message:
+                                'Split Item updated Locally. Please Click on "Save" to keep it permanent',
+                            bContext: context);
                       } else {
                         bloc.addSplitItem(bloc.splitItemDetail.value);
                         CommonToast.getInstance()?.displayToast(

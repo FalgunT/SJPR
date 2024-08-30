@@ -27,7 +27,7 @@ class SplitItemsListScreen extends StatefulWidget {
 }
 
 class _SplitItemsListScreenState extends State<SplitItemsListScreen> {
-  SplitItemsBloc bloc = SplitItemsBloc.getInstance();
+  SplitItemsBloc bloc = SplitItemsBloc.getNewInstance();
   bool? multipleSelected = false, isReadOnly = false;
   var remainingTotalAmount = 0.0;
   var remainingTotalTaxAmount = 0.0;
@@ -46,360 +46,420 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backGroundColor,
-      appBar: AppBar(
         backgroundColor: backGroundColor,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Split Items",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: activeTxtColor,
-                      fontSize: 24),
-                ),
-                isReadOnly == false
-                    ? InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SplitItemsDetailScreen(
-                                        currencySign: widget.currencySign,
-                                        splitListItemData: null,
-                                      )));
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.only(left: 10, right: 10),
-                          height: 40,
-                          width: 100,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: backGroundColor,
-                              border:
-                                  Border.all(color: activeTxtColor, width: 2)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.add,
-                                color: activeTxtColor,
-                                size: 16,
-                              ),
-                              Text(
-                                "Add",
-                                style: TextStyle(
-                                    color: activeTxtColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    : Container(),
-              ],
+        appBar: AppBar(
+          backgroundColor: backGroundColor,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
             ),
-            ListView(
-              shrinkWrap: true,
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                multipleSelected!
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          InkWell(
-                            onTap: () {
-                              _showDeleteConfirmationDialog(
-                                  context, true, SplitListData());
-                            },
-                            child: Container(
-                              //margin: const EdgeInsets.all(10),
-                              padding:
-                                  const EdgeInsets.only(left: 10, right: 10),
-                              height: 40,
-                              width: 150,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: backGroundColor,
-                                  border: Border.all(
-                                      color: activeTxtColor, width: 2)),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Delete Multiple",
-                                    style: TextStyle(
-                                        color: activeTxtColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  ),
-                                ],
-                              ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+        body: Container(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Split Items",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: activeTxtColor,
+                        fontSize: 24),
+                  ),
+                  isReadOnly == false
+                      ? InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        SplitItemsDetailScreen(
+                                          currencySign: widget.currencySign,
+                                          splitListItemData: null,
+                                        )));
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.only(left: 10, right: 10),
+                            height: 40,
+                            width: 100,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: backGroundColor,
+                                border: Border.all(
+                                    color: activeTxtColor, width: 2)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add,
+                                  color: activeTxtColor,
+                                  size: 16,
+                                ),
+                                Text(
+                                  "Add",
+                                  style: TextStyle(
+                                      color: activeTxtColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      )
-                    : Container(),
-                const SizedBox(
-                  height: 20,
-                ),
-                ValueListenableBuilder(
-                    valueListenable: bloc.splitItemListLocal,
-                    builder: (context, value, _) {
-                      remainingTotalAmount = 0.0;
-                      remainingTotalTaxAmount = 0.0;
-                      for (var element in value) {
-                        element.totalAmount = bloc
-                            .getFormatted(element.totalAmount ?? "0.0")
-                            .replaceAll(',', '');
-                        element.taxAmount = bloc
-                            .getFormatted(element.taxAmount ?? "0.0")
-                            .replaceAll(',', '');
+                        )
+                      : Container(),
+                ],
+              ),
+              Expanded(
+                flex: 1,
+                child: ValueListenableBuilder(
+                    valueListenable: bloc.isWaitingForDetail,
+                    builder: (context, value1, child) {
+                      return ValueListenableBuilder(
+                          valueListenable: bloc.splitItemListLocal,
+                          builder: (context, value, _) {
+                            remainingTotalAmount = 0.0;
+                            remainingTotalTaxAmount = 0.0;
+                            for (var element in value) {
+                              element.totalAmount = bloc
+                                  .getFormatted(element.totalAmount ?? "0.0")
+                                  .replaceAll(',', '');
+                              element.taxAmount = bloc
+                                  .getFormatted(element.taxAmount ?? "0.0")
+                                  .replaceAll(',', '');
 
-                        remainingTotalAmount +=
-                            double.parse(element.totalAmount ?? "0.0");
-                        remainingTotalTaxAmount +=
-                            double.parse(element.taxAmount ?? "0.0");
-                      }
-                      remainingTotalAmount = bloc.getFormatted(
-                              (widget.totalAmount ?? "0.0")
-                                  .replaceAll(',', '')) -
-                          remainingTotalAmount;
-                      remainingTotalTaxAmount = bloc.getFormatted(
-                              (widget.totalTaxAmount ?? "0.0")
-                                  .replaceAll(',', '')) -
-                          remainingTotalTaxAmount;
-                      return (value.isEmpty)
-                          ? EmptyItemWidget(
-                              title: StringUtils.noSplitItems,
-                              detail: '',
-                            )
-                          : Column(
-                              children: [
-                                Table(
-                                  columnWidths: isReadOnly == true
-                                      ? const {
-                                          0: FlexColumnWidth(1.5),
-                                          1: FlexColumnWidth(3.5),
-                                          2: FlexColumnWidth(2),
-                                          3: FlexColumnWidth(2),
-                                        }
-                                      : const {
-                                          0: FlexColumnWidth(1.5),
-                                          1: FlexColumnWidth(3.5),
-                                          2: FlexColumnWidth(2),
-                                          3: FlexColumnWidth(2),
-                                          4: FlexColumnWidth(1.25),
-                                        },
-                                  children: [
-                                    TableRow(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          border: const Border(
-                                              bottom: BorderSide(
-                                                  color: Colors.black,
-                                                  width: 4)),
-                                          color: listTileBgColor,
-                                        ),
-                                        children: [
-                                          Center(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                              child: Text(
-                                                isReadOnly == true ? "No" : "",
-                                                style: TextStyle(
-                                                  color: textColor,
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 4),
-                                            child: Text(
-                                              "Category",
-                                              textAlign: TextAlign.start,
-                                              style: TextStyle(
-                                                color: textColor,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                          Center(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                              child: Text(
-                                                "Total Amount",
-                                                style: TextStyle(
-                                                  color: textColor,
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Center(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                              child: Text(
-                                                "Tax Amount",
-                                                style: TextStyle(
-                                                  color: textColor,
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          isReadOnly == true
-                                              ? Center(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        vertical: 10,
-                                                        horizontal: 4),
-                                                    child: Text(
-                                                      "",
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                        color: textColor,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                              : Container(),
-                                        ]),
-                                    for (int i = 0; i < value.length; i++)
-                                      getTableRows(i, value),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                isReadOnly == false
-                                    ? Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8.0, vertical: 16),
-                                        child: Row(
+                              remainingTotalAmount +=
+                                  double.parse(element.totalAmount ?? "0.0");
+                              remainingTotalTaxAmount +=
+                                  double.parse(element.taxAmount ?? "0.0");
+                            }
+                            remainingTotalAmount = double.parse(bloc
+                                    .getFormatted((widget.totalAmount ?? "0.0")
+                                        .replaceAll(',', ''))) -
+                                remainingTotalAmount;
+                            remainingTotalTaxAmount = double.parse(
+                                    bloc.getFormatted(
+                                        (widget.totalTaxAmount ?? "0.0")
+                                            .replaceAll(',', ''))) -
+                                remainingTotalTaxAmount;
+
+                            return (value.isEmpty)
+                                ? value1 == false
+                                    ? EmptyItemWidget(
+                                        title: StringUtils.noinvoice,
+                                        detail: "")
+                                    : Container()
+                                : Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        flex: 1,
+                                        child: ListView(
+                                          physics:
+                                              const AlwaysScrollableScrollPhysics(),
+                                          shrinkWrap: true,
                                           children: [
-                                            SizedBox(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.45,
-                                              child: Text(
-                                                "Remaining Total Amount  :  ",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w700,
-                                                    color: activeTxtColor,
-                                                    fontSize: 20),
-                                              ),
+                                            multipleSelected!
+                                                ? Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      const SizedBox(
+                                                        height: 20,
+                                                      ),
+                                                      InkWell(
+                                                        onTap: () {
+                                                          _showDeleteConfirmationDialog(
+                                                              context,
+                                                              true,
+                                                              SplitListData());
+                                                        },
+                                                        child: Container(
+                                                          //margin: const EdgeInsets.all(10),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
+                                                                  right: 10),
+                                                          height: 40,
+                                                          width: 150,
+                                                          decoration: BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          12),
+                                                              color:
+                                                                  backGroundColor,
+                                                              border: Border.all(
+                                                                  color:
+                                                                      activeTxtColor,
+                                                                  width: 2)),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Text(
+                                                                "Delete Multiple",
+                                                                style: TextStyle(
+                                                                    color:
+                                                                        activeTxtColor,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        16),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Container(),
+                                            const SizedBox(
+                                              height: 20,
                                             ),
-                                            /*  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.35,
-                                  ),*/
-                                            SizedBox(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.25,
-                                              child: Text(
-                                                bloc.getFormatted(
-                                                    remainingTotalAmount
-                                                        .toString()),
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w400,
-                                                    color: textColor,
-                                                    fontSize: 18),
-                                              ),
+                                            Table(
+                                              columnWidths: isReadOnly == true
+                                                  ? const {
+                                                      0: FlexColumnWidth(1.5),
+                                                      1: FlexColumnWidth(3.5),
+                                                      2: FlexColumnWidth(2),
+                                                      3: FlexColumnWidth(2),
+                                                    }
+                                                  : const {
+                                                      0: FlexColumnWidth(1.5),
+                                                      1: FlexColumnWidth(3.5),
+                                                      2: FlexColumnWidth(2),
+                                                      3: FlexColumnWidth(2),
+                                                      4: FlexColumnWidth(1.25),
+                                                    },
+                                              children: [
+                                                TableRow(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                      border: const Border(
+                                                          bottom: BorderSide(
+                                                              color:
+                                                                  Colors.black,
+                                                              width: 4)),
+                                                      color: listTileBgColor,
+                                                    ),
+                                                    children: [
+                                                      Center(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 10),
+                                                          child: Text(
+                                                            isReadOnly == true
+                                                                ? "No"
+                                                                : "",
+                                                            style: TextStyle(
+                                                              color: textColor,
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 10,
+                                                                horizontal: 4),
+                                                        child: Text(
+                                                          "Category",
+                                                          textAlign:
+                                                              TextAlign.start,
+                                                          style: TextStyle(
+                                                            color: textColor,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Center(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .fromLTRB(
+                                                                  0, 10, 4, 10),
+                                                          child: Text(
+                                                            "Total Amount",
+                                                            style: TextStyle(
+                                                              color: textColor,
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Center(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 10),
+                                                          child: Text(
+                                                            "Tax Amount",
+                                                            style: TextStyle(
+                                                              color: textColor,
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      isReadOnly == true
+                                                          ? Center(
+                                                              child: Padding(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical:
+                                                                        10,
+                                                                    horizontal:
+                                                                        4),
+                                                                child: Text(
+                                                                  "",
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color:
+                                                                        textColor,
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            )
+                                                          : Container(),
+                                                    ]),
+                                                for (int i = 0;
+                                                    i < value.length;
+                                                    i++)
+                                                  getTableRows(i, value),
+                                              ],
                                             ),
-                                            SizedBox(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.2,
-                                              child: Text(
-                                                bloc.getFormatted(
-                                                    remainingTotalTaxAmount
-                                                        .toString()),
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w400,
-                                                    color: textColor,
-                                                    fontSize: 18),
-                                              ),
+                                            const SizedBox(
+                                              height: 20,
                                             ),
                                           ],
                                         ),
-                                      )
-                                    : Container(),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                isReadOnly == false
-                                    ? CommonButton(
-                                        textFontSize: 16,
-                                        content: "Save",
-                                        bgColor: buttonBgColor,
-                                        textColor: buttonTextColor,
-                                        outlinedBorderColor: buttonBgColor,
-                                        onPressed: () {
-                                          if (remainingTotalAmount == 0.0 &&
-                                              remainingTotalTaxAmount == 0.0) {
-                                            bloc.updateSplitItemList(context);
-                                          } else {
-                                            CommonToast.getInstance()?.displayToast(
-                                                message:
-                                                    "The total amount of insert and update actions does not match the invoice total amount.",
-                                                bContext: context);
-                                          }
-                                        })
-                                    : Container()
-                              ],
-                            );
+                                      ),
+                                      isReadOnly == false
+                                          ? Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8.0,
+                                                      vertical: 16),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      "Remaining Total Amount  :  ",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          color: activeTxtColor,
+                                                          fontSize: 18),
+                                                    ),
+                                                  ),
+                                                  /*  Container(
+                                              width:
+                                                  MediaQuery.of(context).size.width * 0.35,
+                                            ),*/
+                                                  SizedBox(width: 16),
+                                                  Text(
+                                                    bloc.getFormatted(
+                                                        remainingTotalAmount
+                                                            .toString()),
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: textColor,
+                                                        fontSize: 18),
+                                                  ),
+                                                  SizedBox(width: 12),
+                                                  Text(
+                                                    bloc.getFormatted(
+                                                        remainingTotalTaxAmount
+                                                            .toString()),
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: textColor,
+                                                        fontSize: 18),
+                                                  ),
+                                                  SizedBox(width: 28),
+                                                ],
+                                              ),
+                                            )
+                                          : Container(),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      isReadOnly == false
+                                          ? CommonButton(
+                                              textFontSize: 16,
+                                              content: "Save",
+                                              bgColor: buttonBgColor,
+                                              textColor: buttonTextColor,
+                                              outlinedBorderColor:
+                                                  buttonBgColor,
+                                              onPressed: () {
+                                                if (remainingTotalAmount ==
+                                                        0.0 &&
+                                                    remainingTotalTaxAmount ==
+                                                        0.0) {
+                                                  bloc.updateSplitItemList(
+                                                      context);
+                                                } else {
+                                                  CommonToast.getInstance()
+                                                      ?.displayToast(
+                                                          message:
+                                                              "The total amount of insert and update actions does not match the invoice total amount.",
+                                                          bContext: context);
+                                                }
+                                              })
+                                          : Container()
+                                    ],
+                                  );
+                          });
                     }),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
+              )
+            ],
+          ),
+        ));
   }
 
   TableRow getTableRows(int index, List<SplitListData> value) {
@@ -450,7 +510,9 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen> {
               padding: const EdgeInsets.only(top: 10, right: 8, bottom: 10),
               child: Text(
                 //splitItem.categoryId ?? "",
-                "${bloc.getCategoryNameFromId(valueSplitItem.categoryId ?? "") ?? ""}test test test etdlkskjf jkdj ",
+                bloc.getCategoryNameFromId(valueSplitItem.categoryId ?? "") ??
+                    "",
+                textAlign: TextAlign.start,
                 style: TextStyle(color: textColor, fontSize: 16),
               ),
             ),
