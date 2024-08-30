@@ -35,22 +35,21 @@ dependencies:
   cupertino_icons: ^1.0.2
   connectivity_plus: ^5.0.2
   flutter_svg: ^2.0.9
-  #flutter_secure_storage: ^9.0.0
   fluttertoast: ^8.2.4
   http: ^1.1.2
   hexcolor: ^3.0.1
-  flutter_document_scanner: ^1.1.0
-  flutter_cache_manager: ^3.3.1
-  file_picker: ^8.1.2
+  #flutter_document_scanner: ^1.1.0
+  #flutter_cache_manager: ^3.3.1
+  #file_picker: ^8.1.2
   image_picker: ^1.0.4
   intl: ^0.19.0
   table_calendar: ^3.1.1
   pdf_render: ^1.4.10
   pie_chart: ^5.4.0
   shared_preferences: ^2.2.3
-  #popover: ^0.3.0+1I was
   cunning_document_scanner: ^1.2.3
   path_provider: ^2.0.14
+  flutter_guid: ^0.3.1
 
 
 dev_dependencies:

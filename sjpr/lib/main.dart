@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_document_scanner/flutter_document_scanner.dart';
 import 'package:sjpr/common/app_session.dart';
 import 'package:sjpr/common/custom_progress.dart';
 import 'package:sjpr/di/app_component_base.dart';

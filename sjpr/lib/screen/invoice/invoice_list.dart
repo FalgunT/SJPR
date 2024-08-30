@@ -1,9 +1,7 @@
 import 'dart:async';
 
-import 'package:file_picker/file_picker.dart';
+//import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail.dart';
@@ -178,7 +176,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
     );
   }
 
-  Future<List<PlatformFile>?> _pickFile(int mode) async {
+/*  Future<List<PlatformFile>?> _pickFile(int mode) async {
     // opens storage to pick files and the picked file or files
     // are assigned into result and if no file is chosen result is null.
     // you can also toggle "allowMultiple" true or false depending on your need
@@ -192,16 +190,16 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
     if (result == null) return null;
     // we will log the name, size and path of the
     // first picked file (if multiple are selected)
-    /*print(result.files.first.name);
+    *//*print(result.files.first.name);
     print("Size in Bytes : ${result.files.first.size}");
     print(result.files.first.path);
     if (kDebugMode) {
       var bytes = result.files.first.size;
       double sizeInMB = bytes / (10241 * 1024);
       print("sizeInMB : $sizeInMB");
-    }*/
+    }*//*
     return result.files;
-  }
+  }*/
 
   Widget archiveListView() {
     return ValueListenableBuilder(

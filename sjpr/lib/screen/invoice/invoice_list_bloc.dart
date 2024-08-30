@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'package:flutter_document_scanner/flutter_document_scanner.dart';
 import 'package:sjpr/common/bloc_provider.dart';
 import 'package:sjpr/common/common_toast.dart';
 import 'package:sjpr/di/app_component_base.dart';
 import 'package:flutter/material.dart';
 import 'package:sjpr/model/invoice_list_model.dart';
-import 'package:sjpr/screen/invoice/custom_camera.dart';
-import 'package:sjpr/screen/invoice/invoice_list.dart';
 
 import 'custom_camera2.dart';
 
