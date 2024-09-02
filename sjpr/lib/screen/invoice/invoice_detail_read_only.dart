@@ -159,23 +159,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold),
                                         ),
-                                        ValueListenableBuilder(
-                                          valueListenable:
-                                              bloc.selectedValueCurSign,
-                                          builder: (context, value1, child) {
-                                            return Expanded(
-                                              child: Text(
-                                                '$value1 ${bloc.invoiceDetailData.value.totalAmount ?? ""}',
-                                                style: TextStyle(
-                                                    color: appTheme.textColor,
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                                textAlign: TextAlign.end,
-                                              ),
-                                            );
-                                          },
-                                        )
+                                        getTotalWidget()
                                       ],
                                     ),
                                     const SizedBox(
@@ -558,7 +542,18 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
       ),
     );
   }
-
+  getTotalWidget(){
+    return  ValueListenableBuilder(
+        valueListenable: bloc.selectedValueCurSign,
+        builder: (context, value1, child) {
+          return Text(
+              '$value1 ${bloc.getFormetted(bloc.invoiceDetailData.value.totalAmount ?? "")}',
+              style: TextStyle(
+                  color: appTheme.textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold));
+        });
+  }
   getLines() {
     int count = bloc.invoiceDetailData.value.line_item_count ?? 0;
     return count == 0
@@ -630,12 +625,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                                           fontSize: 16,
                                         )),
                                   ),
-                                  Text(
-                                      "${bloc.selectedValueCurSign.value} ${bloc.invoiceDetailData.value.totalAmount}",
-                                      style: TextStyle(
-                                          color: appTheme.textColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold))
+                                  getTotalWidget()
                                 ],
                               ),
                             ],
@@ -657,7 +647,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
 
   getSplits() {
     int count = bloc.invoiceDetailData.value.split_item_count ?? 0;
-    return Column(
+    return count == 0
+        ? const Center()
+        : Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
@@ -708,12 +700,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold)),
                             ),
-                            Text(
-                                '${bloc.invoiceDetailData.value.split_item_count}',
-                                style: const TextStyle(
-                                  color: Colors.green,
-                                  fontSize: 16,
-                                ))
+                            getTotalWidget()
                           ],
                         ),
                         const SizedBox(

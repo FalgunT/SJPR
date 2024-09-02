@@ -151,21 +151,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  ValueListenableBuilder(
-                                    valueListenable: bloc.selectedValueCurSign,
-                                    builder: (context, value1, child) {
-                                      return Expanded(
-                                        child: Text(
-                                          '$value1 ${bloc.invoiceDetailData.value.totalAmount ?? ""}',
-                                          style: TextStyle(
-                                              color: appTheme.textColor,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
-                                          textAlign: TextAlign.end,
-                                        ),
-                                      );
-                                    },
-                                  )
+                                  getTotalWidget()
                                 ],
                               ),
                               const SizedBox(
@@ -547,6 +533,19 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     );
   }
 
+  getTotalWidget(){
+    return  ValueListenableBuilder(
+        valueListenable: bloc.selectedValueCurSign,
+        builder: (context, value1, child) {
+          return Text(
+              '$value1 ${bloc.getFormetted(bloc.invoiceDetailData.value.totalAmount ?? "")}',
+              style: TextStyle(
+                  color: appTheme.textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold));
+        });
+  }
+
   getLines() {
     return /*bloc.invoiceDetailData.value.line_item_count == 0
         ? Center()
@@ -621,16 +620,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     fontSize: 16,
                                   )),
                             ),
-                            ValueListenableBuilder(
-                                valueListenable: bloc.selectedValueCurSign,
-                                builder: (context, value1, child) {
-                                  return Text(
-                                      '$value1 ${bloc.invoiceDetailData.value.totalAmount ?? ""}',
-                                      style: TextStyle(
-                                          color: appTheme.textColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold));
-                                })
+                            getTotalWidget()
                           ],
                         ),
                       ],
@@ -727,16 +717,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     fontSize: 16,
                                   )),
                             ),
-                            ValueListenableBuilder(
-                                valueListenable: bloc.selectedValueCurSign,
-                                builder: (context, value, child) {
-                                  return Text(
-                                      "$value ${bloc.getFormetted(bloc.invoiceDetailData.value.totalAmount ?? '')}",
-                                      style: TextStyle(
-                                          color: appTheme.textColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold));
-                                })
+                            getTotalWidget()
                           ],
                         ),
                       ],

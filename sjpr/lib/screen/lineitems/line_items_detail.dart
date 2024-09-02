@@ -562,7 +562,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
           message: "Product/Service field is required", bContext: context);
       return false;
     }*/
-    String tid = bloc.lineitemdetail.value.classId ?? "";
+    /* String tid = bloc.lineitemdetail.value.classId ?? "";
     if (tid == "") {
       CommonToast.getInstance()
           ?.displayToast(message: "Class field is required", bContext: context);
@@ -579,7 +579,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
       CommonToast.getInstance()?.displayToast(
           message: "Customer field is required", bContext: context);
       return false;
-    }
+    }*/
     String total = bloc.lineitemdetail.value.totalAmount ?? "";
     if (total.isEmpty) {
       CommonToast.getInstance()?.displayToast(

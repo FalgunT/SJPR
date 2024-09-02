@@ -38,6 +38,10 @@ class Customer {
   final String customerName;
   final String datetime;
 
+
+  //"id":"2","customer_name":"cus1","is_purchase":"0","added_by":"0","datetime":"2024-07-26 14:00:28"
+
+
   Customer(
       {required this.id, required this.customerName, required this.datetime});
 
