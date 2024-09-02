@@ -70,7 +70,7 @@ class ApiRepositoryIml extends ApiRepository {
   }
 
   @override
-  Future<InvoiceList?> getInvoiceList() {
+  Future<InvoiceList?> getInvoiceList({bool isBackground = true}) {
     return _apiServices.getInvoiceList();
   }
 
@@ -253,7 +253,7 @@ abstract class ApiRepository {
   Future<CommonModelClass?> uploadMultiInvoice(
       {required List<CaptureModel> invoice, required String uploadMode});
 
-  Future<InvoiceList?> getInvoiceList();
+  Future<InvoiceList?> getInvoiceList({bool isBackground = true});
 
   Future<InvoiceList?> getArchiveList(String dt, int isPurchase);
 

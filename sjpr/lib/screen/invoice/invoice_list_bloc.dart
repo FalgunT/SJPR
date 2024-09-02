@@ -30,7 +30,7 @@ class InvoiceBloc extends BlocBase {
     var getInvoiceListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
-        .getInvoiceList();
+        .getInvoiceList(isBackground: isBackground);
     if (getInvoiceListResponse != null) {
       if (getInvoiceListResponse.status == true) {
         inboxListData.value = getInvoiceListResponse.data!;

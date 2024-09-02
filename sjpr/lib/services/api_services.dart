@@ -175,7 +175,11 @@ class ApiServices extends ApiClient {
     AppComponentBase.getInstance()?.disableWidget(true);
     var result = invoicepath.split('.');
     var mimeType = result.last;
-    Map body = {"invoice_type": mimeType, "upload_mode": "single"};
+    Map body = {
+      "invoice_type": mimeType,
+      "upload_mode": "single",
+      'is_purchase': '0',
+    };
     //String jsonString = json.encode(body);
     var request =
         http.MultipartRequest("POST", Uri.parse(ApiClient.uploadInvoice));
@@ -212,7 +216,11 @@ class ApiServices extends ApiClient {
     AppComponentBase.getInstance()?.showProgressDialog(true);
     AppComponentBase.getInstance()?.disableWidget(true);
 
-    Map body = {"invoice_type": 'pdf', "upload_mode": uploadMode};
+    Map body = {
+      "invoice_type": 'pdf',
+      "upload_mode": uploadMode,
+      'is_purchase': '0'
+    };
     //String jsonString = json.encode(body);
     var request =
         http.MultipartRequest("POST", Uri.parse(ApiClient.uploadInvoice));
@@ -248,8 +256,8 @@ class ApiServices extends ApiClient {
   //Ends here *********************
 
   Future<InvoiceList?> getInvoiceList() async {
-    var response = await gets(ApiClient.getInvoiceList,
-        headers: getLogoutHeader(), isBackground: true);
+    var response = await gets("${ApiClient.getInvoiceList}/1",
+        headers: getLogoutHeader(), isBackground: false);
     if (response != null) {
       var data = InvoiceList.fromJson(json.decode(response));
       return data;
@@ -262,7 +270,7 @@ class ApiServices extends ApiClient {
       'updated_date': dt,
       'is_purchase': '$isPurchase',
     };
-    var response = await posts(ApiClient.getArchiveList,
+    var response = await posts("${ApiClient.getArchiveList}/0",
         headers: getLogoutHeader(), body: body, isBackground: true);
     if (response != null) {
       var data = InvoiceList.fromJson(json.decode(response));
@@ -489,7 +497,7 @@ class ApiServices extends ApiClient {
   }
 
   Future<CustomerApiResponse?> getAllCustomer() async {
-    var response = await gets(ApiClient.getAllCustomers,
+    var response = await gets("${ApiClient.getAllCustomers}/0",
         headers: getLogoutHeader(), isBackground: true);
     if (response != null) {
       Map res = json.decode(response);
@@ -531,6 +539,7 @@ class ApiServices extends ApiClient {
   Future<CommonModelClass?> addCustomer(String cName) async {
     Map<String, String> body = {
       'customer_name': cName,
+      'is_purchase': '0',
     };
     var response = await posts(ApiClient.postAddCustomer,
         headers: getLogoutHeader(), body: body, isBackground: true);
