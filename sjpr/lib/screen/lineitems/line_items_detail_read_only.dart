@@ -7,8 +7,6 @@ import 'package:sjpr/screen/lineitems/line_items_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/widgets/AddNewItemDialog.dart';
 import 'package:sjpr/widgets/CommonBottomSheetDialog.dart';
-import 'package:sjpr/widgets/common_button.dart';
-import 'package:sjpr/model/api_response_class.dart' as itemclass;
 import 'package:sjpr/widgets/delete_confirmation_dialog.dart';
 
 import '../../common/AppEnums.dart';

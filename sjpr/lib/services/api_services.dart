@@ -265,7 +265,7 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future<InvoiceList?> getArchiveList(String dt, int isPurchase) async {
+  Future<InvoiceList?>  getArchiveList(String dt, int isPurchase) async {
     Map<String, String> body = {
       'updated_date': dt,
       'is_purchase': '$isPurchase',
