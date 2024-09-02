@@ -684,7 +684,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
 //bloc.invoiceDetailData.value.totalTaxAmount,
                           id: bloc.invoiceDetailData.value.id ?? "",
                           isReadOnly: true,
-                        )));
+                        ))).then((onValue) {
+              if (onValue == true) {
+                bloc.getInvoiceDetail(context, widget.id);
+              }
+            });
           },
           child: Container(
               margin: const EdgeInsets.only(bottom: 10),

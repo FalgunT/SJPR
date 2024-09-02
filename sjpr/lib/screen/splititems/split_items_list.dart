@@ -34,6 +34,7 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen> {
   @override
   void initState() {
     isReadOnly = widget.isReadOnly;
+    bloc.scannedInvoiceId = widget.id;
     getData();
     super.initState();
   }
@@ -441,8 +442,13 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen> {
                                                         0.0 &&
                                                     remainingTotalTaxAmount ==
                                                         0.0) {
-                                                  bloc.updateSplitItemList(
-                                                      context);
+                                                  bloc
+                                                      .updateSplitItemList(
+                                                          context)
+                                                      .then((onValue) {
+                                                    Navigator.of(context)
+                                                        .pop(onValue);
+                                                  });
                                                 } else {
                                                   CommonToast.getInstance()
                                                       ?.displayToast(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_guid/flutter_guid.dart';
 import 'package:intl/intl.dart';
 import 'package:sjpr/common/bloc_provider.dart';
+import 'package:sjpr/common/common_toast.dart';
 import 'package:sjpr/di/app_component_base.dart';
 import 'package:flutter/material.dart';
 import 'package:sjpr/model/category_list_model.dart';
@@ -9,6 +10,7 @@ import 'package:sjpr/model/split_list_model.dart';
 
 class SplitItemsBloc extends BlocBase {
   static SplitItemsBloc? _instance;
+  String? scannedInvoiceId;
   StreamController mainStreamController = StreamController.broadcast();
   TextEditingController eController = TextEditingController();
   Stream get mainStream => mainStreamController.stream;
@@ -60,21 +62,41 @@ class SplitItemsBloc extends BlocBase {
     isWaitingForDetail.value = false;
   }
 
-  Future updateSplitItemList(BuildContext context) async {
+  Future<bool> updateSplitItemList(BuildContext context) async {
     List<SplitListDataRequest> lstSplitListDataRequest = [];
     for (var element in splitItemListLocal.value) {
       SplitListDataRequest splitListDataRequest = SplitListDataRequest();
-      splitListDataRequest.id = element.id;
+      splitListDataRequest.id = element.id ?? "";
+      splitListDataRequest.scannedInvoiceId = scannedInvoiceId;
       splitListDataRequest.categoryId = element.categoryId;
       splitListDataRequest.totalAmount = element.totalAmount;
       splitListDataRequest.taxAmount = element.taxAmount;
       splitListDataRequest.action = element.action;
+      lstSplitListDataRequest.add(splitListDataRequest);
     }
     var updateSplitItemListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
         .updateSplitItemList(lstSplitListDataRequest);
-    if (updateSplitItemListResponse != null) {}
+    /*if (updateSplitItemListResponse != null) {}*/
+
+    if (updateSplitItemListResponse != null) {
+      if (updateSplitItemListResponse.error != null &&
+          updateSplitItemListResponse.error!.isNotEmpty) {
+        CommonToast.getInstance()?.displayToast(
+            message: updateSplitItemListResponse.error!, bContext: context);
+      }
+      if (updateSplitItemListResponse.message != null &&
+          updateSplitItemListResponse.message!.isNotEmpty) {
+        CommonToast.getInstance()?.displayToast(
+            message: updateSplitItemListResponse.message!, bContext: context);
+      }
+
+      if (updateSplitItemListResponse.status == true) {
+        return true;
+      }
+    }
+    return false;
   }
 
   Future getDetailCategory(BuildContext context) async {

@@ -681,8 +681,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 //bloc.invoiceDetailData.value.totalTaxAmount,
                           id: bloc.invoiceDetailData.value.id ?? "",
                           isReadOnly: false,
-                        ))).then((_) {
-              bloc.getLineItemList(context, bloc.invoiceDetailData.value.id!);
+                        ))).then((onValue) {
+              if (onValue == true) {
+                bloc.getInvoiceDetail(context, widget.id);
+              }
             });
           },
           child: Container(
