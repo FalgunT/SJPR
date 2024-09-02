@@ -256,7 +256,7 @@ class ApiServices extends ApiClient {
   //Ends here *********************
 
   Future<InvoiceList?> getInvoiceList() async {
-    var response = await gets("${ApiClient.getInvoiceList}/1",
+    var response = await gets("${ApiClient.getInvoiceList}/0/0",
         headers: getLogoutHeader(), isBackground: false);
     if (response != null) {
       var data = InvoiceList.fromJson(json.decode(response));

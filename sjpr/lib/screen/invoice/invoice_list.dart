@@ -303,7 +303,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                     (listData.totalAmount == null ||
                             listData.totalAmount!.isEmpty)
                         ? "N/A"
-                        : '${listData.currency ?? ""} ${listData.totalAmount ?? ""}',
+                        : '${listData.currency ?? ""} ${bloc.getFormetted(listData.totalAmount ?? "")}',
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),

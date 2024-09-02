@@ -30,6 +30,7 @@ class InvoiceDetailBloc extends BlocBase {
   List<ProductServicesListData> pList = [];
   ValueNotifier<bool> isWaitingForDetail = ValueNotifier<bool>(true);
 
+  ValueNotifier<String> ownedBy = ValueNotifier<String>("None");
   ValueNotifier<String> selectedValueC = ValueNotifier<String>("None");
   ValueNotifier<String> selectedValueP = ValueNotifier<String>("None");
   ValueNotifier<String> selectedValueT = ValueNotifier<String>("None");
@@ -120,6 +121,26 @@ class InvoiceDetailBloc extends BlocBase {
         "PROD": lineProduct,
       };
       Check_Cat_Prod(result);
+    }
+  }
+
+  Future getProfile(BuildContext context) async {
+    if (await AppComponentBase.getInstance()
+            ?.getNetworkManager()
+            .isConnected() ??
+        false) {
+      var getProfile = await AppComponentBase.getInstance()
+          ?.getApiInterface()
+          .getApiRepository()
+          .profile();
+
+      if (getProfile != null) {
+        if (getProfile.status == true) {
+          ownedBy.value =
+              '${getProfile.data?.firstname} ${getProfile.data?.lastname}';
+          //profileStreamController.sink.add(getProfile.data);
+        }
+      }
     }
   }
 
@@ -339,8 +360,15 @@ class InvoiceDetailBloc extends BlocBase {
     if (input == null || input.isEmpty) {
       input = "0";
     }
-    double number = double.parse(input);
-    return NumberFormat('##0.00').format(number);
+    String res = "0.00";
+    try {
+      double number = double.parse(input);
+      res = NumberFormat('##0.00').format(number);
+    } catch (e) {
+      debugPrint(e.toString());
+      res = "0.00";
+    }
+    return res;
   }
 
   getCurrencySign() {
@@ -432,13 +460,14 @@ class InvoiceDetailBloc extends BlocBase {
       return false;
     }
     String duedate = invoiceDetailData.value.dueDate ?? "";
-    if (duedate == "") {
+    if (tid != '1' && duedate == "") {
+      //check for type receipt
       CommonToast.getInstance()?.displayToast(
           message: "Due Date field is required", bContext: context);
       return false;
     }
     String invid = invoiceDetailData.value.invoiceId ?? "";
-    if (invid == "") {
+    if (tid != '1' && invid == "") {  //check for type receipt
       CommonToast.getInstance()?.displayToast(
           message: "Invoice Number field is required", bContext: context);
       return false;
@@ -469,13 +498,13 @@ class InvoiceDetailBloc extends BlocBase {
       return false;
     }
     String pmid = invoiceDetailData.value.payment_method_id ?? "";
-    if (pmid == "") {
+    if (tid != '1' && pmid == "") {  //check for type receipt
       CommonToast.getInstance()?.displayToast(
           message: "Payment method field is required", bContext: context);
       return false;
     }
     String pubid = invoiceDetailData.value.publish_to_id ?? "";
-    if (pubid == "") {
+    if (tid != '1' && pubid == "") {   //check for type receipt
       CommonToast.getInstance()?.displayToast(
           message: "Publish To field is required", bContext: context);
       return false;

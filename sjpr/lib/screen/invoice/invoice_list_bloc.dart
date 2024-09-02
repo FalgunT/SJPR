@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:intl/intl.dart';
 import 'package:sjpr/common/bloc_provider.dart';
 import 'package:sjpr/common/common_toast.dart';
 import 'package:sjpr/di/app_component_base.dart';
@@ -175,6 +176,22 @@ class InvoiceBloc extends BlocBase {
     }
     return 'Unknown';
   }
+
+  getFormetted(String input) {
+    if (input == null || input.isEmpty) {
+      input = "0";
+    }
+    String res = "0.00";
+    try {
+      double number = double.parse(input);
+      res = NumberFormat('##0.00').format(number);
+    } catch (e) {
+      debugPrint(e.toString());
+      res = "0.00";
+    }
+    return res;
+  }
+
 
   @override
   void dispose() {}

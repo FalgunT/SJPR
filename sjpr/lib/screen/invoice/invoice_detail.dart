@@ -36,6 +36,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
   _init() async {
     await bloc.getInvoiceDetail(context, widget.id);
+    bloc.getProfile(context);
     bloc.getDetailCategory(context, widget.id);
     bloc.getDetailType(context, widget.id);
     bloc.getCurrency(context);
@@ -248,19 +249,24 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                         bottomSheetType: SheetType.type,
                                         Addf: (String v) {},
                                         onItemSelected: (id, name) {
+                                          debugPrint('--->$id, $name');
                                           bloc.SetName(
                                               id, name, SheetType.type);
+                                          //
                                         }).Show();
                                   });
                                 },
                               ),
-                              commonRowWidget(context,
-                                  isClickable: false,
-                                  title: "Owned by",
-                                  value: bloc.invoiceDetailData.value
-                                          .supplierName ??
-                                      '-',
-                                  onTap: () {}),
+                              ValueListenableBuilder(
+                                valueListenable: bloc.ownedBy,
+                                builder: (context, value, child) {
+                                  return commonRowWidget(context,
+                                      isClickable: false,
+                                      title: "Owned by",
+                                      value: value,
+                                      onTap: () {});
+                                },
+                              ),
                               commonRowWidget(context,
                                   title: "Date",
                                   value: bloc.invoiceDetailData.value
@@ -615,12 +621,16 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     fontSize: 16,
                                   )),
                             ),
-                            Text(
-                                "${bloc.selectedValueCurSign.value} ${bloc.invoiceDetailData.value.totalAmount}",
-                                style: TextStyle(
-                                    color: appTheme.textColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold))
+                            ValueListenableBuilder(
+                                valueListenable: bloc.selectedValueCurSign,
+                                builder: (context, value1, child) {
+                                  return Text(
+                                      '$value1 ${bloc.invoiceDetailData.value.totalAmount ?? ""}',
+                                      style: TextStyle(
+                                          color: appTheme.textColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold));
+                                })
                           ],
                         ),
                       ],
@@ -717,12 +727,16 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     fontSize: 16,
                                   )),
                             ),
-                            Text(
-                                "${bloc.selectedValueCurSign.value} ${bloc.invoiceDetailData.value.totalAmount}",
-                                style: TextStyle(
-                                    color: appTheme.textColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold))
+                            ValueListenableBuilder(
+                                valueListenable: bloc.selectedValueCurSign,
+                                builder: (context, value, child) {
+                                  return Text(
+                                      "$value ${bloc.getFormetted(bloc.invoiceDetailData.value.totalAmount ?? '')}",
+                                      style: TextStyle(
+                                          color: appTheme.textColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold));
+                                })
                           ],
                         ),
                       ],
