@@ -573,8 +573,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           id: bloc.invoiceDetailData.value.id ?? "",
                         ))).then((_) async {
               //bloc.getInvoiceDetail(context, widget.id);
-              await bloc.getLineItemList(
-                  context, bloc.invoiceDetailData.value.id!);
+              await bloc.getLineItemList(context, bloc.invoiceDetailData.value.id!);
               setState(() {});
             });
           },
@@ -671,9 +670,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 //bloc.invoiceDetailData.value.totalTaxAmount,
                           id: bloc.invoiceDetailData.value.id ?? "",
                           isReadOnly: false,
-                        ))).then((onValue) {
+                        ))).then((onValue) async {
               if (onValue == true) {
-                bloc.getInvoiceDetail(context, widget.id);
+               // bloc.getInvoiceDetail(context, widget.id);
+                await bloc.getSplitItemList(context, bloc.invoiceDetailData.value.id!);
+                setState(() {});
               }
             });
           },

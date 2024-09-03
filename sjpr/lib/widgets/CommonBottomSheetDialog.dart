@@ -30,12 +30,14 @@ class CommonBottomSheetDialog {
   Show() {
     return showModalBottomSheet(
         backgroundColor: Colors.black,
+        isScrollControlled: true,
         context: context,
         builder: (context) {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
             return Container(
               padding: const EdgeInsets.all(20),
+              height: MediaQuery.of(context).size.height/1.5,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

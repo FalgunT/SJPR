@@ -155,7 +155,7 @@ class _SplitItemsListScreenState extends State<SplitItemsListScreen> {
                             return (value.isEmpty)
                                 ? value1 == false
                                     ? EmptyItemWidget(
-                                        title: StringUtils.noinvoice,
+                                        title: StringUtils.noSplitItems,
                                         detail: "")
                                     : Container()
                                 : Column(

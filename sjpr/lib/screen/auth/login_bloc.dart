@@ -42,8 +42,8 @@ class LoginBloc extends BlocBase {
   void initData() {
     // TODO: implement initData
     super.initData();
-    emailController.text = 'falguntanwar@virtualemployee.com';
-    passwordController.text = '123456789@';
+   /* emailController.text = 'falguntanwar@virtualemployee.com';
+    passwordController.text = '123456789@';*/
   }
 
   @override

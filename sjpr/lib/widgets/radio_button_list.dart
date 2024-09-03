@@ -61,6 +61,7 @@ class _RadioButtonState extends State<RadioButtonList1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.black,
       appBar: AppBar(
         automaticallyImplyLeading: false,

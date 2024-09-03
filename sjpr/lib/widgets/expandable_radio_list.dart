@@ -60,6 +60,7 @@ class _ExpandableRadioListState extends State<ExpandableRadioList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.black,
       appBar: AppBar(
         automaticallyImplyLeading: false,
