@@ -27,7 +27,6 @@ void main() async {
       .then((_) {
     runApp(MyApp(token: token));
   });
-
 }
 
 class MyApp extends StatefulWidget {
