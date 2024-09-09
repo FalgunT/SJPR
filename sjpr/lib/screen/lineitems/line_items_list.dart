@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sjpr/model/lineitem_list_model.dart';
 import 'package:sjpr/screen/lineitems/line_items_detail.dart';
 import 'package:sjpr/utils/color_utils.dart';
-import 'package:sjpr/utils/image_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
 import 'package:sjpr/widgets/empty_item_widget.dart';
 import 'line_item_list_bloc.dart';
@@ -11,9 +9,13 @@ import 'line_item_list_bloc.dart';
 class LineItemsListScreen extends StatefulWidget {
   final String id;
   final String currencySign;
+  final int isPurchase;
 
   const LineItemsListScreen(
-      {super.key, required this.id, required this.currencySign});
+      {super.key,
+      required this.id,
+      required this.currencySign,
+      required this.isPurchase});
 
   @override
   State<LineItemsListScreen> createState() => _LineItemsListScreenState();
@@ -252,16 +254,16 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                   dense: true,
                   contentPadding: const EdgeInsets.only(left: 10, right: 10),
                   title: Text(
-                    (value[index].name != null && value[index].name!.isNotEmpty)
-                        ? value[index].name!
-                        : "Line Item $index",
+                    (value[index].name.isNotEmpty)
+                        ? "${index + 1} . ${value[index].name}"
+                        : "${index + 1} . ",
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: textColor),
                   ),
                   subtitle: Text(
-                    value[index].description ?? "Category name",
+                    value[index].categoryName ?? "",
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -302,6 +304,7 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                   lineitem_id: lineitem_id,
                   invoice_id: widget.id,
                   currencySign: widget.currencySign,
+                  isPurchase: widget.isPurchase,
                 ))).then((response) async {
       await bloc.getLineItemList(context, widget.id);
       setState(() {});

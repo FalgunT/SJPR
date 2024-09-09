@@ -17,13 +17,10 @@ import 'package:sjpr/model/split_list_model.dart';
 import 'package:sjpr/model/type_list_model.dart';
 import 'package:sjpr/model/upload_invoice.dart';
 import 'package:sjpr/services/api_services.dart';
-
 import '../model/api_response_costomer.dart';
 import '../model/api_response_otprequest.dart';
 import '../model/payment_methods.dart';
 import '../screen/invoice/custom_camera2.dart';
-
-//import '../screen/invoice/custom_camera.dart';
 
 class ApiRepositoryIml extends ApiRepository {
   final ApiServices _apiServices = ApiServices();
@@ -59,20 +56,25 @@ class ApiRepositoryIml extends ApiRepository {
   }*/
 
   @override
-  Future<CommonModelClass?> uploadInvoice({required String invoicepath}) {
-    return _apiServices.uploadInvoice(invoicepath: invoicepath);
+  Future<CommonModelClass?> uploadInvoice(
+      {required String invoicepath, required int isPurchase}) {
+    return _apiServices.uploadInvoice(
+        invoicepath: invoicepath, isPurchase: isPurchase);
   }
 
   @override
   Future<CommonModelClass?> uploadMultiInvoice(
-      {required List<CaptureModel> invoice, required String uploadMode}) {
+      {required List<CaptureModel> invoice,
+      required String uploadMode,
+      required isPurchase}) {
     return _apiServices.uploadMultiInvoice(
-        invoices: invoice, uploadMode: uploadMode);
+        invoices: invoice, uploadMode: uploadMode, isPurchase: isPurchase);
   }
 
   @override
-  Future<InvoiceList?> getInvoiceList({bool isBackground = true}) {
-    return _apiServices.getInvoiceList();
+  Future<InvoiceList?> getInvoiceList(
+      {bool isBackground = true, required isPurchase, required page}) {
+    return _apiServices.getInvoiceList(isPurchase: isPurchase, page: page);
   }
 
   @override
@@ -155,13 +157,14 @@ class ApiRepositoryIml extends ApiRepository {
   }
 
   @override
-  Future<Object?> AddCustomer({required String cName}) {
-    return _apiServices.addCustomer(cName);
+  Future<Object?> AddCustomer(
+      {required String cName, required int isPurchase}) {
+    return _apiServices.addCustomer(cName, isPurchase: isPurchase);
   }
 
   @override
-  Future<CustomerApiResponse?> getAllCustomer() {
-    return _apiServices.getAllCustomer();
+  Future<CustomerApiResponse?> getAllCustomer({required int isPurchase}) {
+    return _apiServices.getAllCustomer(isPurchase: isPurchase);
   }
 
   @override
@@ -228,8 +231,9 @@ class ApiRepositoryIml extends ApiRepository {
   }
 
   @override
-  Future<InvoiceList?> getArchiveList(String dt, int isPurchase) {
-    return _apiServices.getArchiveList(dt, isPurchase);
+  Future<InvoiceList?> getArchiveList(String dt,
+      {required int isPurchase, required page}) {
+    return _apiServices.getArchiveList(dt, isPurchase, page);
   }
 
   @override
@@ -245,7 +249,9 @@ class ApiRepositoryIml extends ApiRepository {
 
   @override
   Future<CommonModelClass?> passwordReset(
-      {required String oldPass,required String pass, required String confirmpass}) {
+      {required String oldPass,
+      required String pass,
+      required String confirmpass}) {
     return _apiServices.passwordReset(oldPass, pass, confirmpass);
   }
 }
@@ -266,14 +272,19 @@ abstract class ApiRepository {
   Future<CommonModelClass?> uploadMultiInvoice(
       {required List<CaptureModel> invoice, required String uploadMode});*/
 
-  Future<CommonModelClass?> uploadInvoice({required String invoicepath});
+  Future<CommonModelClass?> uploadInvoice(
+      {required String invoicepath, required int isPurchase});
 
   Future<CommonModelClass?> uploadMultiInvoice(
-      {required List<CaptureModel> invoice, required String uploadMode});
+      {required List<CaptureModel> invoice,
+      required String uploadMode,
+      required int isPurchase});
 
-  Future<InvoiceList?> getInvoiceList({bool isBackground = true});
+  Future<InvoiceList?> getInvoiceList(
+      {bool isBackground = true, required int isPurchase, required page});
 
-  Future<InvoiceList?> getArchiveList(String dt, int isPurchase);
+  Future<InvoiceList?> getArchiveList(String dt,
+      {required int isPurchase, required page});
 
   Future<InvoiceDetail?> getInvoiceDetail(String id);
 
@@ -311,9 +322,9 @@ abstract class ApiRepository {
     String invoiceId,
   );
 
-  Future<Object?> AddCustomer({required String cName});
+  Future<Object?> AddCustomer({required String cName, required int isPurchase});
 
-  Future<CustomerApiResponse?> getAllCustomer();
+  Future<CustomerApiResponse?> getAllCustomer({required int isPurchase});
 
   Future<ApiResponseLocationModel?> getAllLocation();
 
@@ -339,5 +350,7 @@ abstract class ApiRepository {
       {required String pass, required String confirmpass, required String id});
 
   Future<CommonModelClass?> passwordReset(
-      {required String oldPass,required String pass, required String confirmpass});
+      {required String oldPass,
+      required String pass,
+      required String confirmpass});
 }

@@ -13,7 +13,7 @@ class CommonToast {
     return _instance;
   }
 
-  void displayToast({String message = '',  BuildContext? bContext}) {
+  void displayToast({String message = '', BuildContext? bContext}) {
     Fluttertoast.cancel();
     Fluttertoast.showToast(
         msg: message,
@@ -25,9 +25,8 @@ class CommonToast {
         timeInSecForIosWeb: 2,
         fontSize: _appTheme.successToastTextSize);
 
-    if(message == AppSession.logoutString){
+    if (message == AppSession.logoutString) {
       AppSession.getInstance()?.SessionEndEvent(bContext!);
     }
-
   }
 }

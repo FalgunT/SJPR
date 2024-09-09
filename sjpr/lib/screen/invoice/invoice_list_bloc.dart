@@ -24,42 +24,64 @@ class InvoiceBloc extends BlocBase {
   ValueNotifier<bool> isWaitingArchive = ValueNotifier<bool>(true);
   ValueNotifier<List<InvoiceListData>> archiveListData =
       ValueNotifier<List<InvoiceListData>>([]);
+  int totalCountInbox = -1, totalCountArchive = -1;
 
   Future getInvoiceList(BuildContext context,
-      {bool isBackground = true}) async {
-    isWaitingInbox.value = true;
-    var getInvoiceListResponse = await AppComponentBase.getInstance()
-        ?.getApiInterface()
-        .getApiRepository()
-        .getInvoiceList(isBackground: isBackground);
-    if (getInvoiceListResponse != null) {
-      if (getInvoiceListResponse.status == true) {
-        inboxListData.value = getInvoiceListResponse.data!;
-        // invoiceListStreamController.sink.add(getInvoiceListResponse);
-      } else if (getInvoiceListResponse.message != null) {
-        CommonToast.getInstance()?.displayToast(
-            message: getInvoiceListResponse.message!, bContext: context);
+      {bool isBackground = true,
+      required int isPurchase,
+      required int page}) async {
+    if (totalCountInbox == -1 || (page * 10) < totalCountInbox) {
+      isWaitingInbox.value = true;
+      var getInvoiceListResponse = await AppComponentBase.getInstance()
+          ?.getApiInterface()
+          .getApiRepository()
+          .getInvoiceList(
+              isBackground: isBackground, isPurchase: isPurchase, page: page);
+      if (getInvoiceListResponse != null) {
+        totalCountInbox = getInvoiceListResponse.totalCount ?? 0;
+        if (getInvoiceListResponse.status == true) {
+          if (page == 0) {
+            inboxListData.value = getInvoiceListResponse.data!;
+          } else {
+            List<InvoiceListData> oldData = inboxListData.value;
+            oldData.addAll(getInvoiceListResponse.data!);
+            inboxListData.value = oldData;
+          }
+          // invoiceListStreamController.sink.add(getInvoiceListResponse);
+        } else if (getInvoiceListResponse.message != null) {
+          CommonToast.getInstance()?.displayToast(
+              message: getInvoiceListResponse.message!, bContext: context);
+        }
       }
+      isWaitingInbox.value = false;
     }
-    isWaitingInbox.value = false;
   }
 
-  Future getArchiveList(BuildContext context) async {
-    isWaitingArchive.value = true;
-    var getInvoiceListResponse = await AppComponentBase.getInstance()
-        ?.getApiInterface()
-        .getApiRepository()
-        .getArchiveList('', 0);
-    if (getInvoiceListResponse != null) {
-      if (getInvoiceListResponse.status == true) {
-        archiveListData.value = getInvoiceListResponse.data!;
-        //invoiceArcListStreamController.sink.add(getInvoiceListResponse);
-      } else if (getInvoiceListResponse.message != null) {
-        CommonToast.getInstance()?.displayToast(
-            message: getInvoiceListResponse.message!, bContext: context);
+  Future getArchiveList(BuildContext context,
+      {required int isPurchase, required int page}) async {
+    if (totalCountArchive == -1 || (page * 10) < totalCountArchive) {
+      isWaitingArchive.value = true;
+      var getInvoiceListResponse = await AppComponentBase.getInstance()
+          ?.getApiInterface()
+          .getApiRepository()
+          .getArchiveList('', isPurchase: isPurchase, page: page);
+      if (getInvoiceListResponse != null) {
+        totalCountArchive = getInvoiceListResponse.totalCount ?? 0;
+        if (getInvoiceListResponse.status == true) {
+          if (page == 0) {
+            archiveListData.value = getInvoiceListResponse.data!;
+          } else {
+            List<InvoiceListData> oldData = archiveListData.value;
+            oldData.addAll(getInvoiceListResponse.data!);
+            archiveListData.value = oldData;
+          }
+        } else if (getInvoiceListResponse.message != null) {
+          CommonToast.getInstance()?.displayToast(
+              message: getInvoiceListResponse.message!, bContext: context);
+        }
       }
+      isWaitingArchive.value = false;
     }
-    isWaitingArchive.value = false;
   }
 
   /*
@@ -98,11 +120,12 @@ class InvoiceBloc extends BlocBase {
     }
   }*/
 
-  Future uploadInvoice(BuildContext context, String path) async {
+  Future uploadInvoice(
+      BuildContext context, String path, int isPurchase) async {
     var getInvoiceListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
-        .uploadInvoice(invoicepath: path);
+        .uploadInvoice(invoicepath: path, isPurchase: isPurchase);
     if (getInvoiceListResponse != null &&
         getInvoiceListResponse.status == true) {
       //invoiceListStreamController.sink.add(getInvoiceListResponse.data!);
@@ -116,11 +139,12 @@ class InvoiceBloc extends BlocBase {
   }
 
   uploadMultiInvoice(BuildContext context, List<CaptureModel> captures,
-      String uploadMode) async {
+      String uploadMode, isPurchase) async {
     var getInvoiceListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
-        .uploadMultiInvoice(invoice: captures, uploadMode: uploadMode);
+        .uploadMultiInvoice(
+            invoice: captures, uploadMode: uploadMode, isPurchase: isPurchase);
     if (getInvoiceListResponse != null &&
         getInvoiceListResponse.status == true) {
       //invoiceListStreamController.sink.add(getInvoiceListResponse.data!);
@@ -192,7 +216,9 @@ class InvoiceBloc extends BlocBase {
     return res;
   }
 
-
   @override
-  void dispose() {}
+  void dispose() {
+    inboxListData.dispose();
+    archiveListData.dispose();
+  }
 }

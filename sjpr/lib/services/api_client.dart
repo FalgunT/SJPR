@@ -36,7 +36,7 @@ class ApiClient {
   static String profile = "$baseUrl/profile";
   static String uploadInvoice = "$baseUrl/scaninvoice";
   static String getInvoiceList = "$baseUrl/invoices";
-  static String getArchiveList= "$baseUrl/invoices/archive";
+  static String getArchiveList = "$baseUrl/invoices/archive";
   static String getInvoiceDetail = "$baseUrl/invoicedata";
   static String getCategoryList = "$baseUrl/getcategory";
   static String getProductList = "$baseUrl/getproductservices";
@@ -71,10 +71,8 @@ class ApiClient {
   static String updateSplitItemDetail = "$baseUrl/invoice/split/update";
   static String sendOTP = "$baseUrl/sendotp";
   static final RegExp nameRegExp = RegExp('[a-zA-Z]');
-  static final String newPassword="$baseUrl/forgotpassword";
-  static final String resetPassword="$baseUrl/passwordreset";
-
-
+  static final String newPassword = "$baseUrl/forgotpassword";
+  static final String resetPassword = "$baseUrl/passwordreset";
 
   Map<String, String> getJsonHeader() {
     var header = <String, String>{};
@@ -126,12 +124,12 @@ class ApiClient {
         var response = await http.get(Uri.parse(url), headers: headers);
         if (response.bodyBytes.isNotEmpty) {
           //(successResponse.contains(response.statusCode)) {
-          AppComponentBase.getInstance()?.disableWidget(false);
           String bodyBytes = utf8.decode(response.bodyBytes);
           logPrint(requestData: "", response: response);
           if (isProgressBar) {
             AppComponentBase.getInstance()?.showProgressDialog(false);
           }
+          AppComponentBase.getInstance()?.disableWidget(false);
           return bodyBytes;
         }
         if (isProgressBar) {

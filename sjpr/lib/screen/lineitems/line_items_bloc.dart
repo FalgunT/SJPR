@@ -105,11 +105,12 @@ class LineItemsBloc extends BlocBase {
     }
   }
 
-  Future getAllCustomer(BuildContext context, {bool isAdd = false}) async {
+  Future getAllCustomer(BuildContext context,
+      {bool isAdd = false, required int isPurchase}) async {
     var getResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
-        .getAllCustomer();
+        .getAllCustomer(isPurchase: isPurchase);
     if (getResponse != null) {
       customerList = getResponse.data;
       customerList.forEach(
@@ -126,14 +127,15 @@ class LineItemsBloc extends BlocBase {
     }
   }
 
-  Future addCustomer(BuildContext context, String pName) async {
+  Future addCustomer(BuildContext context, String pName,
+      {required int isPurchase}) async {
     var getCategoryListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
-        .AddCustomer(cName: pName);
+        .AddCustomer(cName: pName, isPurchase: isPurchase);
     if (getCategoryListResponse != null) {
       //refresh the page...
-      getAllCustomer(context, isAdd: true);
+      getAllCustomer(context, isAdd: true, isPurchase: isPurchase);
     }
   }
 

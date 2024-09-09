@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:sjpr/common/AppEnums.dart';
 import 'package:sjpr/common/common_toast.dart';
 import 'package:sjpr/model/split_list_model.dart';
-import 'package:sjpr/screen/catch_invoice/review_page.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
 import 'package:sjpr/screen/splititems/split_items_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
@@ -42,6 +41,13 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
       bloc.selectedValueC = ValueNotifier<String>("None");
     }
     super.initState();
+  }
+
+  getCurrency() {
+    if (widget.currencySign.isEmpty) {
+      return '';
+    }
+    return ' (${widget.currencySign})';
   }
 
   @override
@@ -95,6 +101,7 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
                     return commonRowWidget(
                       title: "Category",
                       value: value,
+                      context: context,
                       onTap: () {
                         CommonBottomSheetDialog(
                             context: context,
@@ -113,13 +120,14 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
                 title: "Total Amount",
                 value: bloc
                     .getFormatted(bloc.splitItemDetail.value.totalAmount ?? ""),
+                context: context,
                 onTap: () {
                   AddNewItemDialog(
                       isAmt: true,
                       context: context,
                       title: "Edit Total Amount",
                       hint: 'Enter Total Amount',
-                      label: 'Total Amount${widget.currencySign}',
+                      label: 'Total Amount${getCurrency()}',
                       oldValue: bloc.getFormatted(
                           bloc.splitItemDetail.value.totalAmount ?? "0.00"),
                       type: SheetType.none,
@@ -134,13 +142,14 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
                   title: "Total Tax Amount",
                   value: bloc
                       .getFormatted(bloc.splitItemDetail.value.taxAmount ?? ""),
+                  context: context,
                   onTap: () {
                     AddNewItemDialog(
                         isAmt: true,
                         context: context,
                         title: "Edit Tax Amount",
                         hint: 'Enter Tax Amount',
-                        label: 'Tax Amount${widget.currencySign}',
+                        label: 'Tax Amount${getCurrency()}',
                         oldValue: bloc.getFormatted(
                             bloc.splitItemDetail.value.taxAmount ?? "0.00"),
                         type: SheetType.none,
@@ -360,6 +369,60 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
       child: const Icon(
         Icons.clear,
         color: Colors.white,
+      ),
+    );
+  }
+
+  Widget commonRowWidget(
+      {required title,
+      required value,
+      required onTap,
+      bool isAmt = false,
+      required context}) {
+    return InkWell(
+      onTap: () {
+        onTap();
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: listTileBgColor,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                    color: textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              child: isAmt
+                  ? Text(
+                      '${widget.currencySign} $value',
+                      style: TextStyle(color: textColor, fontSize: 17),
+                      textAlign: TextAlign.end,
+                    )
+                  : Text(
+                      value,
+                      style: TextStyle(color: textColor, fontSize: 17),
+                      textAlign: TextAlign.end,
+                    ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: textColor,
+            )
+          ],
+        ),
       ),
     );
   }

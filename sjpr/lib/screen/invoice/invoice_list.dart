@@ -8,16 +8,14 @@ import 'package:sjpr/screen/invoice/invoice_detail.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_read_only.dart';
 import 'package:sjpr/screen/invoice/invoice_list_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
-import 'package:sjpr/utils/image_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
-import 'package:sjpr/widgets/custom_camera_modes.dart';
 import 'package:sjpr/widgets/delete_confirmation_dialog.dart';
 import 'package:sjpr/widgets/empty_item_widget.dart';
-import 'custom_camera.dart';
 import 'custom_camera2.dart';
 
 class InvoiceListScreen extends StatefulWidget {
-  const InvoiceListScreen({super.key});
+  final int isPurchase;
+  const InvoiceListScreen({super.key, required this.isPurchase});
 
   @override
   State<InvoiceListScreen> createState() => _InvoiceListScreenState();
@@ -27,11 +25,17 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
     with TickerProviderStateMixin {
   final InvoiceBloc bloc = InvoiceBloc();
   late TabController _tabController;
+  final _inboxScrollController = ScrollController(),
+      _archiveScrollController = ScrollController();
+  int _currentPageInbox = 0, _currentPageArchive = 0;
+  final bool _isLoading = false;
 
   @override
   void initState() {
-    _init();
     super.initState();
+    _init();
+    _inboxScrollController.addListener(_loadMoreInbox);
+    _archiveScrollController.addListener(_loadMoreArchive);
     _tabController = TabController(length: 2, vsync: this);
 
     // Listen for tab changes
@@ -42,9 +46,35 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
     });
   }
 
+  void _loadMoreInbox() {
+    if (_inboxScrollController.position.pixels ==
+            _inboxScrollController.position.maxScrollExtent &&
+        !_isLoading) {
+      _currentPageInbox++;
+      bloc.getInvoiceList(context,
+          isBackground: false,
+          isPurchase: widget.isPurchase,
+          page: _currentPageInbox);
+    }
+  }
+
+  void _loadMoreArchive() {
+    if (_archiveScrollController.position.pixels ==
+            _archiveScrollController.position.maxScrollExtent &&
+        !_isLoading) {
+      _currentPageArchive++;
+      bloc.getArchiveList(context,
+          isPurchase: widget.isPurchase, page: _currentPageArchive);
+    }
+  }
+
   void _init() {
-    bloc.getInvoiceList(context, isBackground: false);
-    bloc.getArchiveList(context);
+    bloc.getInvoiceList(context,
+        isBackground: false,
+        isPurchase: widget.isPurchase,
+        page: _currentPageInbox);
+    bloc.getArchiveList(context,
+        isPurchase: widget.isPurchase, page: _currentPageArchive);
   }
 
   @override
@@ -190,14 +220,14 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
     if (result == null) return null;
     // we will log the name, size and path of the
     // first picked file (if multiple are selected)
-    *//*print(result.files.first.name);
+    */ /*print(result.files.first.name);
     print("Size in Bytes : ${result.files.first.size}");
     print(result.files.first.path);
     if (kDebugMode) {
       var bytes = result.files.first.size;
       double sizeInMB = bytes / (10241 * 1024);
       print("sizeInMB : $sizeInMB");
-    }*//*
+    }*/ /*
     return result.files;
   }*/
 
@@ -215,6 +245,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                       padding: const EdgeInsets.only(top: 20, bottom: 20),
                       shrinkWrap: true,
                       itemCount: value.length,
+                      controller: _archiveScrollController,
                       itemBuilder: (BuildContext context, int index) {
                         var listData = value[index];
                         return getChild(listData);
@@ -238,6 +269,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                       padding: const EdgeInsets.only(top: 20, bottom: 20),
                       shrinkWrap: true,
                       itemCount: value.length,
+                      controller: _inboxScrollController,
                       itemBuilder: (BuildContext context, int index) {
                         var listData = value[index];
                         return getChild(listData);
@@ -264,6 +296,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
               MaterialPageRoute(
                   builder: (context) => InvoiceDetailScreen(
                         id: listData.id!,
+                        isPurchase: widget.isPurchase,
                       ))).then((onValue) {
             if (onValue) {
               _init();
@@ -347,6 +380,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                     MaterialPageRoute(
                         builder: (context) => InvoiceDetailReadOnlyScreen(
                               id: listData.id!,
+                              isPurchase: widget.isPurchase,
                             )));
               },
               child: getOptionChild(
@@ -542,12 +576,17 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
         debugPrint('Mode--->${response.mode}');
         //  var file = XFile(invoice.path!, name: invoice.name, bytes: invoice.bytes, length: invoice.size);
         if (response.mode == 1) {
-          await bloc.uploadInvoice(context, response.models[0].capturePath);
+          await bloc.uploadInvoice(
+              context, response.models[0].capturePath, widget.isPurchase);
         } else {
           await bloc.uploadMultiInvoice(context, response.models,
-              response.mode == 2 ? 'multiple' : "combine");
+              response.mode == 2 ? 'multiple' : "combine", widget.isPurchase);
         }
-        bloc.getInvoiceList(context);
+        _currentPageInbox = 0;
+        bloc.getInvoiceList(context,
+            isBackground: true,
+            isPurchase: widget.isPurchase,
+            page: _currentPageInbox);
       }
     });
   }
@@ -609,4 +648,12 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
     }*/ /*
     }
   }*/
+
+  @override
+  void dispose() {
+    _inboxScrollController.dispose();
+    _archiveScrollController.dispose();
+    _tabController.dispose();
+    super.dispose();
+  }
 }

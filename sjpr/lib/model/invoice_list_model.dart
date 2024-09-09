@@ -4,7 +4,6 @@ class InvoiceList {
   String? message;
   int? totalCount;
   List<InvoiceListData>? data;
-  List<InvoiceListData>? archiveData;
 
   InvoiceList({this.status, this.message, this.totalCount, this.data});
 
@@ -18,7 +17,6 @@ class InvoiceList {
         data?.add(InvoiceListData.fromJson(v));
       });
     }
-    archiveData = <InvoiceListData>[];
   }
 
   Map<String, dynamic> toJson() {

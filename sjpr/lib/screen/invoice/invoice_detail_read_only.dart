@@ -20,8 +20,10 @@ import '../lineitems/line_items_list_readonly.dart';
 
 class InvoiceDetailReadOnlyScreen extends StatefulWidget {
   final String id;
+  final int isPurchase;
 
-  const InvoiceDetailReadOnlyScreen({super.key, required this.id});
+  const InvoiceDetailReadOnlyScreen(
+      {super.key, required this.id, required this.isPurchase});
 
   @override
   State<InvoiceDetailReadOnlyScreen> createState() =>
@@ -30,7 +32,7 @@ class InvoiceDetailReadOnlyScreen extends StatefulWidget {
 
 class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
   late InvoiceDetailBloc bloc;
-  TextEditingController _eDescController = TextEditingController();
+  final TextEditingController _eDescController = TextEditingController();
   late var appTheme;
 
   @override
@@ -487,7 +489,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                                         CupertinoSwitch(
                                           value: true,
                                           onChanged: (value) {},
-                                          activeColor: appTheme.activeTxtColor,
+                                          activeTrackColor:
+                                              appTheme.activeTxtColor,
                                         ),
                                       ],
                                     ),
@@ -542,8 +545,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
       ),
     );
   }
-  getTotalWidget(){
-    return  ValueListenableBuilder(
+
+  getTotalWidget() {
+    return ValueListenableBuilder(
         valueListenable: bloc.selectedValueCurSign,
         builder: (context, value1, child) {
           return Text(
@@ -554,6 +558,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                   fontWeight: FontWeight.bold));
         });
   }
+
   getLines() {
     int count = bloc.invoiceDetailData.value.line_item_count ?? 0;
     return count == 0
@@ -579,6 +584,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                           builder: (context) => LineItemsListReadOnlyScreen(
                                 currencySign: bloc.selectedValueCurSign.value,
                                 id: bloc.invoiceDetailData.value.id ?? "",
+                                isPurchase: widget.isPurchase,
                               ))).then((_) {
                     bloc.getLineItemList(context, widget.id);
                   });
@@ -650,98 +656,99 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
     return count == 0
         ? const Center()
         : Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            "Split Items",
-            style: TextStyle(
-                color: appTheme.activeTxtColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold),
-          ),
-        ),
-        InkWell(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => SplitItemsListScreen(
-                          currencySign: bloc.selectedValueCurSign.value,
-                          totalAmount: bloc.invoiceDetailData.value.totalAmount,
-//bloc.invoiceDetailData.value.totalAmount
-                          totalTaxAmount:
-                              bloc.invoiceDetailData.value.totalTaxAmount,
-//bloc.invoiceDetailData.value.totalTaxAmount,
-                          id: bloc.invoiceDetailData.value.id ?? "",
-                          isReadOnly: true,
-                        ))).then((onValue) {
-              if (onValue == true) {
-                bloc.getInvoiceDetail(context, widget.id);
-              }
-            });
-          },
-          child: Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: appTheme.listTileBgColor,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Split Items",
+                  style: TextStyle(
+                      color: appTheme.activeTxtColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SplitItemsListScreen(
+                                currencySign: bloc.selectedValueCurSign.value,
+                                totalAmount:
+                                    bloc.invoiceDetailData.value.totalAmount,
+//bloc.invoiceDetailData.value.totalAmount
+                                totalTaxAmount:
+                                    bloc.invoiceDetailData.value.totalTaxAmount,
+//bloc.invoiceDetailData.value.totalTaxAmount,
+                                id: bloc.invoiceDetailData.value.id ?? "",
+                                isReadOnly: true,
+                              ))).then((onValue) {
+                    if (onValue == true) {
+                      bloc.getInvoiceDetail(context, widget.id);
+                    }
+                  });
+                },
+                child: Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: appTheme.listTileBgColor,
+                    ),
+                    child: Row(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text("Consult split items",
-                                  style: TextStyle(
-                                      color: appTheme.textColor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                            getTotalWidget()
-                          ],
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text("Consult split items",
+                                        style: TextStyle(
+                                            color: appTheme.textColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  getTotalWidget()
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text("Total",
+                                        style: TextStyle(
+                                          color: appTheme.textColor,
+                                          fontSize: 16,
+                                        )),
+                                  ),
+                                  Text(
+                                      "${bloc.selectedValueCurSign.value} ${bloc.invoiceDetailData.value.totalAmount}",
+                                      style: TextStyle(
+                                          color: appTheme.textColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold))
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(
-                          height: 5,
+                          width: 10,
                         ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text("Total",
-                                  style: TextStyle(
-                                    color: appTheme.textColor,
-                                    fontSize: 16,
-                                  )),
-                            ),
-                            Text(
-                                "${bloc.selectedValueCurSign.value} ${bloc.invoiceDetailData.value.totalAmount}",
-                                style: TextStyle(
-                                    color: appTheme.textColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold))
-                          ],
-                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: appTheme.textColor,
+                        )
                       ],
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: appTheme.textColor,
-                  )
-                ],
-              )),
-        ),
-      ],
-    );
+                    )),
+              ),
+            ],
+          );
   }
 
   Widget commonRowWidget(BuildContext context,

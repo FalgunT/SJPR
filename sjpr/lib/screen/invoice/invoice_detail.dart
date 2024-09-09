@@ -15,8 +15,9 @@ import '../splititems/split_items_list.dart';
 
 class InvoiceDetailScreen extends StatefulWidget {
   final String id;
-
-  const InvoiceDetailScreen({super.key, required this.id});
+  final int isPurchase;
+  const InvoiceDetailScreen(
+      {super.key, required this.id, required this.isPurchase});
 
   @override
   State<InvoiceDetailScreen> createState() => _InvoiceDetailScreenState();
@@ -475,7 +476,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                                     .payment_status =
                                                 bb ? '1' : '0';
                                           },
-                                          activeColor: appTheme.activeTxtColor,
+                                          activeTrackColor:
+                                              appTheme.activeTxtColor,
                                         )
                                       ],
                                     );
@@ -533,8 +535,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     );
   }
 
-  getTotalWidget(){
-    return  ValueListenableBuilder(
+  getTotalWidget() {
+    return ValueListenableBuilder(
         valueListenable: bloc.selectedValueCurSign,
         builder: (context, value1, child) {
           return Text(
@@ -571,9 +573,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                     builder: (context) => LineItemsListScreen(
                           currencySign: bloc.selectedValueCurSign.value,
                           id: bloc.invoiceDetailData.value.id ?? "",
+                          isPurchase: widget.isPurchase,
                         ))).then((_) async {
               //bloc.getInvoiceDetail(context, widget.id);
-              await bloc.getLineItemList(context, bloc.invoiceDetailData.value.id!);
+              await bloc.getLineItemList(
+                  context, bloc.invoiceDetailData.value.id!);
               setState(() {});
             });
           },
@@ -672,8 +676,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           isReadOnly: false,
                         ))).then((onValue) async {
               if (onValue == true) {
-               // bloc.getInvoiceDetail(context, widget.id);
-                await bloc.getSplitItemList(context, bloc.invoiceDetailData.value.id!);
+                // bloc.getInvoiceDetail(context, widget.id);
+                await bloc.getSplitItemList(
+                    context, bloc.invoiceDetailData.value.id!);
                 setState(() {});
               }
             });
@@ -814,7 +819,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         // initialDate: selectedDate,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate) {
+    if (picked != null && selectedDate != picked) {
       setState(() {
         String formattedDate = DateFormat('dd/MM/yyyy').format(picked);
         selectedDate = formattedDate;

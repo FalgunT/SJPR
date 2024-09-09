@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sjpr/model/category_list_model.dart';
 import 'package:sjpr/screen/lineitems/line_items_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/widgets/AddNewItemDialog.dart';
@@ -11,23 +10,23 @@ import 'package:sjpr/widgets/delete_confirmation_dialog.dart';
 
 import '../../common/AppEnums.dart';
 import '../../common/common_toast.dart';
-import '../../utils/textinput_utils.dart';
-import '../../widgets/expandable_radio_list.dart';
-import '../../widgets/radio_button_list.dart';
 
 class LineItemsDetailReadOnlyScreen extends StatefulWidget {
   final String invoice_id;
   final String lineitem_id;
   final String currencySign;
+  final int isPurchase;
 
   const LineItemsDetailReadOnlyScreen(
       {super.key,
       required this.invoice_id,
       required this.lineitem_id,
-      required this.currencySign});
+      required this.currencySign,
+      required this.isPurchase});
 
   @override
-  State<LineItemsDetailReadOnlyScreen> createState() => _LineItemsDetailScreenState();
+  State<LineItemsDetailReadOnlyScreen> createState() =>
+      _LineItemsDetailScreenState();
 }
 
 class _LineItemsDetailScreenState extends State<LineItemsDetailReadOnlyScreen> {
@@ -77,7 +76,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailReadOnlyScreen> {
                                 color: activeTxtColor,
                                 fontSize: 24),
                           ),
-                        /*  CommonButton(
+                          /*  CommonButton(
                               textFontSize: 16,
                               height: 30,
                               content: "Delete",
@@ -225,7 +224,8 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailReadOnlyScreen> {
                                       ItemId: getId(SheetType.customer),
                                       bottomSheetType: SheetType.customer,
                                       Addf: (String v) {
-                                        bloc.addCustomer(context, v);
+                                        bloc.addCustomer(context, v,
+                                            isPurchase: widget.isPurchase);
                                       },
                                       onItemSelected: (id, name) {
                                         SetName(id, name, SheetType.customer);
@@ -255,8 +255,8 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailReadOnlyScreen> {
                       commonRowWidget(
                           isAmt: true,
                           title: "Unit price",
-                          value: bloc
-                              .getFormetted(bloc.lineitemdetail.value.unitPrice),
+                          value: bloc.getFormetted(
+                              bloc.lineitemdetail.value.unitPrice),
                           onTap: () {
                             AddNewItemDialog(
                                 isAmt: true,
@@ -277,8 +277,8 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailReadOnlyScreen> {
                       commonRowWidget(
                           isAmt: true,
                           title: "Net Amount",
-                          value: bloc
-                              .getFormetted(bloc.lineitemdetail.value.netAmount),
+                          value: bloc.getFormetted(
+                              bloc.lineitemdetail.value.netAmount),
                           onTap: () {
                             AddNewItemDialog(
                                 isAmt: true,
@@ -362,7 +362,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailReadOnlyScreen> {
                                 });
                           },
                           context: context),
-                     /* CommonButton(
+                      /* CommonButton(
                           textFontSize: 16,
                           content: "Save",
                           bgColor: buttonBgColor,
@@ -452,7 +452,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailReadOnlyScreen> {
                       textAlign: TextAlign.end,
                     ),
             ),
-           /* const SizedBox(
+            /* const SizedBox(
               width: 10,
             ),
             Icon(
@@ -465,33 +465,13 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailReadOnlyScreen> {
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return DeleteConfirmationDialog(
-          label: 'Delete line',
-          onPressed: () async {
-            bool res = await bloc.deleteLineItemDetail(
-                bloc.lineitemdetail.value.id, context);
-            if (res) {
-              Navigator.of(context).pop(); // Close the dialog
-              Navigator.of(context).pop(); // Close the page
-              // Add your delete logic here
-            }
-          },
-        );
-      },
-    );
-  }
-
   Future<void> _init() async {
     if (widget.lineitem_id.isNotEmpty) {
       await bloc.getLineItemDetail(context, widget.lineitem_id);
     }
     bloc.getDetailCategory(context);
     bloc.getProductService(context);
-    bloc.getAllCustomer(context);
+    bloc.getAllCustomer(context, isPurchase: widget.isPurchase);
     bloc.getAllTaxRate(context);
     bloc.getAllClass(context);
     bloc.getAllLocations(context);
@@ -550,7 +530,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailReadOnlyScreen> {
   }
 
   bool isValid() {
-    String catid = bloc.lineitemdetail.value.categoryId ?? "";
+    String gcatid = bloc.lineitemdetail.value.categoryId ?? "";
     /*if (catid == "") {
       CommonToast.getInstance()?.displayToast(
           message: "Category field is required", bContext: context);
@@ -602,7 +582,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailReadOnlyScreen> {
   }
 
   getCurrency() {
-    if(widget.currencySign.isEmpty){
+    if (widget.currencySign.isEmpty) {
       return '';
     }
     return ' (${widget.currencySign})';

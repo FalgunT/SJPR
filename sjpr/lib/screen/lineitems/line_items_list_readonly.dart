@@ -12,12 +12,17 @@ import 'line_items_detail_read_only.dart';
 class LineItemsListReadOnlyScreen extends StatefulWidget {
   final String id;
   final String currencySign;
+  final int isPurchase;
 
   const LineItemsListReadOnlyScreen(
-      {super.key, required this.id, required this.currencySign});
+      {super.key,
+      required this.id,
+      required this.currencySign,
+      required this.isPurchase});
 
   @override
-  State<LineItemsListReadOnlyScreen> createState() => _LineItemsListScreenState();
+  State<LineItemsListReadOnlyScreen> createState() =>
+      _LineItemsListScreenState();
 }
 
 class _LineItemsListScreenState extends State<LineItemsListReadOnlyScreen> {
@@ -264,6 +269,7 @@ class _LineItemsListScreenState extends State<LineItemsListReadOnlyScreen> {
                                   currencySign: widget.currencySign,
                                   invoice_id: widget.id,
                                   lineitem_id: value[index].id ?? "",
+                                  isPurchase: widget.isPurchase,
                                 ))).then((response) async {
                       bloc.getLineItemList(context, widget.id);
                     });

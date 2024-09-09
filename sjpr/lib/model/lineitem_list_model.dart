@@ -48,6 +48,8 @@ class LineItemListData {
   late String? netAmount;
   late String datetime;
   late String scannedCurrencyId;
+  String? categoryName;
+  String? mainCategoryName;
 
   LineItemListData({
     required this.id,
@@ -67,6 +69,8 @@ class LineItemListData {
     this.netAmount,
     required this.datetime,
     required this.scannedCurrencyId,
+    this.categoryName,
+    this.mainCategoryName,
   });
 
   factory LineItemListData.fromJson(Map<String, dynamic> json) {
@@ -87,6 +91,8 @@ class LineItemListData {
       taxRateId: json['tax_rate_id'],
       netAmount: json['net_amount'],
       datetime: json['datetime'],
+      categoryName: json['category_name'],
+      mainCategoryName: json['main_category_name'],
       scannedCurrencyId: json['scanned_currency_id'],
     );
   }
@@ -109,6 +115,8 @@ class LineItemListData {
       'tax_rate_id': taxRateId,
       'net_amount': netAmount,
       'datetime': datetime,
+      'category_name': categoryName,
+      'main_category_name': mainCategoryName,
       'scanned_currency_id': scannedCurrencyId,
     };
   }

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:sjpr/di/app_component_base.dart';
 import 'package:sjpr/model/api_response_location.dart';
 import 'package:sjpr/model/api_response_taxrate.dart';
@@ -21,15 +20,12 @@ import 'package:sjpr/model/split_list_model.dart';
 import 'package:sjpr/model/type_list_model.dart';
 import 'package:sjpr/model/upload_invoice.dart';
 import 'package:sjpr/services/api_client.dart';
-
 import 'package:http/http.dart' as http;
-
 import '../di/app_shared_preferences.dart';
 import '../model/api_response_class.dart';
 import '../model/api_response_costomer.dart';
 import '../model/api_response_otprequest.dart';
 import '../screen/invoice/custom_camera2.dart';
-//import '../screen/invoice/custom_camera.dart';
 
 class ApiServices extends ApiClient {
   Future<Login?> login(String email, String password) async {
@@ -160,7 +156,8 @@ class ApiServices extends ApiClient {
   }*/
 
 //new Engine function***************
-  Future<CommonModelClass?> uploadInvoice({required String invoicepath}) async {
+  Future<CommonModelClass?> uploadInvoice(
+      {required String invoicepath, required int isPurchase}) async {
     /*  if (ApiClient.bearerToken.isEmpty) {
       var tokenValue = await AppComponentBase.getInstance()
           ?.getApiInterface()
@@ -179,7 +176,7 @@ class ApiServices extends ApiClient {
     Map body = {
       "invoice_type": mimeType,
       "upload_mode": "single",
-      'is_purchase': '0',
+      'is_purchase': isPurchase.toString(),
     };
     //String jsonString = json.encode(body);
     var request =
@@ -213,14 +210,15 @@ class ApiServices extends ApiClient {
 
   Future<CommonModelClass?> uploadMultiInvoice(
       {required List<CaptureModel> invoices,
-      required String uploadMode}) async {
+      required String uploadMode,
+      required int isPurchase}) async {
     AppComponentBase.getInstance()?.showProgressDialog(true);
     AppComponentBase.getInstance()?.disableWidget(true);
 
     Map body = {
       "invoice_type": 'pdf',
       "upload_mode": uploadMode,
-      'is_purchase': '0'
+      'is_purchase': isPurchase.toString()
     };
     //String jsonString = json.encode(body);
     var request =
@@ -256,9 +254,12 @@ class ApiServices extends ApiClient {
 
   //Ends here *********************
 
-  Future<InvoiceList?> getInvoiceList() async {
-    var response = await gets("${ApiClient.getInvoiceList}/0/0",
-        headers: getLogoutHeader(), isBackground: false);
+  Future<InvoiceList?> getInvoiceList(
+      {required isPurchase, required page}) async {
+    String url = "${ApiClient.getInvoiceList}/$page/$isPurchase";
+    debugPrint('url : $url');
+    var response =
+        await gets(url, headers: getLogoutHeader(), isBackground: false);
     if (response != null) {
       var data = InvoiceList.fromJson(json.decode(response));
       return data;
@@ -266,12 +267,14 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future<InvoiceList?> getArchiveList(String dt, int isPurchase) async {
+  Future<InvoiceList?> getArchiveList(
+      String dt, int isPurchase, int page) async {
     Map<String, String> body = {
+      'name_id': '',
       'updated_date': dt,
       'is_purchase': '$isPurchase',
     };
-    var response = await posts("${ApiClient.getArchiveList}/0",
+    var response = await posts("${ApiClient.getArchiveList}/$page",
         headers: getLogoutHeader(), body: body, isBackground: true);
     if (response != null) {
       var data = InvoiceList.fromJson(json.decode(response));
@@ -497,8 +500,8 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future<CustomerApiResponse?> getAllCustomer() async {
-    var response = await gets("${ApiClient.getAllCustomers}/0",
+  Future<CustomerApiResponse?> getAllCustomer({required int isPurchase}) async {
+    var response = await gets("${ApiClient.getAllCustomers}/$isPurchase",
         headers: getLogoutHeader(), isBackground: true);
     if (response != null) {
       Map res = json.decode(response);
@@ -537,10 +540,11 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future<CommonModelClass?> addCustomer(String cName) async {
+  Future<CommonModelClass?> addCustomer(String cName,
+      {required int isPurchase}) async {
     Map<String, String> body = {
       'customer_name': cName,
-      'is_purchase': '0',
+      'is_purchase': isPurchase.toString(),
     };
     var response = await posts(ApiClient.postAddCustomer,
         headers: getLogoutHeader(), body: body, isBackground: true);
@@ -640,7 +644,8 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future<CommonModelClass?> newPassword(String pass, String confirmpass,String id) async {
+  Future<CommonModelClass?> newPassword(
+      String pass, String confirmpass, String id) async {
     Map<String, String> body = {
       'id': id,
       'newpassword': pass,
@@ -654,7 +659,9 @@ class ApiServices extends ApiClient {
     }
     return null;
   }
-  Future<CommonModelClass?> passwordReset(String old,String pass, String confirmpass) async {
+
+  Future<CommonModelClass?> passwordReset(
+      String old, String pass, String confirmpass) async {
     Map<String, String> body = {
       'oldpassword': old,
       'newpassword': pass,

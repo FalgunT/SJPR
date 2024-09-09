@@ -21,12 +21,14 @@ class LineItemsDetailScreen extends StatefulWidget {
   final String invoice_id;
   final String lineitem_id;
   final String currencySign;
+  final int isPurchase;
 
   const LineItemsDetailScreen(
       {super.key,
       required this.invoice_id,
       required this.lineitem_id,
-      required this.currencySign});
+      required this.currencySign,
+      required this.isPurchase});
 
   @override
   State<LineItemsDetailScreen> createState() => _LineItemsDetailScreenState();
@@ -35,10 +37,15 @@ class LineItemsDetailScreen extends StatefulWidget {
 class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
   LineItemsBloc bloc = LineItemsBloc();
   final _focusNode = FocusNode();
-
+  String? custTitle;
   @override
   initState() {
     super.initState();
+    if (widget.isPurchase == 0) {
+      custTitle = "Customer";
+    } else {
+      custTitle = "Supplier";
+    }
     _init();
   }
 
@@ -77,17 +84,18 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                               color: activeTxtColor,
                               fontSize: 24),
                         ),
-                  widget.lineitem_id.isNotEmpty?
-                        CommonButton(
-                            textFontSize: 16,
-                            height: 30,
-                            content: "Delete",
-                            bgColor: backGroundColor,
-                            textColor: activeTxtColor,
-                            outlinedBorderColor: activeTxtColor,
-                            onPressed: () {
-                              _showDeleteConfirmationDialog(context);
-                            }):const Center()
+                        widget.lineitem_id.isNotEmpty
+                            ? CommonButton(
+                                textFontSize: 16,
+                                height: 30,
+                                content: "Delete",
+                                bgColor: backGroundColor,
+                                textColor: activeTxtColor,
+                                outlinedBorderColor: activeTxtColor,
+                                onPressed: () {
+                                  _showDeleteConfirmationDialog(context);
+                                })
+                            : const Center()
                       ],
                     ),
                     Spacer(),
@@ -216,17 +224,18 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                         valueListenable: bloc.selectedValueCustomer,
                         builder: (context, value, _) {
                           return commonRowWidget(
-                              title: "Customer",
+                              title: custTitle,
                               value: value,
                               onTap: () {
                                 CommonBottomSheetDialog(
                                     context: context,
                                     list: bloc.customerList,
-                                    title: "Customer",
+                                    title: custTitle ?? "",
                                     ItemId: getId(SheetType.customer),
                                     bottomSheetType: SheetType.customer,
                                     Addf: (String v) {
-                                      bloc.addCustomer(context, v);
+                                      bloc.addCustomer(context, v,
+                                          isPurchase: widget.isPurchase);
                                     },
                                     onItemSelected: (id, name) {
                                       SetName(id, name, SheetType.customer);
@@ -486,12 +495,12 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
   Future<void> _init() async {
     if (widget.lineitem_id.isNotEmpty) {
       await bloc.getLineItemDetail(context, widget.lineitem_id);
-    }else{
+    } else {
       bloc.lineitemdetail.value.invoiceId = widget.invoice_id;
     }
     bloc.getDetailCategory(context);
     bloc.getProductService(context);
-    bloc.getAllCustomer(context);
+    bloc.getAllCustomer(context, isPurchase: widget.isPurchase);
     bloc.getAllTaxRate(context);
     bloc.getAllClass(context);
     bloc.getAllLocations(context);
@@ -602,7 +611,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
   }
 
   getCurrency() {
-    if(widget.currencySign.isEmpty){
+    if (widget.currencySign.isEmpty) {
       return '';
     }
     return ' (${widget.currencySign})';
