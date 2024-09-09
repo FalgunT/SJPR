@@ -69,8 +69,12 @@ class ApiClient {
   static String getSplitItemList = "$baseUrl/invoice/split/list/";
   static String insertSplitItemDetail = "$baseUrl/invoice/split/insert";
   static String updateSplitItemDetail = "$baseUrl/invoice/split/update";
-
+  static String sendOTP = "$baseUrl/sendotp";
   static final RegExp nameRegExp = RegExp('[a-zA-Z]');
+  static final String newPassword="$baseUrl/forgotpassword";
+  static final String resetPassword="$baseUrl/passwordreset";
+
+
 
   Map<String, String> getJsonHeader() {
     var header = <String, String>{};

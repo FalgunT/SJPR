@@ -19,6 +19,7 @@ import 'package:sjpr/model/upload_invoice.dart';
 import 'package:sjpr/services/api_services.dart';
 
 import '../model/api_response_costomer.dart';
+import '../model/api_response_otprequest.dart';
 import '../model/payment_methods.dart';
 import '../screen/invoice/custom_camera2.dart';
 
@@ -230,6 +231,23 @@ class ApiRepositoryIml extends ApiRepository {
   Future<InvoiceList?> getArchiveList(String dt, int isPurchase) {
     return _apiServices.getArchiveList(dt, isPurchase);
   }
+
+  @override
+  Future<CommonModelClass?> newPassword(
+      {required String pass, required String confirmpass, required String id}) {
+    return _apiServices.newPassword(pass, confirmpass, id);
+  }
+
+  @override
+  Future<OtpResponse?> sendOTP({required String email}) {
+    return _apiServices.sendOTP(email);
+  }
+
+  @override
+  Future<CommonModelClass?> passwordReset(
+      {required String oldPass,required String pass, required String confirmpass}) {
+    return _apiServices.passwordReset(oldPass, pass, confirmpass);
+  }
 }
 
 abstract class ApiRepository {
@@ -314,4 +332,12 @@ abstract class ApiRepository {
 
   Future<CommonModelClass?> insertSplitItemDetail(String invoiceId,
       String categoryId, String totalAmount, String totalTaxAmount);
+
+  Future<OtpResponse?> sendOTP({required String email});
+
+  Future<CommonModelClass?> newPassword(
+      {required String pass, required String confirmpass, required String id});
+
+  Future<CommonModelClass?> passwordReset(
+      {required String oldPass,required String pass, required String confirmpass});
 }

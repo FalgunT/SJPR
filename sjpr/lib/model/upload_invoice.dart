@@ -9,7 +9,13 @@ class CommonModelClass {
   CommonModelClass.fromJson(Map<dynamic, dynamic> json) {
     status = json['status'];
     message = json['message'];
-    data = json.containsKey('data') ? json['data'].toString() : "";
+    if ((json['data'].runtimeType == List<dynamic>) && (json['data'] as List).isEmpty)  {
+      json['data'] = "";
+    }else{
+      data = json.containsKey('data') ? json['data'].toString() : "";
+    }
+
+    //data = json.containsKey('data') ? json['data'].toString() : "";
     error = json.containsKey('error') ? json['error'].toString() : "";
   }
 

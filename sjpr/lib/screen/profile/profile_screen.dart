@@ -7,8 +7,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:sjpr/model/profile_model.dart';
 import 'package:sjpr/screen/dashboard/dashboard_bloc.dart';
 import 'package:sjpr/screen/profile/general_setting.dart';
+import 'package:sjpr/screen/profile/profile_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/image_utils.dart';
+
+import '../../common/app_theme.dart';
+import '../../widgets/common_button.dart';
+import '../../widgets/common_text_filed.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -19,7 +24,9 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final DashboardBloc bloc = DashboardBloc.getInstance();
+  ProfileBloc pBloc = ProfileBloc();
   File file = File('');
+
   @override
   void initState() {
     super.initState();
@@ -432,6 +439,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),*/
                             const SizedBox(
+                              height: 10,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                showNewPasswordSheet();
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: profileListBgColor,
+                                ),
+                                child: ListTile(
+                                  leading: SvgPicture.asset(
+                                    SvgImages.import,
+                                  ),
+                                  title: const Text("Reset Password"),
+                                  trailing: const Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 20,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
                               height: 20,
                             ),
                             GestureDetector(
@@ -473,5 +505,125 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         );
                       })),
         ));
+  }
+
+  GlobalKey<FormState> formforgetDetailKey = GlobalKey<FormState>();
+
+  showNewPasswordSheet() {
+    final appTheme = AppTheme.of(context);
+
+    showModalBottomSheet(
+        backgroundColor: appTheme.listTileBgColor,
+        isScrollControlled: true,
+        isDismissible: false,
+        // Prevents tapping outside to dismiss
+        enableDrag: false,
+        context: context,
+        builder: (BuildContext context) {
+          final bottom = EdgeInsets.fromViewPadding(
+                  WidgetsBinding.instance.window.viewInsets,
+                  WidgetsBinding.instance.window.devicePixelRatio)
+              .bottom;
+          return Wrap(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(20, 20, 20, bottom),
+                /*   padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context)
+                      .viewInsets
+                      .bottom), */
+                // Add bottom padding to avoid keyboard overlap
+                child: Form(
+                  key: formforgetDetailKey,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "Reset Password",
+                              style: TextStyle(
+                                  color: appTheme.textColor, fontSize: 18),
+                            ),
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(
+                                Icons.close,
+                                color: appTheme.textColor,
+                              ))
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CommonTextField(
+                        controller: pBloc.oldpasswordController,
+                        hintText: "Old password",
+                        isPassword: true,
+                        validation: (String? val) {
+                          if (val == null || val.isEmpty) {
+                            return 'This field can\'t be empty';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CommonTextField(
+                        controller: pBloc.passwordController,
+                        hintText: "New password",
+                        isPassword: true,
+                        validation: (String? val) {
+                          if (val == null || val.isEmpty) {
+                            return 'This field can\'t be empty';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CommonTextField(
+                        controller: pBloc.confirmpasswordController,
+                        hintText: "Confirm password",
+                        isPassword: true,
+                        validation: (String? val) {
+                          if (val == null || val.isEmpty) {
+                            return 'This field can\'t be empty';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CommonButton(
+                          content: "Submit",
+                          bgColor: appTheme.buttonBgColor,
+                          textColor: appTheme.buttonTextColor,
+                          outlinedBorderColor: appTheme.buttonBgColor,
+                          onPressed: () async {
+                            if (formforgetDetailKey.currentState!.validate()) {
+                              var res =
+                                  await pBloc.ResetPassword(context, true);
+                              if (res) {
+                                Navigator.pop(context);
+                              }
+                            }
+                          }),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        });
   }
 }

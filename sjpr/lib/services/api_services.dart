@@ -27,6 +27,7 @@ import 'package:http/http.dart' as http;
 import '../di/app_shared_preferences.dart';
 import '../model/api_response_class.dart';
 import '../model/api_response_costomer.dart';
+import '../model/api_response_otprequest.dart';
 import '../screen/invoice/custom_camera2.dart';
 //import '../screen/invoice/custom_camera.dart';
 
@@ -265,7 +266,7 @@ class ApiServices extends ApiClient {
     return null;
   }
 
-  Future<InvoiceList?>  getArchiveList(String dt, int isPurchase) async {
+  Future<InvoiceList?> getArchiveList(String dt, int isPurchase) async {
     Map<String, String> body = {
       'updated_date': dt,
       'is_purchase': '$isPurchase',
@@ -619,6 +620,48 @@ class ApiServices extends ApiClient {
     debugPrint('request body : $jsonData');
     var response = await postJson(ApiClient.updateSplitItemDetail,
         headers: getLogoutHeader(), body: jsonData, isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+
+  Future<OtpResponse?> sendOTP(String email) async {
+    Map<String, String> body = {
+      'email': email,
+    };
+    var response = await postJson(ApiClient.sendOTP,
+        headers: getLoginHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data1 = OtpResponse.fromJson(json.decode(response));
+      return data1;
+    }
+    return null;
+  }
+
+  Future<CommonModelClass?> newPassword(String pass, String confirmpass,String id) async {
+    Map<String, String> body = {
+      'id': id,
+      'newpassword': pass,
+      'confirm_password': confirmpass,
+    };
+    var response = await postJson(ApiClient.newPassword,
+        headers: getLoginHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+  Future<CommonModelClass?> passwordReset(String old,String pass, String confirmpass) async {
+    Map<String, String> body = {
+      'oldpassword': old,
+      'newpassword': pass,
+      'confirm_password': confirmpass,
+    };
+    var response = await postJson(ApiClient.resetPassword,
+        headers: getLogoutHeader(), body: body, isBackground: true);
     if (response != null) {
       var data = CommonModelClass.fromJson(json.decode(response));
       return data;
