@@ -146,6 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void showForgetBottomSheet() {
     final appTheme = AppTheme.of(context);
+    clearController();
     showModalBottomSheet(
         backgroundColor: appTheme.listTileBgColor,
         isScrollControlled: true,
@@ -243,6 +244,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   showOTPSheet() {
+    clearController();
     final appTheme = AppTheme.of(context);
     showModalBottomSheet(
         backgroundColor: appTheme.listTileBgColor,
@@ -337,7 +339,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   showNewPasswordSheet() {
     final appTheme = AppTheme.of(context);
-
+    clearController();
     showModalBottomSheet(
         backgroundColor: appTheme.listTileBgColor,
         isScrollControlled: true,
@@ -535,5 +537,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           );
         });
+  }
+
+  void clearController() {
+    loginBloc.confirmpasswordController.text = "";
+    loginBloc.passwordController.text = "";
+    loginBloc.otpController.text = "";
   }
 }

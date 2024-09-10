@@ -476,7 +476,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                                     .payment_status =
                                                 bb ? '1' : '0';
                                           },
-                                          activeTrackColor:
+                                          activeColor:
                                               appTheme.activeTxtColor,
                                         )
                                       ],

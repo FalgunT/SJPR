@@ -19,13 +19,17 @@ class AppSession {
     try {
       AppSharedPreference().clearDataOnLogout();
       clearCache();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => MyApp(
-                  token: '',
-                )),
-      );
+      Navigator.of(context).popUntil((route) => false);
+      Future.delayed(const Duration(milliseconds: 50),(){
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MyApp(
+                token: '',
+              )),
+        );
+      });
+
     } catch (e) {
       print(e);
     }

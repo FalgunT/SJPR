@@ -350,8 +350,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             Transform.scale(
                                               scale: 0.8,
                                               child: CupertinoSwitch(
-                                                activeTrackColor:
-                                                    listTileBgColor,
+                                                activeColor: listTileBgColor,
                                                 thumbColor: activeTxtColor,
                                                 value: true,
                                                 onChanged: (bool value) {},
@@ -383,8 +382,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             Transform.scale(
                                               scale: 0.8,
                                               child: CupertinoSwitch(
-                                                activeTrackColor:
-                                                    listTileBgColor,
+                                                activeColor: listTileBgColor,
                                                 thumbColor: activeTxtColor,
                                                 value: true,
                                                 onChanged: (bool value) {
@@ -513,7 +511,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   showNewPasswordSheet() {
     final appTheme = AppTheme.of(context);
-
+    clearController();
     showModalBottomSheet(
         backgroundColor: appTheme.listTileBgColor,
         isScrollControlled: true,
@@ -627,5 +625,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           );
         });
+  }
+
+  void clearController() {
+    pBloc.confirmpasswordController.text = "";
+    pBloc.passwordController.text = "";
+    pBloc.oldpasswordController.text = "";
   }
 }

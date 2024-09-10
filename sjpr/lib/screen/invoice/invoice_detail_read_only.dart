@@ -489,7 +489,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                                         CupertinoSwitch(
                                           value: true,
                                           onChanged: (value) {},
-                                          activeTrackColor:
+                                          activeColor:
                                               appTheme.activeTxtColor,
                                         ),
                                       ],
