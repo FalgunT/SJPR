@@ -30,6 +30,9 @@ class InvoiceBloc extends BlocBase {
       {bool isBackground = true,
       required int isPurchase,
       required int page}) async {
+    if (page == 0) {
+      totalCountInbox = -1;
+    }
     if (totalCountInbox == -1 || (page * 10) < totalCountInbox) {
       isWaitingInbox.value = true;
       var getInvoiceListResponse = await AppComponentBase.getInstance()
@@ -59,6 +62,9 @@ class InvoiceBloc extends BlocBase {
 
   Future getArchiveList(BuildContext context,
       {required int isPurchase, required int page}) async {
+    if (page == 0) {
+      totalCountArchive = -1;
+    }
     if (totalCountArchive == -1 || (page * 10) < totalCountArchive) {
       isWaitingArchive.value = true;
       var getInvoiceListResponse = await AppComponentBase.getInstance()

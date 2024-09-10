@@ -489,8 +489,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                                         CupertinoSwitch(
                                           value: true,
                                           onChanged: (value) {},
-                                          activeColor:
-                                              appTheme.activeTxtColor,
+                                          activeColor: appTheme.activeTxtColor,
                                         ),
                                       ],
                                     ),
@@ -586,7 +585,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                                 id: bloc.invoiceDetailData.value.id ?? "",
                                 isPurchase: widget.isPurchase,
                               ))).then((_) {
-                    bloc.getLineItemList(context, widget.id);
+                    //bloc.getLineItemList(context, widget.id);
                   });
                 },
                 child: Container(
@@ -685,7 +684,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
                                 isReadOnly: true,
                               ))).then((onValue) {
                     if (onValue == true) {
-                      bloc.getInvoiceDetail(context, widget.id);
+                      //bloc.getInvoiceDetail(context, widget.id);
                     }
                   });
                 },

@@ -69,6 +69,8 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
   }
 
   void _init() {
+    _currentPageInbox = 0;
+    _currentPageArchive = 0;
     bloc.getInvoiceList(context,
         isBackground: false,
         isPurchase: widget.isPurchase,
