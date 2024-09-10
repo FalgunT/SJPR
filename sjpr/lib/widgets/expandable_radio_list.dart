@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../common/AppEnums.dart';
 import '../model/category_list_model.dart';
 import '../utils/color_utils.dart';
+import 'AddNewItemDialog.dart';
 
 class ExpandableRadioList extends StatefulWidget {
   List<CategoryListData> catList;
@@ -99,10 +101,49 @@ class _ExpandableRadioListState extends State<ExpandableRadioList> {
             shape: const Border(),
             initiallyExpanded: false,
             //leading: /*Icon(Icons.category, color: textColor)*/,
-            title: Text(
-              filtered[index].name ?? "Category $index",
-              style: TextStyle(color: textColor, fontSize: 18),
+            title: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  filtered[index].name ?? "Category $index",
+                  style: TextStyle(color: textColor, fontSize: 18),
+                ),
+                OutlinedButton.icon(
+                  style: const ButtonStyle(
+                    //padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero), // Removes padding
+                    visualDensity: VisualDensity.compact, // Reduces overall space
+                    alignment: Alignment.center,
+                  ),
+
+                  onPressed: () {
+                    Navigator.pop(context);
+                    AddNewItemDialog(
+                        context: context,
+                        title: "Add Category",
+                        hint: 'Enter Category Name',
+                        label: 'Category Name',
+                        oldValue: "",
+                        type: SheetType.category,
+                        onPressed: (String v) {
+                          debugPrint('F() called--->, $v');
+                          //Addf(v);
+
+                        });
+                  },
+                  label: const Text(
+                    "Add",
+                    style: TextStyle(color: Colors.white,fontSize: 12),
+                  ),
+                  icon: const Icon(
+                    Icons.add,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
+
             children: getChildren(index),
           );
         },

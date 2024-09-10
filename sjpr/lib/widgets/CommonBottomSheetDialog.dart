@@ -57,6 +57,11 @@ class CommonBottomSheetDialog {
                         children: [
                           isAddButtonRequired()
                               ? OutlinedButton.icon(
+                            style: const ButtonStyle(
+                              //padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero), // Removes padding
+                              visualDensity: VisualDensity.compact, // Reduces overall space
+                              alignment: Alignment.center,
+                            ),
                                   onPressed: () {
                                     Navigator.pop(context);
                                     AddNewItemDialog(

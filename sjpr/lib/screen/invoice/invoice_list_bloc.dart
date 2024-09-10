@@ -24,6 +24,9 @@ class InvoiceBloc extends BlocBase {
   ValueNotifier<bool> isWaitingArchive = ValueNotifier<bool>(true);
   ValueNotifier<List<InvoiceListData>> archiveListData =
       ValueNotifier<List<InvoiceListData>>([]);
+
+  ValueNotifier<String> compName = ValueNotifier<String>('');
+  ValueNotifier<String> compEmail = ValueNotifier<String>('');
   int totalCountInbox = -1, totalCountArchive = -1;
 
   Future getInvoiceList(BuildContext context,
@@ -206,6 +209,28 @@ class InvoiceBloc extends BlocBase {
     }
     return 'Unknown';
   }
+
+
+  Future getProfile(BuildContext context) async {
+    if (await AppComponentBase.getInstance()
+        ?.getNetworkManager()
+        .isConnected() ??
+        false) {
+      var getProfile = await AppComponentBase.getInstance()
+          ?.getApiInterface()
+          .getApiRepository()
+          .profile();
+
+      if (getProfile != null) {
+        if (getProfile.status == true) {
+          compEmail.value = '${getProfile.data?.email}';
+          compName.value = '${getProfile.data?.companyName}';
+          //profileStreamController.sink.add(getProfile.data);
+        }
+      }
+    }
+  }
+
 
   getFormetted(String input) {
     if (input == null || input.isEmpty) {

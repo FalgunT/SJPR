@@ -15,6 +15,7 @@ import 'custom_camera2.dart';
 
 class InvoiceListScreen extends StatefulWidget {
   final int isPurchase;
+
   const InvoiceListScreen({super.key, required this.isPurchase});
 
   @override
@@ -77,6 +78,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
         page: _currentPageInbox);
     bloc.getArchiveList(context,
         isPurchase: widget.isPurchase, page: _currentPageArchive);
+    bloc.getProfile(context);
   }
 
   @override
@@ -95,14 +97,20 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
             color: appTheme.textColor,
           ),
         ),
-        actions: [
+        title: Text(
+          widget.isPurchase == 1
+              ? StringUtils.catchBill
+              : StringUtils.catchInvoice,
+          style: const TextStyle(color: Colors.white),
+        ),
+        /*actions: [
           IconButton(
               onPressed: () {},
               icon: Icon(
                 Icons.menu,
                 color: appTheme.textColor,
               )),
-        ],
+        ],*/
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: GestureDetector(
@@ -159,14 +167,25 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Decaprio Digital Marketing",
-              style: TextStyle(color: appTheme.activeTxtColor, fontSize: 20),
-            ),
-            Text(
-              'luiz@decaprio.com.uk',
-              style: TextStyle(color: appTheme.textColor),
-            ),
+            ValueListenableBuilder(
+                valueListenable: bloc.compName,
+                builder: (BuildContext context, value, Widget? child) {
+                  return Text(
+                    value,
+                    style:
+                        TextStyle(color: appTheme.activeTxtColor, fontSize: 20),
+                  );
+                }),
+
+            ValueListenableBuilder(
+                valueListenable: bloc.compEmail,
+                builder: (BuildContext context, value, Widget? child) {
+                  return Text(
+                    value,
+                    style: TextStyle(color: appTheme.textColor),
+                  );
+                }),
+
             const SizedBox(
               height: 20,
             ),
@@ -299,6 +318,9 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                   builder: (context) => InvoiceDetailScreen(
                         id: listData.id!,
                         isPurchase: widget.isPurchase,
+                        title: widget.isPurchase == 1
+                            ? StringUtils.catchBill
+                            : StringUtils.catchInvoice,
                       ))).then((onValue) {
             if (onValue) {
               _init();
@@ -592,6 +614,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
       }
     });
   }
+
   /*Future<void> _imgFromCamera(BuildContext context) async {
     Navigator.of(context).pop();
     Navigator.push(

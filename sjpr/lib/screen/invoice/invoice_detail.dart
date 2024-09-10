@@ -15,9 +15,10 @@ import '../splititems/split_items_list.dart';
 
 class InvoiceDetailScreen extends StatefulWidget {
   final String id;
+  final String title;
   final int isPurchase;
   const InvoiceDetailScreen(
-      {super.key, required this.id, required this.isPurchase});
+      {super.key, required this.id, required this.isPurchase,required this.title});
 
   @override
   State<InvoiceDetailScreen> createState() => _InvoiceDetailScreenState();
@@ -64,6 +65,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             color: appTheme.textColor,
           ),
         ),
+        title: Text(widget.title, style: const TextStyle(color: Colors.white),),
       ),
       body: SingleChildScrollView(
         child: ValueListenableBuilder(
