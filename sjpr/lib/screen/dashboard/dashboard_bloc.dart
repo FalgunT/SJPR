@@ -38,6 +38,25 @@ class DashboardBloc extends BlocBase {
     }
   }
 
+  Future updateProfile(
+      BuildContext context, bool mounted, String profilePath) async {
+    if (await AppComponentBase.getInstance()
+            ?.getNetworkManager()
+            .isConnected() ??
+        false) {
+      var getProfile = await AppComponentBase.getInstance()
+          ?.getApiInterface()
+          .getApiRepository()
+          .uploadProfilePic(profilePath: profilePath);
+      if (!mounted) return;
+      if (getProfile != null) {
+        if (getProfile.status == true) {
+          //profileStreamController.sink.add(getProfile.data);
+        }
+      }
+    }
+  }
+
   Future logout(BuildContext context, bool mounted) async {
     if (await AppComponentBase.getInstance()
             ?.getNetworkManager()

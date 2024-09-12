@@ -69,6 +69,32 @@ class ApiServices extends ApiClient {
     return null;
   }
 
+  Future<CommonModelClass?> uploadProfilePic(
+      {required String profilePath}) async {
+    AppComponentBase.getInstance()?.showProgressDialog(true);
+    AppComponentBase.getInstance()?.disableWidget(true);
+    var request = http.MultipartRequest(
+        "POST", Uri.parse(ApiClient.uploadProfilePicture));
+
+    request.files.add(await http.MultipartFile.fromPath(
+      'profile_image',
+      profilePath,
+    ));
+    var response = await postsMultipart(
+      request,
+      headers: getLogoutHeader(),
+      encoding: Encoding.getByName('utf-8'),
+      isBackground: true,
+    );
+    AppComponentBase.getInstance()?.showProgressDialog(false);
+    AppComponentBase.getInstance()?.disableWidget(false);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
+    }
+    return null;
+  }
+
   /*Future<CommonModelClass?> uploadInvoice({required XFile invoice}) async {
     */ /*  if (ApiClient.bearerToken.isEmpty) {
       var tokenValue = await AppComponentBase.getInstance()
@@ -536,6 +562,22 @@ class ApiServices extends ApiClient {
     if (response != null) {
       Map res = json.decode(response);
       return ApiResponseTaxRate.fromJson(res);
+    }
+    return null;
+  }
+
+  Future<CommonModelClass?> addSubcategory(
+      String id, String categoryName, String code) async {
+    Map<String, String> body = {
+      'id': id,
+      'category_name': categoryName,
+      'code': "1234"
+    };
+    var response = await posts(ApiClient.postAddSubcategory,
+        headers: getLogoutHeader(), body: body, isBackground: true);
+    if (response != null) {
+      var data = CommonModelClass.fromJson(json.decode(response));
+      return data;
     }
     return null;
   }

@@ -155,7 +155,7 @@ class InvoiceDetailBloc extends BlocBase {
     return false;
   }
 
-  Future getDetailCategory(BuildContext context, String invoiceId) async {
+  Future getDetailCategory(BuildContext context) async {
     var getCategoryListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
@@ -247,6 +247,24 @@ class InvoiceDetailBloc extends BlocBase {
     if (getCategoryListResponse != null) {
       //refresh the page...
       getProductService(context, isAdd: true);
+    }
+  }
+
+  Future addSubcategory(
+      BuildContext context, String id, String categoryName) async {
+    var getCategoryListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .addSubcategory(id, categoryName, "");
+    if (getCategoryListResponse != null) {
+      if (getCategoryListResponse.message != null) {
+        CommonToast.getInstance()?.displayToast(
+            bContext: context, message: getCategoryListResponse.message!);
+      }
+      //refresh the page...
+      getDetailCategory(
+        context,
+      );
     }
   }
 
@@ -467,7 +485,8 @@ class InvoiceDetailBloc extends BlocBase {
       return false;
     }
     String invid = invoiceDetailData.value.invoiceId ?? "";
-    if (tid != '1' && invid == "") {  //check for type receipt
+    if (tid != '1' && invid == "") {
+      //check for type receipt
       CommonToast.getInstance()?.displayToast(
           message: "Invoice Number field is required", bContext: context);
       return false;
@@ -498,13 +517,15 @@ class InvoiceDetailBloc extends BlocBase {
       return false;
     }
     String pmid = invoiceDetailData.value.payment_method_id ?? "";
-    if (tid != '1' && pmid == "") {  //check for type receipt
+    if (tid != '1' && pmid == "") {
+      //check for type receipt
       CommonToast.getInstance()?.displayToast(
           message: "Payment method field is required", bContext: context);
       return false;
     }
     String pubid = invoiceDetailData.value.publish_to_id ?? "";
-    if (tid != '1' && pubid == "") {   //check for type receipt
+    if (tid != '1' && pubid == "") {
+      //check for type receipt
       CommonToast.getInstance()?.displayToast(
           message: "Publish To field is required", bContext: context);
       return false;

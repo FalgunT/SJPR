@@ -77,12 +77,18 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          bloc.lineitemdetail.value.name,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: activeTxtColor,
-                              fontSize: 24),
+                        Flexible(
+                          child: Text(
+                            bloc.lineitemdetail.value.name,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: activeTxtColor,
+                                overflow: TextOverflow.ellipsis,
+                                fontSize: 24),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 4,
                         ),
                         widget.lineitem_id.isNotEmpty
                             ? CommonButton(
@@ -140,7 +146,9 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
                                     title: "Category",
                                     ItemId: getCategoryId(),
                                     bottomSheetType: SheetType.category,
-                                    Addf: () {},
+                                    Addf: (String item, String id) {
+                                      bloc.addSubcategory(context, id, item);
+                                    },
                                     onItemSelected: (id, name) {
                                       SetName(id, name, SheetType.category);
                                     }).Show();

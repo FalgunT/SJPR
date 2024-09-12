@@ -298,6 +298,10 @@ class _SplitItemsDetailScreenState extends State<SplitItemsDetailScreen> {
                         bloc.selectedValueC.value = name;*/
                       },
                       selectedId: getCategoryId(),
+                      // onItemAdded: (String item, String id) {},
+                      onItemAdded: (String item, String id) {
+                        bloc.addSubcategory(context, id, item);
+                      },
                     ),
                   )
                 ],

@@ -255,8 +255,10 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                   contentPadding: const EdgeInsets.only(left: 10, right: 10),
                   title: Text(
                     (value[index].name.isNotEmpty)
-                        ? "${index + 1} . ${value[index].name}"
-                        : "${index + 1} . ",
+                        ? value[index].name
+                        : (value[index].description.isNotEmpty)
+                            ? value[index].description
+                            : "Line Item ${index + 1}",
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,

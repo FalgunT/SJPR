@@ -44,7 +44,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailReadOnlyScreen> {
 
   _init() async {
     await bloc.getInvoiceDetail(context, widget.id);
-    bloc.getDetailCategory(context, widget.id);
+    bloc.getDetailCategory(context);
     bloc.getDetailType(context, widget.id);
     bloc.getCurrency(context);
     bloc.getPaymentMethods(context);

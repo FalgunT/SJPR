@@ -34,7 +34,7 @@ class LineItemDetailApiResponse {
 class LineItem {
   String id = "-1";
   String invoiceId = "-1";
-  String name = "Line Item";
+  String name = "";
   String description = "Desc";
   String quantity = "0";
   String unitPrice = "0.0";

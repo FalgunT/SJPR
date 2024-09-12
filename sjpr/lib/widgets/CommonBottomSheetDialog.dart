@@ -15,6 +15,7 @@ class CommonBottomSheetDialog {
   final int ItemId;
   final SheetType bottomSheetType;
   final Function Addf;
+  void Function(String, String)? onItemAdded;
   final Function onItemSelected;
 
   CommonBottomSheetDialog({
@@ -24,6 +25,7 @@ class CommonBottomSheetDialog {
     required this.ItemId,
     required this.bottomSheetType,
     required this.Addf,
+    this.onItemAdded,
     required this.onItemSelected,
   });
 
@@ -37,7 +39,7 @@ class CommonBottomSheetDialog {
               builder: (BuildContext context, StateSetter setState) {
             return Container(
               padding: const EdgeInsets.all(20),
-              height: MediaQuery.of(context).size.height/1.5,
+              height: MediaQuery.of(context).size.height / 1.5,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -57,11 +59,12 @@ class CommonBottomSheetDialog {
                         children: [
                           isAddButtonRequired()
                               ? OutlinedButton.icon(
-                            style: const ButtonStyle(
-                              //padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero), // Removes padding
-                              visualDensity: VisualDensity.compact, // Reduces overall space
-                              alignment: Alignment.center,
-                            ),
+                                  style: const ButtonStyle(
+                                    //padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero), // Removes padding
+                                    visualDensity: VisualDensity
+                                        .compact, // Reduces overall space
+                                    alignment: Alignment.center,
+                                  ),
                                   onPressed: () {
                                     Navigator.pop(context);
                                     AddNewItemDialog(
@@ -125,6 +128,12 @@ class CommonBottomSheetDialog {
                             f: (id, name) {
                               debugPrint('--->f() called');
                               onItemSelected(id, name);
+                            },
+                            onItemAdded: (String item, String id) {
+                              //Addf(item, id);
+                              if (onItemAdded != null) {
+                                onItemAdded!(item, id);
+                              }
                             },
                           ),
                         )

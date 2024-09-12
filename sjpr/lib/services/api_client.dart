@@ -34,6 +34,7 @@ class ApiClient {
   static String login = "$baseUrl/login";
   static String logout = "$baseUrl/logout";
   static String profile = "$baseUrl/profile";
+  static String uploadProfilePicture = "$baseUrl/profile/update";
   static String uploadInvoice = "$baseUrl/scaninvoice";
   static String getInvoiceList = "$baseUrl/invoices";
   static String getArchiveList = "$baseUrl/invoices/archive";
@@ -50,6 +51,7 @@ class ApiClient {
   static String getPaymentMethods = "$baseUrl/getpaymentmethod";
   static String getPublishTo = "$baseUrl/getpublishto";
 
+  static String postAddSubcategory = "$baseUrl/addsubcategory";
   static String postAddCustomer = "$baseUrl/addcustomers";
   static String postAddClass = "$baseUrl/addclass";
   static String postAddLocation = "$baseUrl/addlocation";

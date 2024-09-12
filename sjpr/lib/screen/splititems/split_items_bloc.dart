@@ -194,4 +194,22 @@ class SplitItemsBloc extends BlocBase {
   void dispose() {
     _instance?.dispose();
   }
+
+  Future addSubcategory(
+      BuildContext context, String id, String categoryName) async {
+    var getCategoryListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .addSubcategory(id, categoryName, "");
+    if (getCategoryListResponse != null) {
+      if (getCategoryListResponse.message != null) {
+        CommonToast.getInstance()?.displayToast(
+            bContext: context, message: getCategoryListResponse.message!);
+      }
+      //refresh the page...
+      getDetailCategory(
+        context,
+      );
+    }
+  }
 }

@@ -9,12 +9,14 @@ class ExpandableRadioList extends StatefulWidget {
   List<CategoryListData> catList;
   int selectedId;
   Function f;
+  void Function(String, String) onItemAdded;
 
   ExpandableRadioList(
       {super.key,
       required this.catList,
       required this.selectedId,
-      required this.f});
+      required this.f,
+      required this.onItemAdded});
 
   @override
   State<ExpandableRadioList> createState() => _ExpandableRadioListState();
@@ -29,7 +31,6 @@ class _ExpandableRadioListState extends State<ExpandableRadioList> {
   void initState() {
     filtered = widget.catList;
     super.initState();
-
   }
 
   @override
@@ -37,21 +38,30 @@ class _ExpandableRadioListState extends State<ExpandableRadioList> {
     super.dispose();
   }
 
-  filtermyList(){
+  filtermyList() {
     print(_searchTextController.text);
     filter = _searchTextController.text;
-    if(filter .isEmpty){
+    if (filter.isEmpty) {
       filtered = widget.catList;
-    }else{
-      filtered= widget.catList.where((item) {
-        final matchesTitle = item.name!.toLowerCase().contains(filter.toLowerCase());
-        final filteredChildren = item.list!.where((child) => child.sub_category_name!.toLowerCase().contains(filter.toLowerCase())).toList();
+    } else {
+      filtered = widget.catList.where((item) {
+        final matchesTitle =
+            item.name!.toLowerCase().contains(filter.toLowerCase());
+        final filteredChildren = item.list!
+            .where((child) => child.sub_category_name!
+                .toLowerCase()
+                .contains(filter.toLowerCase()))
+            .toList();
         return matchesTitle || filteredChildren.isNotEmpty;
       }).map((item) {
         return CategoryListData(
           id: item.id,
           name: item.name,
-          list: item.list!.where((child) => child.sub_category_name!.toLowerCase().contains(filter.toLowerCase())).toList(),
+          list: item.list!
+              .where((child) => child.sub_category_name!
+                  .toLowerCase()
+                  .contains(filter.toLowerCase()))
+              .toList(),
         );
       }).toList();
     }
@@ -112,12 +122,12 @@ class _ExpandableRadioListState extends State<ExpandableRadioList> {
                 OutlinedButton.icon(
                   style: const ButtonStyle(
                     //padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero), // Removes padding
-                    visualDensity: VisualDensity.compact, // Reduces overall space
+                    visualDensity:
+                        VisualDensity.compact, // Reduces overall space
                     alignment: Alignment.center,
                   ),
-
                   onPressed: () {
-                    Navigator.pop(context);
+                    //filtered[index].Navigator.pop(context);
                     AddNewItemDialog(
                         context: context,
                         title: "Add Category",
@@ -126,14 +136,12 @@ class _ExpandableRadioListState extends State<ExpandableRadioList> {
                         oldValue: "",
                         type: SheetType.category,
                         onPressed: (String v) {
-                          debugPrint('F() called--->, $v');
-                          //Addf(v);
-
+                          widget.onItemAdded(v, filtered[index].id);
                         });
                   },
                   label: const Text(
                     "Add",
-                    style: TextStyle(color: Colors.white,fontSize: 12),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                   icon: const Icon(
                     Icons.add,

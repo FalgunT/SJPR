@@ -41,6 +41,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (pickedImage != null) {
       setState(() {
         file = File(pickedImage.path);
+        Navigator.of(context).pop();
+        bloc.updateProfile(context, mounted, pickedImage.path);
       });
     }
   }
@@ -188,6 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         profile!.profileImage!,
                                                         height: 100,
                                                         width: 100,
+                                                        fit: BoxFit.fill,
                                                       )
                                                     : Image.asset(
                                                         AssetImages
@@ -374,7 +377,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             const Expanded(
                                               /* width: MediaQuery.sizeOf(context)
                                                       .width *
-                                                  0.2,*/
+                                                  0.23w,*/
                                               child: Text(
                                                 "Save to Gallery",
                                               ),

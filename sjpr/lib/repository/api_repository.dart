@@ -40,6 +40,12 @@ class ApiRepositoryIml extends ApiRepository {
     return _apiServices.profile();
   }
 
+  @override
+  Future<CommonModelClass?> uploadProfilePic({
+    required String profilePath,
+  }) {
+    return _apiServices.uploadProfilePic(profilePath: profilePath);
+  }
   /*
  old
 
@@ -157,6 +163,12 @@ class ApiRepositoryIml extends ApiRepository {
   }
 
   @override
+  Future<CommonModelClass?> addSubcategory(
+      String id, String categoryName, String code) {
+    return _apiServices.addSubcategory(id, categoryName, code);
+  }
+
+  @override
   Future<Object?> AddCustomer(
       {required String cName, required int isPurchase}) {
     return _apiServices.addCustomer(cName, isPurchase: isPurchase);
@@ -263,6 +275,8 @@ abstract class ApiRepository {
 
   Future<Profile?> profile();
 
+  Future<CommonModelClass?> uploadProfilePic({required String profilePath});
+
   Future<CommonModelClass?> addProduct({required String pName});
 
   /*
@@ -321,6 +335,9 @@ abstract class ApiRepository {
   Future<CommonModelClass?> deleteLineItemDetail(
     String invoiceId,
   );
+
+  Future<CommonModelClass?> addSubcategory(
+      String id, String categoryName, String code);
 
   Future<Object?> AddCustomer({required String cName, required int isPurchase});
 

@@ -127,6 +127,22 @@ class LineItemsBloc extends BlocBase {
     }
   }
 
+  Future addSubcategory(
+      BuildContext context, String id, String categoryName) async {
+    var getCategoryListResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .addSubcategory(id, categoryName, "");
+    if (getCategoryListResponse != null) {
+      if (getCategoryListResponse.message != null) {
+        CommonToast.getInstance()?.displayToast(
+            bContext: context, message: getCategoryListResponse.message!);
+      }
+      //refresh the page...
+      getDetailCategory(context);
+    }
+  }
+
   Future addCustomer(BuildContext context, String pName,
       {required int isPurchase}) async {
     var getCategoryListResponse = await AppComponentBase.getInstance()
@@ -313,6 +329,10 @@ class LineItemsBloc extends BlocBase {
   }
 
   void setValues() {
+    if (lineitemdetail.value.name == null ||
+        lineitemdetail.value.name.isEmpty) {
+      lineitemdetail.value.name = lineitemdetail.value.description ?? "";
+    }
     txtController.text = lineitemdetail.value.description ?? "";
   }
 

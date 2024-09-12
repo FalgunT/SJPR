@@ -18,7 +18,10 @@ class InvoiceDetailScreen extends StatefulWidget {
   final String title;
   final int isPurchase;
   const InvoiceDetailScreen(
-      {super.key, required this.id, required this.isPurchase,required this.title});
+      {super.key,
+      required this.id,
+      required this.isPurchase,
+      required this.title});
 
   @override
   State<InvoiceDetailScreen> createState() => _InvoiceDetailScreenState();
@@ -39,7 +42,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   _init() async {
     await bloc.getInvoiceDetail(context, widget.id);
     bloc.getProfile(context);
-    bloc.getDetailCategory(context, widget.id);
+    bloc.getDetailCategory(context);
     bloc.getDetailType(context, widget.id);
     bloc.getCurrency(context);
     bloc.getPaymentMethods(context);
@@ -65,7 +68,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             color: appTheme.textColor,
           ),
         ),
-        title: Text(widget.title, style: const TextStyle(color: Colors.white),),
+        title: Text(
+          widget.title,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
       body: SingleChildScrollView(
         child: ValueListenableBuilder(
@@ -236,7 +242,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                         title: "Type",
                                         ItemId: bloc.getId(SheetType.type),
                                         bottomSheetType: SheetType.type,
-                                        Addf: (String v) {},
+                                        Addf: (String item, String id) {},
+                                        onItemAdded: (String item, String id) {
+                                          bloc.addSubcategory(
+                                              context, id, item);
+                                        },
                                         onItemSelected: (id, name) {
                                           debugPrint('--->$id, $name');
                                           bloc.SetName(
@@ -478,8 +488,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                                     .payment_status =
                                                 bb ? '1' : '0';
                                           },
-                                          activeColor:
-                                              appTheme.activeTxtColor,
+                                          activeColor: appTheme.activeTxtColor,
                                         )
                                       ],
                                     );
