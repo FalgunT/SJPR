@@ -170,9 +170,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         return Column(
                           children: [
                             const SizedBox(
-                              height: 120,
+                              height: 48,
                             ),
-                            Row(
+                            getProfileIcon(profile),
+                            /*Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
@@ -242,7 +243,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       color: buttonTextColor,
                                     ))
                               ],
-                            ),
+                            ),*/
                             const SizedBox(
                               height: 15,
                             ),
@@ -442,7 +443,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),*/
                             const SizedBox(
-                              height: 10,
+                              height: 20,
                             ),
                             InkWell(
                               onTap: () {
@@ -467,7 +468,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             const SizedBox(
-                              height: 20,
+                              height: 10,
                             ),
                             GestureDetector(
                               onTap: () {
@@ -496,7 +497,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             const SizedBox(
-                              height: 10,
+                              height: 16,
                             ),
                             Center(
                               child: Image.asset(
@@ -634,5 +635,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
     pBloc.confirmpasswordController.text = "";
     pBloc.passwordController.text = "";
     pBloc.oldpasswordController.text = "";
+  }
+
+  getProfileIcon(ProfileData? profile) {
+    return Stack(
+
+      children: [
+        Center(
+          child: Stack(
+            children: [
+              Center(
+                  child: ClipRRect(
+                      borderRadius:
+                      BorderRadius.circular(120),
+                      child: file.path == ''
+                          ? ((profile != null &&
+                          profile!.profileImage !=
+                              null)
+                          ? Image.network(
+                        profile!.profileImage!,
+                        height: 160,
+                        width: 160,
+                        fit: BoxFit.fill,
+                      )
+                          : Image.asset(
+                        AssetImages
+                            .personPlaceholder,
+                        height: 160,
+                        fit: BoxFit.fill,
+                        width: 160,
+                      ))
+                          : Image.file(
+                        file,
+                        height: 100,
+                        fit: BoxFit.fill,
+                        width: 100,
+                      ))),
+              Positioned(
+                  bottom: 5,
+                  left: 20,
+                  right: 20,
+                  child: Container(
+                    height: 35,
+                    width: 35,
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                        color: buttonTextColor,
+                        shape: BoxShape.circle),
+                    child: Center(
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            bottomSheetDialog();
+                          },
+                          icon: SvgPicture.asset(
+                            SvgImages.edit,
+                          ),
+                        )),
+                  ))
+            ],
+          ),
+        ),
+        Positioned(
+            right: 0,
+            child: Center(
+                child:  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      size: 24,
+                      color: buttonTextColor,
+                    ))))
+
+      ],
+    );
   }
 }

@@ -27,6 +27,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
+
     bloc.getProfile(context, mounted);
     dashboardItems.add(DashboardItems(SvgImages.imageClientArea,
         StringUtils.clientArea, StringUtils.descClientArea));
@@ -113,13 +115,17 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                     MaterialPageRoute(builder: (context) {
                                       return const ProfileScreen();
                                     }),
-                                  );
+                                  ).then((_) async {
+                                    //bloc.getInvoiceDetail(context, widget.id);
+                                    await bloc.getProfile(context, mounted);
+                                    setState(() {});
+                                  });
                                 },
                                 child: Container(
                                   decoration: ShapeDecoration(
                                     color: const Color(0xFFD6BC51),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
+                                      borderRadius: BorderRadius.circular(32),
                                     ),
                                   ),
                                   child: Row(
@@ -137,10 +143,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                                   profile.profileImage !=
                                                       null) {
                                                 return Container(
-                                                  width: 33,
-                                                  height: 34,
-                                                  margin: const EdgeInsets.only(
-                                                      left: 4),
+                                                  width: 32,
+                                                  height: 32,
+                                                  margin: const EdgeInsets.all(4),
                                                   decoration: ShapeDecoration(
                                                     image: DecorationImage(
                                                       image: NetworkImage(
@@ -154,10 +159,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                               }
                                             }
                                             return Container(
-                                              width: 33,
-                                              height: 34,
-                                              margin: const EdgeInsets.only(
-                                                  left: 4),
+                                              width: 32,
+                                              height: 32,
+                                              margin: const EdgeInsets.all(4),
                                               decoration: ShapeDecoration(
                                                 image: DecorationImage(
                                                   image: AssetImage(AssetImages
@@ -356,5 +360,6 @@ class DashboardItems {
   String? image;
   String? title;
   String? subTitle;
+
   DashboardItems(this.image, this.title, this.subTitle);
 }

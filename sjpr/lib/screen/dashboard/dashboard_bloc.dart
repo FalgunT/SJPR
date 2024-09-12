@@ -32,6 +32,7 @@ class DashboardBloc extends BlocBase {
       if (!mounted) return;
       if (getProfile != null) {
         if (getProfile.status == true) {
+          debugPrint(getProfile.data.toString());
           profileStreamController.sink.add(getProfile.data);
         }
       }

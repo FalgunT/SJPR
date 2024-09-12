@@ -58,4 +58,9 @@ class ProfileData {
     data['profile_image'] = this.profileImage;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'ProfileData{id: $id, email: $email, firstname: $firstname, lastname: $lastname, companyName: $companyName, profileImage: $profileImage}';
+  }
 }

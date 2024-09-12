@@ -2,9 +2,11 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/image_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
@@ -260,7 +262,13 @@ class _PictureCaptureState extends State<PictureCapture> {
               flex: 1,
               child: IconButton(
                 onPressed: () async {
-                  performAction();
+                  if (Platform.isAndroid) {
+                    performAction();
+                  } else if (Platform.isIOS) {
+                    // iOS-specific code
+                    //for ios we need to give gallry option seperately...
+                    bottomSheetDialog();
+                  }
                 },
                 icon: Container(
                     padding: const EdgeInsets.all(8),
@@ -339,6 +347,7 @@ class _PictureCaptureState extends State<PictureCapture> {
 
   Future<void> performAction() async {
     List<String> _pictures = [];
+
     if (mode == 1) {
       try {
         _pictures = await CunningDocumentScanner.getPictures(
@@ -427,6 +436,134 @@ class _PictureCaptureState extends State<PictureCapture> {
           ],
         ),
       );
+    }
+  }
+
+  Future<void> bottomSheetDialog() {
+    return showModalBottomSheet(
+        backgroundColor: textFieldBgColor,
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              padding: const EdgeInsets.only(
+                  top: 20, bottom: 10, left: 8, right: 8),
+              height: MediaQuery.of(context).size.height / 2.8,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                        width: 86,
+                        height: 4,
+                        decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(4),
+                              topRight: Radius.circular(4),
+                              bottomLeft: Radius.circular(4),
+                              bottomRight: Radius.circular(4),
+                            ),
+                            color: Colors.black //Color.fromRGBO(44, 45, 51, 1),
+                            )),
+                    const SizedBox(height: 24),
+                    Text(
+                      "Capture or Select Image",
+                      style: TextStyle(fontSize: 20, color: activeTxtColor),
+                    ),
+                    const SizedBox(height: 16),
+                    ListTile(
+                      onTap: () {
+                        performAction();
+                      },
+                      title: Text(
+                        "Camera",
+                        style: TextStyle(color: activeTxtColor),
+                      ),
+                      subtitle: const Text(
+                        "Capture an invoice with the device’s camera and upload to the server.",
+                        style: TextStyle(color: Colors.white70, fontSize: 10),
+                      ),
+                      leading: Icon(
+                        Icons.camera_alt_outlined,
+                        color: activeTxtColor,
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios_outlined,
+                        color: Colors.white70,
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    ListTile(
+                      onTap: () {
+                        pickImage(ImageSource.gallery);
+                      },
+                      title: Text(
+                        "Gallery",
+                        style: TextStyle(color: activeTxtColor),
+                      ),
+                      subtitle: Text(
+                        "Select an existing invoice image from the gallery to upload to the server.",
+                        style: TextStyle(color: Colors.white70, fontSize: 10),
+                      ),
+                      leading: Icon(
+                        Icons.image_outlined,
+                        color: activeTxtColor,
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios_outlined,
+                        color: Colors.white70,
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
+                ),
+              ),
+            );
+          });
+        });
+  }
+
+  pickImage(ImageSource source) async {
+    //for single image...
+    List<XFile> xfilePick = [];
+    if (mode == 1) {
+      XFile? xf = await ImagePicker().pickImage(
+        source: source,
+        imageQuality: 100,
+      );
+      if (xf != null) {
+        xfilePick.add(xf);
+      }
+    } else {
+      xfilePick = await ImagePicker().pickMultiImage(imageQuality: 100);
+    }
+
+    if (!mounted) return;
+
+    if (xfilePick.isNotEmpty) {
+      for (var picture in xfilePick) {
+        cModels.add(CaptureModel(
+            widget: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.file(File(picture.path)),
+            ),
+            isSelect: false,
+            capturePath: picture.path));
+      }
+
+      setState(() {
+        debugPrint('--->W len ${cModels.length}');
+        setInstructionStatus();
+        status = true;
+      });
+    } else {
+      // If no image is selected it will show a
+      // snackbar saying nothing is selected
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Nothing is selected')));
     }
   }
 }
