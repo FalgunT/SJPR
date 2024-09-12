@@ -474,6 +474,7 @@ class _PictureCaptureState extends State<PictureCapture> {
                     const SizedBox(height: 16),
                     ListTile(
                       onTap: () {
+                        Navigator.pop(context);
                         performAction();
                       },
                       title: Text(
@@ -497,6 +498,7 @@ class _PictureCaptureState extends State<PictureCapture> {
                     const SizedBox(height: 4),
                     ListTile(
                       onTap: () {
+                        Navigator.pop(context);
                         pickImage(ImageSource.gallery);
                       },
                       title: Text(
