@@ -1,11 +1,9 @@
 import 'dart:async';
 
-//import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail.dart';
-import 'package:sjpr/screen/invoice/invoice_detail_read_only.dart';
 import 'package:sjpr/screen/invoice/invoice_list_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
@@ -176,7 +174,6 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                         TextStyle(color: appTheme.activeTxtColor, fontSize: 20),
                   );
                 }),
-
             ValueListenableBuilder(
                 valueListenable: bloc.compEmail,
                 builder: (BuildContext context, value, Widget? child) {
@@ -185,7 +182,6 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                     style: TextStyle(color: appTheme.textColor),
                   );
                 }),
-
             const SizedBox(
               height: 20,
             ),
@@ -321,6 +317,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                         title: widget.isPurchase == 1
                             ? StringUtils.catchBill
                             : StringUtils.catchInvoice,
+                        isReadOnly: false,
                       ))).then((onValue) {
             if (onValue) {
               _init();
@@ -402,9 +399,13 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => InvoiceDetailReadOnlyScreen(
+                        builder: (context) => InvoiceDetailScreen(
                               id: listData.id!,
                               isPurchase: widget.isPurchase,
+                              isReadOnly: true,
+                              title: widget.isPurchase == 1
+                                  ? StringUtils.catchBill
+                                  : StringUtils.catchInvoice,
                             )));
               },
               child: getOptionChild(

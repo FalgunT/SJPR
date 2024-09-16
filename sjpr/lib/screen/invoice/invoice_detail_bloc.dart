@@ -14,6 +14,7 @@ import 'package:sjpr/model/split_list_model.dart';
 import 'package:sjpr/model/type_list_model.dart';
 
 import '../../common/AppEnums.dart';
+import '../../model/api_response_taxrate.dart';
 import '../../model/category_list_model.dart';
 import '../../model/product_list_model.dart';
 import '../../widgets/check_box.dart';
@@ -28,6 +29,7 @@ class InvoiceDetailBloc extends BlocBase {
   List<CategoryListData> cList = [];
   List<TypeListData> tList = [];
   List<ProductServicesListData> pList = [];
+  List<DataItem> taxRateList = [];
   ValueNotifier<bool> isWaitingForDetail = ValueNotifier<bool>(true);
 
   ValueNotifier<String> ownedBy = ValueNotifier<String>("None");
@@ -38,6 +40,7 @@ class InvoiceDetailBloc extends BlocBase {
   ValueNotifier<String> selectedValueCurSign = ValueNotifier<String>("");
   ValueNotifier<String> selectedValuePM = ValueNotifier<String>("None");
   ValueNotifier<String> selectedValuePT = ValueNotifier<String>("None");
+  ValueNotifier<String> selectedValueTaxRate = ValueNotifier<String>("None");
 
   ValueNotifier<bool> hideCat = ValueNotifier<bool>(false);
   ValueNotifier<bool> hideProd = ValueNotifier<bool>(false);
@@ -121,6 +124,33 @@ class InvoiceDetailBloc extends BlocBase {
         "PROD": lineProduct,
       };
       Check_Cat_Prod(result);
+    }
+  }
+
+  Future getAllTaxRate(BuildContext context, {bool isAdd = false}) async {
+    var getResponse = await AppComponentBase.getInstance()
+        ?.getApiInterface()
+        .getApiRepository()
+        .getAllTaxRate();
+    if (getResponse != null) {
+      taxRateList = getResponse.data;
+      taxRateList.forEach(
+        (element) {
+          if (element.id == invoiceDetailData.value.supplierTaxId) {
+            selectedValueTaxRate.value = element.taxRate;
+          }
+        },
+      );
+      if (isAdd) {
+        selectedValueTaxRate.value = taxRateList.last.taxRate;
+        invoiceDetailData.value.supplierTaxId = taxRateList.last.id;
+      } else {
+        String id = invoiceDetailData.value.supplierTaxId ?? '';
+        if (id.isEmpty) {
+          selectedValueTaxRate.value = taxRateList.first.taxRate;
+          invoiceDetailData.value.supplierTaxId = taxRateList.first.id;
+        }
+      }
     }
   }
 
@@ -423,6 +453,8 @@ class InvoiceDetailBloc extends BlocBase {
       id = invoiceDetailData.value.payment_method_id ?? '';
     } else if (bottomSheetType == SheetType.publishto) {
       id = invoiceDetailData.value.publish_to_id ?? '';
+    }else if (bottomSheetType == SheetType.taxrate) {
+      id = invoiceDetailData.value.supplierTaxId ?? '';
     }
     if (id.isEmpty) {
       id = '0';
@@ -450,6 +482,9 @@ class InvoiceDetailBloc extends BlocBase {
     } else if (bottomSheetType == SheetType.category) {
       invoiceDetailData.value.scanned_category_id = '$id';
       selectedValueC.value = name;
+    }else if (bottomSheetType == SheetType.taxrate) {
+      invoiceDetailData.value.supplierTaxId = '$id';
+      selectedValueTaxRate.value = name;
     }
   }
 

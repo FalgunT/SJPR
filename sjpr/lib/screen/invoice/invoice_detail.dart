@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
 import 'package:sjpr/screen/lineitems/line_items_list.dart';
+import 'package:sjpr/widgets/amount_widget.dart';
 import 'package:sjpr/widgets/common_button.dart';
 import 'package:sjpr/widgets/empty_item_widget.dart';
 import '../../common/AppEnums.dart';
@@ -17,11 +18,14 @@ class InvoiceDetailScreen extends StatefulWidget {
   final String id;
   final String title;
   final int isPurchase;
+  final bool isReadOnly;
+
   const InvoiceDetailScreen(
       {super.key,
       required this.id,
       required this.isPurchase,
-      required this.title});
+      required this.title,
+      required this.isReadOnly});
 
   @override
   State<InvoiceDetailScreen> createState() => _InvoiceDetailScreenState();
@@ -41,10 +45,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
   _init() async {
     await bloc.getInvoiceDetail(context, widget.id);
+
     bloc.getProfile(context);
     bloc.getDetailCategory(context);
     bloc.getDetailType(context, widget.id);
     bloc.getCurrency(context);
+    bloc.getAllTaxRate(context);
     bloc.getPaymentMethods(context);
     bloc.getPublishTo(context);
     //  await bloc.getDetailOwnBy(context, widget.id);
@@ -283,6 +289,26 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),
+                              TextField(
+                                minLines: 4,
+                                keyboardType: TextInputType.multiline,
+                                maxLines: null,
+                                style: const TextStyle(color: Colors.white),
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: appTheme.listTileBgColor,
+                                  hintStyle:
+                                      const TextStyle(color: Colors.white),
+                                  hintText: 'Description',
+                                  labelText: 'Add Description',
+                                  labelStyle:
+                                      const TextStyle(color: Colors.white),
+                                  contentPadding: const EdgeInsets.only(
+                                      left: 14.0, bottom: 8.0, top: 8.0),
+                                ),
+                                controller: _eDescController,
+                              ),
+                              spacer(),
                               commonRowWidget(context,
                                   title: "Due Date",
                                   value: bloc.invoiceDetailData.value.dueDate,
@@ -306,110 +332,6 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     onPressed: (String v) {
                                       debugPrint('F() called--->, $v');
                                       bloc.invoiceDetailData.value.invoiceId =
-                                          v;
-                                      setState(() {});
-                                    });
-                              }),
-                              ValueListenableBuilder(
-                                valueListenable: bloc.selectedValueCur,
-                                builder: (context, value, child) {
-                                  return commonRowWidget(context,
-                                      title: "Currency",
-                                      value: bloc.selectedValueCur.value,
-                                      onTap: () {
-                                    CommonBottomSheetDialog(
-                                        context: context,
-                                        list: bloc.curList,
-                                        title: "Currency",
-                                        ItemId: bloc.getId(SheetType.currency),
-                                        bottomSheetType: SheetType.currency,
-                                        Addf: (String v) {},
-                                        onItemSelected: (id, name) {
-                                          debugPrint(
-                                              'onItemSelected---> $id, $name');
-                                          bloc.SetName(
-                                              id, name, SheetType.currency);
-                                        }).Show();
-                                  });
-                                },
-                              ),
-                              commonRowWidget(context,
-                                  title: "Total",
-                                  value: bloc.getFormetted(
-                                      bloc.invoiceDetailData.value.netAmount ??
-                                          "0.00"),
-                                  isNumber: true, onTap: () {
-                                AddNewItemDialog(
-                                    isAmt: true,
-                                    context: context,
-                                    title: "Edit Total Amount",
-                                    hint: 'Enter Total Amount',
-                                    label:
-                                        'Total Amount ${bloc.getCurrencySign()}',
-                                    oldValue: bloc.getFormetted(bloc
-                                            .invoiceDetailData
-                                            .value
-                                            .netAmount ??
-                                        "0.00"),
-                                    type: SheetType.none,
-                                    onPressed: (String v) {
-                                      debugPrint('F() called--->, $v');
-                                      bloc.invoiceDetailData.value.netAmount =
-                                          v;
-                                      setState(() {});
-                                    });
-                              }),
-                              commonRowWidget(context,
-                                  title: "Tax",
-                                  isNumber: true,
-                                  value: bloc.getFormetted(bloc
-                                          .invoiceDetailData
-                                          .value
-                                          .totalTaxAmount ??
-                                      "0.00"), onTap: () {
-                                AddNewItemDialog(
-                                    isAmt: true,
-                                    context: context,
-                                    title: "Edit Tax Amount",
-                                    hint: 'Enter Tax Amount',
-                                    label:
-                                        'Tax Amount${bloc.getCurrencySign()}',
-                                    oldValue: bloc.getFormetted(bloc
-                                            .invoiceDetailData
-                                            .value
-                                            .totalTaxAmount ??
-                                        "0.00"),
-                                    type: SheetType.none,
-                                    onPressed: (String v) {
-                                      debugPrint('F() called--->, $v');
-                                      bloc.invoiceDetailData.value
-                                          .totalTaxAmount = v;
-                                      setState(() {});
-                                    });
-                              }),
-                              commonRowWidget(context,
-                                  title: "Tax Total",
-                                  isNumber: true,
-                                  value: bloc.getFormetted(bloc
-                                          .invoiceDetailData
-                                          .value
-                                          .totalAmount ??
-                                      "0.00"), onTap: () {
-                                AddNewItemDialog(
-                                    isAmt: true,
-                                    context: context,
-                                    title: "Edit Tax Total",
-                                    hint: 'Enter Tax Total',
-                                    label: 'Tax Total${bloc.getCurrencySign()}',
-                                    oldValue: bloc.getFormetted(bloc
-                                            .invoiceDetailData
-                                            .value
-                                            .totalAmount ??
-                                        "0.00"),
-                                    type: SheetType.none,
-                                    onPressed: (String v) {
-                                      debugPrint('F() called--->, $v');
-                                      bloc.invoiceDetailData.value.totalAmount =
                                           v;
                                       setState(() {});
                                     });
@@ -495,26 +417,31 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                   },
                                 ),
                               ),
-                              TextField(
-                                minLines: 4,
-                                keyboardType: TextInputType.multiline,
-                                maxLines: null,
-                                style: const TextStyle(color: Colors.white),
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: appTheme.listTileBgColor,
-                                  hintStyle:
-                                      const TextStyle(color: Colors.white),
-                                  hintText: 'Description',
-                                  labelText: 'Add Description',
-                                  labelStyle:
-                                      const TextStyle(color: Colors.white),
-                                  contentPadding: const EdgeInsets.only(
-                                      left: 14.0, bottom: 8.0, top: 8.0),
-                                ),
-                                controller: _eDescController,
+                              ValueListenableBuilder(
+                                valueListenable: bloc.selectedValueCur,
+                                builder: (context, value, child) {
+                                  return commonRowWidget(context,
+                                      title: "Currency",
+                                      value: bloc.selectedValueCur.value,
+                                      onTap: () {
+                                    CommonBottomSheetDialog(
+                                        context: context,
+                                        list: bloc.curList,
+                                        title: "Currency",
+                                        ItemId: bloc.getId(SheetType.currency),
+                                        bottomSheetType: SheetType.currency,
+                                        Addf: (String v) {},
+                                        onItemSelected: (id, name) {
+                                          debugPrint(
+                                              'onItemSelected---> $id, $name');
+                                          bloc.SetName(
+                                              id, name, SheetType.currency);
+                                        }).Show();
+                                  });
+                                },
                               ),
-                              spacer(),
+                              AmountWidget(
+                                  bloc: bloc, isReadOnly: widget.isReadOnly),
                               CommonButton(
                                   content: "Submit",
                                   bgColor: appTheme.buttonBgColor,
