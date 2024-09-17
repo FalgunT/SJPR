@@ -10,12 +10,14 @@ class LineItemsListScreen extends StatefulWidget {
   final String id;
   final String currencySign;
   final int isPurchase;
+  final bool isReadOnly;
 
   const LineItemsListScreen(
       {super.key,
       required this.id,
       required this.currencySign,
-      required this.isPurchase});
+      required this.isPurchase,
+      required this.isReadOnly});
 
   @override
   State<LineItemsListScreen> createState() => _LineItemsListScreenState();
@@ -67,6 +69,7 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                           color: activeTxtColor,
                           fontSize: 24),
                     ),
+                    widget.isReadOnly?Center():
                     InkWell(
                       onTap: () {
                         onItemTap(lineitem_id: "");
@@ -306,7 +309,7 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                   lineitem_id: lineitem_id,
                   invoice_id: widget.id,
                   currencySign: widget.currencySign,
-                  isPurchase: widget.isPurchase,
+                  isPurchase: widget.isPurchase, isReadOnly: widget.isReadOnly,
                 ))).then((response) async {
       await bloc.getLineItemList(context, widget.id);
       setState(() {});

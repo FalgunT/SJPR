@@ -8,6 +8,7 @@ import 'package:sjpr/model/api_response_class.dart';
 import 'package:sjpr/model/lineitem_detail_model.dart';
 import 'package:sjpr/model/product_list_model.dart';
 
+import '../../common/AppEnums.dart';
 import '../../model/api_response_costomer.dart';
 import '../../model/api_response_location.dart';
 import '../../model/api_response_taxrate.dart';
@@ -15,6 +16,8 @@ import '../../model/currency_model.dart';
 
 class LineItemsBloc extends BlocBase {
   TextEditingController txtController = TextEditingController();
+  ValueNotifier<bool> isWaitingForDetail = ValueNotifier<bool>(true);
+
 
   ValueNotifier<LineItem> lineitemdetail =
       ValueNotifier<LineItem>(LineItem.empty());
@@ -36,6 +39,7 @@ class LineItemsBloc extends BlocBase {
   //List<CurrencyModel> currencyList = [];
 
   Future getLineItemDetail(BuildContext context, String lineItemId) async {
+    isWaitingForDetail.value = true;
     var getLineItemListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
@@ -49,6 +53,8 @@ class LineItemsBloc extends BlocBase {
         setValues();
       }
     }
+
+    isWaitingForDetail.value = false;
   }
 
   Future getDetailCategory(BuildContext context) async {
@@ -221,9 +227,127 @@ class LineItemsBloc extends BlocBase {
       if (isAdd) {
         selectedValueTaxRate.value = taxRateList.last.taxRate;
         lineitemdetail.value.taxRateId = taxRateList.last.id;
+      }else{
+        if(lineitemdetail.value.taxRateId.isEmpty){
+          selectedValueTaxRate.value = taxRateList.first.taxRate;
+          lineitemdetail.value.taxRateId = taxRateList.first.id;
+        }
+
       }
     }
   }
+
+  getCategoryId() {
+    String catid = '0';
+    if (lineitemdetail.value.categoryId.isEmpty) {
+      catid = '0';
+    } else {
+      catid = lineitemdetail.value.categoryId;
+    }
+    return int.parse(catid);
+  }
+
+  getId(bottomSheetType) {
+    String id = "0";
+    if (bottomSheetType == SheetType.product) {
+      id = lineitemdetail.value.productId;
+    } else if (bottomSheetType == SheetType.itemclass) {
+      id = lineitemdetail.value.classId;
+    } else if (bottomSheetType == SheetType.location) {
+      id = lineitemdetail.value.locationId;
+    } else if (bottomSheetType == SheetType.customer) {
+      id = lineitemdetail.value.customerId;
+    } else if (bottomSheetType == SheetType.taxrate) {
+      id = lineitemdetail.value.taxRateId;
+    }
+    if (id.isEmpty) {
+      id = '0';
+    }
+    return int.parse(id);
+  }
+
+  void SetName(id, name, bottomSheetType) {
+    if (bottomSheetType == SheetType.product) {
+      lineitemdetail.value.productId = '$id';
+      selectedValueP.value = name;
+    } else if (bottomSheetType == SheetType.itemclass) {
+      lineitemdetail.value.classId = '$id';
+      selectedValueClass.value = name;
+    } else if (bottomSheetType == SheetType.location) {
+      lineitemdetail.value.locationId = '$id';
+      selectedValueL.value = name;
+    } else if (bottomSheetType == SheetType.customer) {
+      lineitemdetail.value.customerId = '$id';
+      selectedValueCustomer.value = name;
+    } else if (bottomSheetType == SheetType.taxrate) {
+      lineitemdetail.value.taxRateId = '$id';
+      selectedValueTaxRate.value = name;
+    } else if (bottomSheetType == SheetType.category) {
+      lineitemdetail.value.categoryId = '$id';
+      selectedValueC.value = name;
+    }
+  }
+
+  bool isValid(BuildContext context) {
+    String catid = lineitemdetail.value.categoryId ?? "";
+    /*if (catid == "") {
+      CommonToast.getInstance()?.displayToast(
+          message: "Category field is required", bContext: context);
+      return false;
+    }
+    String pid = lineitemdetail.value.productId ?? "";
+    if (pid == "") {
+      CommonToast.getInstance()?.displayToast(
+          message: "Product/Service field is required", bContext: context);
+      return false;
+    }*/
+    /* String tid = lineitemdetail.value.classId ?? "";
+    if (tid == "") {
+      CommonToast.getInstance()
+          ?.displayToast(message: "Class field is required", bContext: context);
+      return false;
+    }
+    String loc = lineitemdetail.value.locationId ?? "";
+    if (loc == "") {
+      CommonToast.getInstance()?.displayToast(
+          message: "Location field is required", bContext: context);
+      return false;
+    }
+    String cus = lineitemdetail.value.customerId ?? "";
+    if (cus == "") {
+      CommonToast.getInstance()?.displayToast(
+          message: "Customer field is required", bContext: context);
+      return false;
+    }*/
+    String total = lineitemdetail.value.totalAmount ?? "";
+    if (total.isEmpty) {
+      CommonToast.getInstance()?.displayToast(
+          message: "Total  field is required", bContext: context);
+      return false;
+    }
+    String tax = lineitemdetail.value.taxRate ?? "";
+    if (tax.isEmpty) {
+      CommonToast.getInstance()
+          ?.displayToast(message: "Tax  field is required", bContext: context);
+      return false;
+    }
+    String net = lineitemdetail.value.netAmount ?? "";
+    if (net.isEmpty) {
+      CommonToast.getInstance()?.displayToast(
+          message: "Net Amount field is required", bContext: context);
+      return false;
+    }
+    return true;
+  }
+
+  getCurrency(String currencySign) {
+    if (currencySign.isEmpty) {
+      return '';
+    }
+    return ' ($currencySign)';
+  }
+
+
 
   /*Future getCurrency(BuildContext context) async {
     var getCategoryListResponse = await AppComponentBase.getInstance()

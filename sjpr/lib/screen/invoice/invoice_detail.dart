@@ -533,6 +533,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 currencySign: bloc.selectedValueCurSign.value,
                                 id: bloc.invoiceDetailData.value.id ?? "",
                                 isPurchase: widget.isPurchase,
+                                isReadOnly: widget.isReadOnly,
                               ))).then((_) async {
                     //bloc.getInvoiceDetail(context, widget.id);
                     await bloc.getLineItemList(

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sjpr/screen/invoice/invoice_detail_bloc.dart';
+import 'package:sjpr/screen/lineitems/line_items_bloc.dart';
 import 'package:sjpr/utils/color_utils.dart';
 
 import '../common/AppEnums.dart';
@@ -9,18 +10,23 @@ import '../model/api_response_taxrate.dart';
 import 'AddNewItemDialog.dart';
 import 'CommonBottomSheetDialog.dart';
 
-class AmountWidget extends StatefulWidget {
-  InvoiceDetailBloc bloc;
+class LineAmountWidget extends StatefulWidget {
+  LineItemsBloc bloc;
   bool isReadOnly;
+  String curSign;
 
-  AmountWidget({super.key, required this.bloc, required this.isReadOnly});
+  LineAmountWidget(
+      {super.key,
+      required this.bloc,
+      required this.curSign,
+      required this.isReadOnly});
 
   @override
-  State<AmountWidget> createState() => _AmountWidgetState();
+  State<LineAmountWidget> createState() => _LineAmountWidgetState();
 }
 
-class _AmountWidgetState extends State<AmountWidget> {
-  late ApiAmount apiAmount;
+class _LineAmountWidgetState extends State<LineAmountWidget> {
+  late ApiLineAmount apiAmount;
   late int taxId;
   String error = "";
 
@@ -52,38 +58,72 @@ class _AmountWidgetState extends State<AmountWidget> {
                     fontSize: 18,
                     fontWeight: FontWeight.bold),
               ),
-              ValueListenableBuilder(
-                  valueListenable: widget.bloc.selectedValueCurSign,
-                  builder: (context, value, _) {
-                    return Text(
-                      "$value ${getApiTotal()}",
-                      style: TextStyle(
-                          color: activeTxtColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
-                    );
-                  }),
+              Text(
+                "${widget.curSign} ${getApiTotal()}",
+                style: TextStyle(
+                    color: activeTxtColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
+              )
             ],
           ),
           children: [
             commonRowWidget(context,
+                title: "Quantity",
+                value: widget.bloc.lineitemdetail.value.quantity, onTap: () {
+              AddNewItemDialog(
+                  isAmt: true,
+                  context: context,
+                  title: 'Edit Quantity',
+                  hint: 'Enter Quantity',
+                  label: 'Quantity',
+                  oldValue: widget.bloc.lineitemdetail.value.quantity,
+                  type: SheetType.none,
+                  onPressed: (String v) {
+                    debugPrint('F() called--->, $v');
+                    widget.bloc.lineitemdetail.value.quantity = v;
+                    setState(() {});
+                  });
+            }),
+            commonRowWidget(context,
+                title: "Unit price",
+                value: widget.bloc
+                    .getFormetted(widget.bloc.lineitemdetail.value.unitPrice),
+                onTap: () {
+              AddNewItemDialog(
+                  isAmt: true,
+                  context: context,
+                  title: "Edit Unit price",
+                  hint: 'Enter Unit price',
+                  label: 'Unit price${widget.bloc.getCurrency(widget.curSign)}',
+                  oldValue: widget.bloc
+                      .getFormetted(widget.bloc.lineitemdetail.value.unitPrice),
+                  type: SheetType.none,
+                  onPressed: (String v) {
+                    debugPrint('F() called--->, $v');
+                    widget.bloc.lineitemdetail.value.unitPrice = v;
+                    setState(() {});
+                  });
+            }),
+            commonRowWidget(context,
                 title: "Total",
-                isClickable: !widget.isReadOnly,
+                isClickable: false,
                 value: widget.bloc.getFormetted(
-                    widget.bloc.invoiceDetailData.value.netAmount ?? "0.00"),
+                    widget.bloc.lineitemdetail.value.netAmount ?? "0.00"),
                 isNumber: true, onTap: () {
               AddNewItemDialog(
                   isAmt: true,
                   context: context,
                   title: "Edit Total Amount",
                   hint: 'Enter Total Amount',
-                  label: 'Total Amount ${widget.bloc.getCurrencySign()}',
+                  label:
+                      'Total Amount ${widget.bloc.getCurrency(widget.curSign)}',
                   oldValue: widget.bloc.getFormetted(
-                      widget.bloc.invoiceDetailData.value.netAmount ?? "0.00"),
+                      widget.bloc.lineitemdetail.value.netAmount ?? "0.00"),
                   type: SheetType.none,
                   onPressed: (String v) {
                     debugPrint('F() called--->, $v');
-                    widget.bloc.invoiceDetailData.value.netAmount = v;
+                    widget.bloc.lineitemdetail.value.netAmount = v;
                     updateAmount();
                   });
             }),
@@ -118,21 +158,20 @@ class _AmountWidgetState extends State<AmountWidget> {
                 isClickable: getClickStatus(),
                 isNumber: true,
                 value: widget.bloc.getFormetted(
-                    widget.bloc.invoiceDetailData.value.totalTaxAmount ??
-                        "0.00"), onTap: () {
+                    widget.bloc.lineitemdetail.value.taxRate ?? "0.00"),
+                onTap: () {
               AddNewItemDialog(
                   isAmt: true,
                   context: context,
                   title: "Edit Tax Amount",
                   hint: 'Enter Tax Amount',
-                  label: 'Tax Amount${widget.bloc.getCurrencySign()}',
+                  label: 'Tax Amount${widget.bloc.getCurrency(widget.curSign)}',
                   oldValue: widget.bloc.getFormetted(
-                      widget.bloc.invoiceDetailData.value.totalTaxAmount ??
-                          "0.00"),
+                      widget.bloc.lineitemdetail.value.taxRate ?? "0.00"),
                   type: SheetType.none,
                   onPressed: (String v) {
                     debugPrint('F() called--->, $v');
-                    widget.bloc.invoiceDetailData.value.totalTaxAmount = v;
+                    widget.bloc.lineitemdetail.value.taxRate = v;
                     updateAmount();
                   });
             }),
@@ -141,21 +180,20 @@ class _AmountWidgetState extends State<AmountWidget> {
                 isClickable: getClickStatus(),
                 isNumber: true,
                 value: widget.bloc.getFormetted(
-                    widget.bloc.invoiceDetailData.value.totalAmount ?? "0.00"),
+                    widget.bloc.lineitemdetail.value.totalAmount ?? "0.00"),
                 onTap: () {
               AddNewItemDialog(
                   isAmt: true,
                   context: context,
                   title: "Edit Tax Total",
                   hint: 'Enter Tax Total',
-                  label: 'Tax Total${widget.bloc.getCurrencySign()}',
+                  label: 'Tax Total${widget.bloc.getCurrency(widget.curSign)}',
                   oldValue: widget.bloc.getFormetted(
-                      widget.bloc.invoiceDetailData.value.totalAmount ??
-                          "0.00"),
+                      widget.bloc.lineitemdetail.value.totalAmount ?? "0.00"),
                   type: SheetType.none,
                   onPressed: (String v) {
                     debugPrint('F() called--->, $v');
-                    widget.bloc.invoiceDetailData.value.totalAmount = v;
+                    widget.bloc.lineitemdetail.value.totalAmount = v;
                     setState(() {});
                   });
             }),
@@ -246,18 +284,12 @@ class _AmountWidgetState extends State<AmountWidget> {
               width: 5,
             ),
             isNumber
-                ? ValueListenableBuilder(
-                    valueListenable: widget.bloc.selectedValueCurSign,
-                    builder: (context, value1, child) {
-                      return Expanded(
-                        child: Text(
-                          '$value1 $value',
-                          style: TextStyle(
-                              color: appTheme.textColor, fontSize: 14),
-                          textAlign: TextAlign.end,
-                        ),
-                      );
-                    },
+                ? Expanded(
+                    child: Text(
+                      '${widget.curSign} $value',
+                      style: TextStyle(color: appTheme.textColor, fontSize: 14),
+                      textAlign: TextAlign.end,
+                    ),
                   )
                 : Expanded(
                     child: Text(
@@ -286,28 +318,42 @@ class _AmountWidgetState extends State<AmountWidget> {
     // TODO: implement initState
     super.initState();
     taxId = getTaxRateValue();
-    apiAmount = ApiAmount(
-        billAmount: widget.bloc.invoiceDetailData.value.netAmount ?? '0.00',
-        taxAmount: widget.bloc.invoiceDetailData.value.totalTaxAmount ?? '0.00',
-        taxId: widget.bloc.invoiceDetailData.value.supplierTaxId ?? "",
-        grandTotal: widget.bloc.invoiceDetailData.value.totalAmount ?? '0.00');
+    apiAmount = ApiLineAmount(
+        billAmount: widget.bloc.lineitemdetail.value.netAmount ?? '0.00',
+        taxAmount: widget.bloc.lineitemdetail.value.taxRate ?? '0.00',
+        taxId: widget.bloc.lineitemdetail.value.taxRateId ?? "",
+        grandTotal: widget.bloc.lineitemdetail.value.totalAmount ?? '0.00',
+        qty: widget.bloc.lineitemdetail.value.quantity ?? '0',
+        unitP: widget.bloc.lineitemdetail.value.unitPrice ?? '0');
     debugPrint('-------------------------------------------');
     debugPrint(apiAmount.toString());
     debugPrint('-------------------------------------------');
+    setInitial();
+  }
+
+  void setInitial() {
+    double qty = double.parse(apiAmount.qty);
+    double up = double.parse(apiAmount.unitP);
+    double tot = qty * up;
+
+    widget.bloc.lineitemdetail.value.netAmount =
+        apiAmount.billAmount = tot.toStringAsFixed(2);
   }
 
   void reset() {
     error = "";
-    widget.bloc.invoiceDetailData.value.netAmount = apiAmount.billAmount;
-    widget.bloc.invoiceDetailData.value.totalTaxAmount = apiAmount.taxAmount;
-    widget.bloc.invoiceDetailData.value.totalAmount = apiAmount.grandTotal;
+    widget.bloc.lineitemdetail.value.quantity = apiAmount.qty;
+    widget.bloc.lineitemdetail.value.unitPrice = apiAmount.unitP;
+    widget.bloc.lineitemdetail.value.netAmount = apiAmount.billAmount;
+    widget.bloc.lineitemdetail.value.taxRate = apiAmount.taxAmount;
+    widget.bloc.lineitemdetail.value.totalAmount = apiAmount.grandTotal;
     if (apiAmount.taxId.isEmpty) {
-      apiAmount.taxId = widget.bloc.invoiceDetailData.value.supplierTaxId =
+      apiAmount.taxId = widget.bloc.lineitemdetail.value.taxRateId =
           widget.bloc.taxRateList.first.id;
       widget.bloc.selectedValueTaxRate.value =
           widget.bloc.taxRateList.first.taxRate;
     } else {
-      widget.bloc.invoiceDetailData.value.supplierTaxId = apiAmount.taxId;
+      widget.bloc.lineitemdetail.value.taxRateId = apiAmount.taxId;
       widget.bloc.selectedValueTaxRate.value =
           getTaxnameFromId(apiAmount.taxId);
     }
@@ -322,11 +368,10 @@ class _AmountWidgetState extends State<AmountWidget> {
     if (id > -1) {
       //calculate all...
       double billamt =
-          double.parse(widget.bloc.invoiceDetailData.value.netAmount ?? "0.00");
+          double.parse(widget.bloc.lineitemdetail.value.netAmount ?? "0.00");
       double tax = (billamt * id) / 100;
-      widget.bloc.invoiceDetailData.value.totalTaxAmount =
-          (tax).toStringAsFixed(2);
-      widget.bloc.invoiceDetailData.value.totalAmount =
+      widget.bloc.lineitemdetail.value.taxRate = (tax).toStringAsFixed(2);
+      widget.bloc.lineitemdetail.value.totalAmount =
           (billamt + tax).toStringAsFixed(2);
     }
     checkforApiAmount();
@@ -336,7 +381,7 @@ class _AmountWidgetState extends State<AmountWidget> {
   int getTaxRateValue() {
     for (int i = 0; i < widget.bloc.taxRateList.length; i++) {
       if (widget.bloc.taxRateList[i].id ==
-          widget.bloc.invoiceDetailData.value.supplierTaxId) {
+          widget.bloc.lineitemdetail.value.taxRateId) {
         if (i == 0) {
           return -1;
         } else if (i == 1 || i == 4 || i == 5) {
@@ -352,7 +397,7 @@ class _AmountWidgetState extends State<AmountWidget> {
   getApiTotal() {
     double? tot = double.parse(apiAmount.grandTotal);
     if (tot == 0.0) {
-      return widget.bloc.invoiceDetailData.value.totalAmount ?? '0.00';
+      return widget.bloc.lineitemdetail.value.totalAmount ?? '0.00';
     } else {
       return apiAmount.grandTotal;
     }
@@ -362,7 +407,7 @@ class _AmountWidgetState extends State<AmountWidget> {
     double? localTotal =
         double.parse(double.parse(apiAmount.grandTotal).toStringAsFixed(2));
     double? tot = double.parse(
-        double.parse(widget.bloc.invoiceDetailData.value.totalAmount ?? '0.00')
+        double.parse(widget.bloc.lineitemdetail.value.totalAmount ?? '0.00')
             .toStringAsFixed(2));
     debugPrint('local:' + localTotal.toString());
     debugPrint('api:' + tot.toString());
@@ -372,7 +417,7 @@ class _AmountWidgetState extends State<AmountWidget> {
       return;
     }
     if (localTotal != tot) {
-      error = "The invoice total amount does not match!";
+      error = "The line item total amount does not match!";
     } else {
       error = "";
     }
@@ -383,7 +428,7 @@ class _AmountWidgetState extends State<AmountWidget> {
       return false;
     }
     try {
-      if (widget.bloc.invoiceDetailData.value.supplierTaxId !=
+      if (widget.bloc.lineitemdetail.value.taxRateId !=
           widget.bloc.taxRateList.first.id) {
         return false;
       }
@@ -403,20 +448,24 @@ class _AmountWidgetState extends State<AmountWidget> {
   }
 }
 
-class ApiAmount {
+class ApiLineAmount {
+  String qty;
+  String unitP;
   String billAmount;
   String taxAmount;
   String grandTotal;
   String taxId;
 
-  ApiAmount(
-      {required this.billAmount,
+  ApiLineAmount(
+      {required this.qty,
+      required this.unitP,
+      required this.billAmount,
       required this.taxAmount,
       required this.grandTotal,
       required this.taxId});
 
   @override
   String toString() {
-    return 'ApiAmount{billAmount: $billAmount, taxAmount: $taxAmount, grandTotal: $grandTotal,taxId: $taxId}';
+    return 'ApiLineAmount{qty: $qty, unitP: $unitP, billAmount: $billAmount, taxAmount: $taxAmount, grandTotal: $grandTotal, taxId: $taxId}';
   }
 }
