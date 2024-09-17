@@ -39,7 +39,7 @@ class InvoiceDetailData {
   String? invoiceDate;
   String? totalTaxAmount;
   String? dueDate;
-  String? supplierTaxId;
+  String? tax_rate_id;
 
   String? supplierAddress;
   String? supplierName;
@@ -76,7 +76,7 @@ class InvoiceDetailData {
       this.invoiceDate,
       this.totalTaxAmount,
       this.dueDate,
-      this.supplierTaxId,
+      this.tax_rate_id,
       this.supplierAddress,
       this.supplierName,
       this.supplierEmail,
@@ -108,7 +108,7 @@ class InvoiceDetailData {
     invoiceDate = json['invoice_date'];
     totalTaxAmount = json['total_tax_amount'];
     dueDate = json['due_date'];
-    supplierTaxId = json['supplier_tax_id'];
+    tax_rate_id = json['tax_rate_id'];
     supplierAddress = json['supplier_address'];
     supplierName = json['supplier_name'];
     supplierEmail = json['supplier_email'];
@@ -148,7 +148,7 @@ class InvoiceDetailData {
         'invoice_date': invoiceDate ?? "",
         'total_tax_amount': totalTaxAmount ?? "",
         'due_date': dueDate ?? "",
-        'supplier_tax_id': supplierTaxId ?? "",
+        'tax_rate_id': tax_rate_id ?? "",
         'supplier_address': supplierAddress ?? "",
         'supplier_name': supplierName ?? "",
         'supplier_email': supplierEmail ?? "",

@@ -289,7 +289,7 @@ class _AmountWidgetState extends State<AmountWidget> {
     apiAmount = ApiAmount(
         billAmount: widget.bloc.invoiceDetailData.value.netAmount ?? '0.00',
         taxAmount: widget.bloc.invoiceDetailData.value.totalTaxAmount ?? '0.00',
-        taxId: widget.bloc.invoiceDetailData.value.supplierTaxId ?? "",
+        taxId: widget.bloc.invoiceDetailData.value.tax_rate_id ?? "",
         grandTotal: widget.bloc.invoiceDetailData.value.totalAmount ?? '0.00');
     debugPrint('-------------------------------------------');
     debugPrint(apiAmount.toString());
@@ -302,12 +302,12 @@ class _AmountWidgetState extends State<AmountWidget> {
     widget.bloc.invoiceDetailData.value.totalTaxAmount = apiAmount.taxAmount;
     widget.bloc.invoiceDetailData.value.totalAmount = apiAmount.grandTotal;
     if (apiAmount.taxId.isEmpty) {
-      apiAmount.taxId = widget.bloc.invoiceDetailData.value.supplierTaxId =
+      apiAmount.taxId = widget.bloc.invoiceDetailData.value.tax_rate_id =
           widget.bloc.taxRateList.first.id;
       widget.bloc.selectedValueTaxRate.value =
           widget.bloc.taxRateList.first.taxRate;
     } else {
-      widget.bloc.invoiceDetailData.value.supplierTaxId = apiAmount.taxId;
+      widget.bloc.invoiceDetailData.value.tax_rate_id = apiAmount.taxId;
       widget.bloc.selectedValueTaxRate.value =
           getTaxnameFromId(apiAmount.taxId);
     }
@@ -336,7 +336,7 @@ class _AmountWidgetState extends State<AmountWidget> {
   int getTaxRateValue() {
     for (int i = 0; i < widget.bloc.taxRateList.length; i++) {
       if (widget.bloc.taxRateList[i].id ==
-          widget.bloc.invoiceDetailData.value.supplierTaxId) {
+          widget.bloc.invoiceDetailData.value.tax_rate_id) {
         if (i == 0) {
           return -1;
         } else if (i == 1 || i == 4 || i == 5) {
@@ -383,7 +383,7 @@ class _AmountWidgetState extends State<AmountWidget> {
       return false;
     }
     try {
-      if (widget.bloc.invoiceDetailData.value.supplierTaxId !=
+      if (widget.bloc.invoiceDetailData.value.tax_rate_id !=
           widget.bloc.taxRateList.first.id) {
         return false;
       }

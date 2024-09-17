@@ -88,6 +88,7 @@ class _LineAmountWidgetState extends State<LineAmountWidget> {
             commonRowWidget(context,
                 title: "Unit price",
                 isClickable: !widget.isReadOnly,
+                isNumber: true,
                 value: widget.bloc
                     .getFormetted(widget.bloc.lineitemdetail.value.unitPrice),
                 onTap: () {
