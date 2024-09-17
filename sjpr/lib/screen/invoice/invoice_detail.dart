@@ -536,8 +536,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 isReadOnly: widget.isReadOnly,
                               ))).then((_) async {
                     //bloc.getInvoiceDetail(context, widget.id);
-                    await bloc.getLineItemList(
-                        context, bloc.invoiceDetailData.value.id!);
+                    if (!widget.isReadOnly) {
+                      await bloc.getLineItemList(
+                          context, bloc.invoiceDetailData.value.id!);
+                    }
                     setState(() {});
                   });
                 },

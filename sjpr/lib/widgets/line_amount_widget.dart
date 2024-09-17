@@ -42,11 +42,10 @@ class _LineAmountWidgetState extends State<LineAmountWidget> {
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
+          initiallyExpanded: widget.isReadOnly,
           iconColor: activeTxtColor,
           collapsedIconColor: activeTxtColor,
-          //backgroundColor: listTileBgColor,
           tilePadding: const EdgeInsets.symmetric(horizontal: 16),
-          // Adjust the horizontal padding
           childrenPadding: EdgeInsets.zero,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -70,6 +69,7 @@ class _LineAmountWidgetState extends State<LineAmountWidget> {
           children: [
             commonRowWidget(context,
                 title: "Quantity",
+                isClickable: !widget.isReadOnly,
                 value: widget.bloc.lineitemdetail.value.quantity, onTap: () {
               AddNewItemDialog(
                   isAmt: true,
@@ -87,6 +87,7 @@ class _LineAmountWidgetState extends State<LineAmountWidget> {
             }),
             commonRowWidget(context,
                 title: "Unit price",
+                isClickable: !widget.isReadOnly,
                 value: widget.bloc
                     .getFormetted(widget.bloc.lineitemdetail.value.unitPrice),
                 onTap: () {

@@ -69,39 +69,41 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                           color: activeTxtColor,
                           fontSize: 24),
                     ),
-                    widget.isReadOnly?Center():
-                    InkWell(
-                      onTap: () {
-                        onItemTap(lineitem_id: "");
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.only(left: 10, right: 10),
-                        height: 40,
-                        width: 100,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: backGroundColor,
-                            border:
-                                Border.all(color: activeTxtColor, width: 2)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.add,
-                              color: activeTxtColor,
-                              size: 16,
+                    widget.isReadOnly
+                        ? Center()
+                        : InkWell(
+                            onTap: () {
+                              onItemTap(lineitem_id: "");
+                            },
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.only(left: 10, right: 10),
+                              height: 40,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: backGroundColor,
+                                  border: Border.all(
+                                      color: activeTxtColor, width: 2)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.add,
+                                    color: activeTxtColor,
+                                    size: 16,
+                                  ),
+                                  Text(
+                                    "Add",
+                                    style: TextStyle(
+                                        color: activeTxtColor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                ],
+                              ),
                             ),
-                            Text(
-                              "Add",
-                              style: TextStyle(
-                                  color: activeTxtColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                          ),
                   ],
                 ),
                 const SizedBox(
@@ -309,9 +311,13 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                   lineitem_id: lineitem_id,
                   invoice_id: widget.id,
                   currencySign: widget.currencySign,
-                  isPurchase: widget.isPurchase, isReadOnly: widget.isReadOnly,
+                  isPurchase: widget.isPurchase,
+                  isReadOnly: widget.isReadOnly,
                 ))).then((response) async {
-      await bloc.getLineItemList(context, widget.id);
+      if (!widget.isReadOnly) {
+        await bloc.getLineItemList(context, widget.id);
+      }
+
       setState(() {});
     });
   }
