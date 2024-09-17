@@ -5,6 +5,7 @@ import 'package:sjpr/utils/color_utils.dart';
 
 import '../common/AppEnums.dart';
 import '../common/app_theme.dart';
+import '../model/api_response_taxrate.dart';
 import 'AddNewItemDialog.dart';
 import 'CommonBottomSheetDialog.dart';
 
@@ -24,171 +25,188 @@ class _AmountWidgetState extends State<AmountWidget> {
   String error = "";
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    taxId = getTaxRateValue();
-    apiAmount = ApiAmount(
-        billAmount: widget.bloc.invoiceDetailData.value.netAmount ?? '0.00',
-        taxAmount: widget.bloc.invoiceDetailData.value.totalTaxAmount ?? '0.00',
-        grandTotal: widget.bloc.invoiceDetailData.value.totalAmount ?? '0.00');
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return ExpansionTile(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Amount',
-            style: TextStyle(color: activeTxtColor),
-          ),
-          ValueListenableBuilder(
-              valueListenable: widget.bloc.selectedValueCurSign,
-              builder: (context, value, _) {
-                return Text(
-                  "$value ${getApiTotal()}",
-                  style: TextStyle(color: activeTxtColor),
-                );
-              }),
-        ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      //padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: listTileBgColor,
       ),
-      children: [
-        commonRowWidget(context,
-            title: "Total",
-            value: widget.bloc.getFormetted(
-                widget.bloc.invoiceDetailData.value.netAmount ?? "0.00"),
-            isNumber: true, onTap: () {
-          AddNewItemDialog(
-              isAmt: true,
-              context: context,
-              title: "Edit Total Amount",
-              hint: 'Enter Total Amount',
-              label: 'Total Amount ${widget.bloc.getCurrencySign()}',
-              oldValue: widget.bloc.getFormetted(
-                  widget.bloc.invoiceDetailData.value.netAmount ?? "0.00"),
-              type: SheetType.none,
-              onPressed: (String v) {
-                debugPrint('F() called--->, $v');
-                widget.bloc.invoiceDetailData.value.netAmount = v;
-                updateAmount();
-              });
-        }),
-        ValueListenableBuilder(
-            valueListenable: widget.bloc.selectedValueTaxRate,
-            builder: (context, value, _) {
-              return commonRowWidget(
-                context,
-                //  isClickable: widget.bloc.invoiceDetailData.value.supplierTaxId,
-                title: "Tax rate",
-                value: value,
-                onTap: () {
-                  CommonBottomSheetDialog(
-                      context: context,
-                      list: widget.bloc.taxRateList,
-                      title: "Tax rate",
-                      ItemId: widget.bloc.getId(SheetType.taxrate),
-                      bottomSheetType: SheetType.taxrate,
-                      Addf: () {},
-                      onItemSelected: (id, name) {
-                        widget.bloc.SetName(id, name, SheetType.taxrate);
-                        Future.delayed(Duration(milliseconds: 80), () {
-                          updateAmount();
-                        });
-                      }).Show();
-                },
-              );
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          iconColor: activeTxtColor,
+          collapsedIconColor: activeTxtColor,
+          //backgroundColor: listTileBgColor,
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+          // Adjust the horizontal padding
+          childrenPadding: EdgeInsets.zero,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Amount',
+                style: TextStyle(
+                    color: activeTxtColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
+              ),
+              ValueListenableBuilder(
+                  valueListenable: widget.bloc.selectedValueCurSign,
+                  builder: (context, value, _) {
+                    return Text(
+                      "$value ${getApiTotal()}",
+                      style: TextStyle(
+                          color: activeTxtColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    );
+                  }),
+            ],
+          ),
+          children: [
+            commonRowWidget(context,
+                title: "Total",
+                isClickable: !widget.isReadOnly,
+                value: widget.bloc.getFormetted(
+                    widget.bloc.invoiceDetailData.value.netAmount ?? "0.00"),
+                isNumber: true, onTap: () {
+              AddNewItemDialog(
+                  isAmt: true,
+                  context: context,
+                  title: "Edit Total Amount",
+                  hint: 'Enter Total Amount',
+                  label: 'Total Amount ${widget.bloc.getCurrencySign()}',
+                  oldValue: widget.bloc.getFormetted(
+                      widget.bloc.invoiceDetailData.value.netAmount ?? "0.00"),
+                  type: SheetType.none,
+                  onPressed: (String v) {
+                    debugPrint('F() called--->, $v');
+                    widget.bloc.invoiceDetailData.value.netAmount = v;
+                    updateAmount();
+                  });
             }),
-        commonRowWidget(context,
-            title: "Tax",
-            // isClickable: taxId>-1? false:true,
-            isNumber: true,
-            value: widget.bloc.getFormetted(
-                widget.bloc.invoiceDetailData.value.totalTaxAmount ?? "0.00"),
-            onTap: () {
-          AddNewItemDialog(
-              isAmt: true,
-              context: context,
-              title: "Edit Tax Amount",
-              hint: 'Enter Tax Amount',
-              label: 'Tax Amount${widget.bloc.getCurrencySign()}',
-              oldValue: widget.bloc.getFormetted(
-                  widget.bloc.invoiceDetailData.value.totalTaxAmount ?? "0.00"),
-              type: SheetType.none,
-              onPressed: (String v) {
-                debugPrint('F() called--->, $v');
-                widget.bloc.invoiceDetailData.value.totalTaxAmount = v;
-                updateAmount();
-              });
-        }),
-        commonRowWidget(context,
-            title: "Tax + Total",
-            isNumber: true,
-            value: widget.bloc.getFormetted(
-                widget.bloc.invoiceDetailData.value.totalAmount ?? "0.00"),
-            onTap: () {
-          AddNewItemDialog(
-              isAmt: true,
-              context: context,
-              title: "Edit Tax Total",
-              hint: 'Enter Tax Total',
-              label: 'Tax Total${widget.bloc.getCurrencySign()}',
-              oldValue: widget.bloc.getFormetted(
-                  widget.bloc.invoiceDetailData.value.totalAmount ?? "0.00"),
-              type: SheetType.none,
-              onPressed: (String v) {
-                debugPrint('F() called--->, $v');
-                widget.bloc.invoiceDetailData.value.totalAmount = v;
-                setState(() {});
-              });
-        }),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Text(
-            error,
-            style: TextStyle(
-                color: redColor, fontWeight: FontWeight.w200, fontSize: 12),
-          ),
-        ),
-        InkWell(
-          onTap: () async {
-            //set flag cancel ...
-            //and update the invoice..
-            reset();
-          },
-          child: Container(
-            padding: const EdgeInsets.only(left: 8, right: 8),
-            margin: EdgeInsets.only(bottom: 16),
-            height: 40,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: backGroundColor,
-                border: Border.all(color: activeTxtColor, width: 1)),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
+            ValueListenableBuilder(
+                valueListenable: widget.bloc.selectedValueTaxRate,
+                builder: (context, value, _) {
+                  return commonRowWidget(
+                    context,
+                    isClickable: !widget.isReadOnly,
+                    title: "Tax rate",
+                    value: value,
+                    onTap: () {
+                      CommonBottomSheetDialog(
+                          context: context,
+                          list: widget.bloc.taxRateList,
+                          title: "Tax rate",
+                          ItemId: widget.bloc.getId(SheetType.taxrate),
+                          bottomSheetType: SheetType.taxrate,
+                          Addf: () {},
+                          onItemSelected: (id, name) {
+                            widget.bloc.SetName(id, name, SheetType.taxrate);
+                            Future.delayed(const Duration(milliseconds: 80),
+                                () {
+                              updateAmount();
+                            });
+                          }).Show();
+                    },
+                  );
+                }),
+            commonRowWidget(context,
+                title: "Tax",
+                isClickable: getClickStatus(),
+                isNumber: true,
+                value: widget.bloc.getFormetted(
+                    widget.bloc.invoiceDetailData.value.totalTaxAmount ??
+                        "0.00"), onTap: () {
+              AddNewItemDialog(
+                  isAmt: true,
+                  context: context,
+                  title: "Edit Tax Amount",
+                  hint: 'Enter Tax Amount',
+                  label: 'Tax Amount${widget.bloc.getCurrencySign()}',
+                  oldValue: widget.bloc.getFormetted(
+                      widget.bloc.invoiceDetailData.value.totalTaxAmount ??
+                          "0.00"),
+                  type: SheetType.none,
+                  onPressed: (String v) {
+                    debugPrint('F() called--->, $v');
+                    widget.bloc.invoiceDetailData.value.totalTaxAmount = v;
+                    updateAmount();
+                  });
+            }),
+            commonRowWidget(context,
+                title: "Total + Tax",
+                isClickable: getClickStatus(),
+                isNumber: true,
+                value: widget.bloc.getFormetted(
+                    widget.bloc.invoiceDetailData.value.totalAmount ?? "0.00"),
+                onTap: () {
+              AddNewItemDialog(
+                  isAmt: true,
+                  context: context,
+                  title: "Edit Tax Total",
+                  hint: 'Enter Tax Total',
+                  label: 'Tax Total${widget.bloc.getCurrencySign()}',
+                  oldValue: widget.bloc.getFormetted(
+                      widget.bloc.invoiceDetailData.value.totalAmount ??
+                          "0.00"),
+                  type: SheetType.none,
+                  onPressed: (String v) {
+                    debugPrint('F() called--->, $v');
+                    widget.bloc.invoiceDetailData.value.totalAmount = v;
+                    setState(() {});
+                  });
+            }),
+            widget.isReadOnly && error == ""
+                ? const Center()
+                : Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      error,
+                      style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.w200,
+                          fontSize: 12),
+                    ),
+                  ),
+            widget.isReadOnly?Center():
+            SizedBox(
+              width: MediaQuery.of(context).size.width - 80,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  reset();
+                },
+                icon: Icon(
                   Icons.reset_tv_outlined,
+                  size: 14,
                   color: activeTxtColor,
-                  size: 16,
                 ),
-                const SizedBox(
-                  width: 6,
-                ),
-                Text(
-                  "Reset",
+                // The icon inside the button
+                label: Text(
+                  'Reset',
                   style: TextStyle(
-                      color: activeTxtColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
+                    color: activeTxtColor,
+                  ),
                 ),
-              ],
+                // The text inside the button
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.blue,
+                  side: BorderSide(color: activeTxtColor, width: 1),
+                  // Border color and width
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8), // Rounded corners
+                  ), // Icon and text color
+                ),
+              ),
             ),
-          ),
+            const SizedBox(
+              height: 8,
+            )
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -201,10 +219,11 @@ class _AmountWidgetState extends State<AmountWidget> {
     final appTheme = AppTheme.of(context);
     return InkWell(
       onTap: () {
+        if (!isClickable) return;
         onTap();
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
@@ -258,7 +277,42 @@ class _AmountWidgetState extends State<AmountWidget> {
     );
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    taxId = getTaxRateValue();
+    apiAmount = ApiAmount(
+        billAmount: widget.bloc.invoiceDetailData.value.netAmount ?? '0.00',
+        taxAmount: widget.bloc.invoiceDetailData.value.totalTaxAmount ?? '0.00',
+        taxId: widget.bloc.invoiceDetailData.value.supplierTaxId ?? "",
+        grandTotal: widget.bloc.invoiceDetailData.value.totalAmount ?? '0.00');
+    debugPrint('-------------------------------------------');
+    debugPrint(apiAmount.toString());
+    debugPrint('-------------------------------------------');
+  }
+
+  void reset() {
+    error = "";
+    widget.bloc.invoiceDetailData.value.netAmount = apiAmount.billAmount;
+    widget.bloc.invoiceDetailData.value.totalTaxAmount = apiAmount.taxAmount;
+    widget.bloc.invoiceDetailData.value.totalAmount = apiAmount.grandTotal;
+    if (apiAmount.taxId.isEmpty) {
+      apiAmount.taxId = widget.bloc.invoiceDetailData.value.supplierTaxId =
+          widget.bloc.taxRateList.first.id;
+      widget.bloc.selectedValueTaxRate.value =
+          widget.bloc.taxRateList.first.taxRate;
+    } else {
+      widget.bloc.invoiceDetailData.value.supplierTaxId = apiAmount.taxId;
+      widget.bloc.selectedValueTaxRate.value =
+          getTaxnameFromId(apiAmount.taxId);
+    }
+
+    setState(() {});
+  }
+
   void updateAmount() {
+    error = "";
     int id = getTaxRateValue();
     taxId = id;
     if (id > -1) {
@@ -292,11 +346,11 @@ class _AmountWidgetState extends State<AmountWidget> {
   }
 
   getApiTotal() {
-    double? tot = double.parse(apiAmount!.grandTotal);
+    double? tot = double.parse(apiAmount.grandTotal);
     if (tot == 0.0) {
       return widget.bloc.invoiceDetailData.value.totalAmount ?? '0.00';
     } else {
-      return apiAmount?.grandTotal;
+      return apiAmount.grandTotal;
     }
   }
 
@@ -306,30 +360,54 @@ class _AmountWidgetState extends State<AmountWidget> {
     double? tot = double.parse(
         double.parse(widget.bloc.invoiceDetailData.value.totalAmount ?? '0.00')
             .toStringAsFixed(2));
-    debugPrint('local:'+ localTotal.toString());
-    debugPrint('api:'+ tot.toString());
+    debugPrint('local:' + localTotal.toString());
+    debugPrint('api:' + tot.toString());
     if (localTotal != tot) {
       error = "The invoice total amount does not match!";
-    }else{
+    } else {
       error = "";
     }
   }
 
-  void reset() {}
+  getClickStatus() {
+    if (widget.isReadOnly) {
+      return false;
+    }
+    try {
+      if (widget.bloc.invoiceDetailData.value.supplierTaxId !=
+          widget.bloc.taxRateList.first.id) {
+        return false;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return true;
+  }
+
+  String getTaxnameFromId(String taxId) {
+    for (DataItem obj in widget.bloc.taxRateList) {
+      if (obj.id == taxId) {
+        return obj.taxRate;
+      }
+    }
+    return '';
+  }
 }
 
 class ApiAmount {
   String billAmount;
   String taxAmount;
   String grandTotal;
+  String taxId;
 
   ApiAmount(
       {required this.billAmount,
       required this.taxAmount,
-      required this.grandTotal});
+      required this.grandTotal,
+      required this.taxId});
 
   @override
   String toString() {
-    return 'ApiAmount{billAmount: $billAmount, taxAmount: $taxAmount, grandTotal: $grandTotal}';
+    return 'ApiAmount{billAmount: $billAmount, taxAmount: $taxAmount, grandTotal: $grandTotal,taxId: $taxId}';
   }
 }

@@ -45,12 +45,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
   _init() async {
     await bloc.getInvoiceDetail(context, widget.id);
-
+    bloc.getAllTaxRate(context);
     bloc.getProfile(context);
     bloc.getDetailCategory(context);
     bloc.getDetailType(context, widget.id);
     bloc.getCurrency(context);
-    bloc.getAllTaxRate(context);
+
     bloc.getPaymentMethods(context);
     bloc.getPublishTo(context);
     //  await bloc.getDetailOwnBy(context, widget.id);
@@ -108,49 +108,53 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  InkWell(
-                                    onTap: () async {
-                                      //set flag cancel ...
-                                      //and update the invoice..
-                                      bool res = await bloc.CancelInvoice();
-                                      if (res) {
-                                        Navigator.pop(context, res);
-                                      }
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.only(
-                                          left: 8, right: 8),
-                                      height: 40,
-                                      width: 100,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          color: backGroundColor,
-                                          border: Border.all(
-                                              color: redColor, width: 2)),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.clear,
-                                            color: redColor,
-                                            size: 16,
+                                  widget.isReadOnly
+                                      ? Center()
+                                      : InkWell(
+                                          onTap: () async {
+                                            //set flag cancel ...
+                                            //and update the invoice..
+                                            bool res =
+                                                await bloc.CancelInvoice();
+                                            if (res) {
+                                              Navigator.pop(context, res);
+                                            }
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.only(
+                                                left: 8, right: 8),
+                                            height: 40,
+                                            width: 100,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                color: backGroundColor,
+                                                border: Border.all(
+                                                    color: redColor, width: 2)),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.clear,
+                                                  color: redColor,
+                                                  size: 16,
+                                                ),
+                                                const SizedBox(
+                                                  width: 6,
+                                                ),
+                                                Text(
+                                                  "Cancel",
+                                                  style: TextStyle(
+                                                      color: redColor,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 16),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                          const SizedBox(
-                                            width: 6,
-                                          ),
-                                          Text(
-                                            "Cancel",
-                                            style: TextStyle(
-                                                color: redColor,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                        ),
                                 ],
                               ),
                               spacer(),
@@ -240,6 +244,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 builder: (context, value, child) {
                                   return commonRowWidget(context,
                                       title: "Type",
+                                      isClickable: !widget.isReadOnly,
                                       value: bloc.selectedValueT.value,
                                       onTap: () {
                                     CommonBottomSheetDialog(
@@ -274,6 +279,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               ),
                               commonRowWidget(context,
                                   title: "Date",
+                                  isClickable: !widget.isReadOnly,
                                   value: bloc.invoiceDetailData.value
                                       .invoiceDate, onTap: () {
                                 _selectDate(context, 4);
@@ -291,6 +297,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               ),
                               TextField(
                                 minLines: 4,
+                                enabled: !widget.isReadOnly,
                                 keyboardType: TextInputType.multiline,
                                 maxLines: null,
                                 style: const TextStyle(color: Colors.white),
@@ -311,12 +318,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               spacer(),
                               commonRowWidget(context,
                                   title: "Due Date",
+                                  isClickable: !widget.isReadOnly,
                                   value: bloc.invoiceDetailData.value.dueDate,
                                   onTap: () {
                                 _selectDate(context, 5);
                               }),
                               commonRowWidget(context,
                                   title: "Invoice Number",
+                                  isClickable: !widget.isReadOnly,
                                   value: bloc.invoiceDetailData.value.invoiceId,
                                   onTap: () {
                                 AddNewItemDialog(
@@ -341,6 +350,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 builder: (context, value, child) {
                                   return commonRowWidget(context,
                                       title: "Payment method",
+                                      isClickable: !widget.isReadOnly,
                                       value: value, onTap: () {
                                     CommonBottomSheetDialog(
                                         context: context,
@@ -365,6 +375,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 builder: (context, value, child) {
                                   return commonRowWidget(context,
                                       title: "Publish to",
+                                      isClickable: !widget.isReadOnly,
                                       value: value, onTap: () {
                                     CommonBottomSheetDialog(
                                         context: context,
@@ -382,39 +393,44 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                   });
                                 },
                               ),
-                              Container(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: appTheme.listTileBgColor,
-                                ),
-                                child: ValueListenableBuilder(
-                                  valueListenable: bloc.switchVal,
-                                  builder: (context, value, child) {
-                                    return Row(
-                                      children: [
-                                        Expanded(
-                                            child: Text(
-                                          value ? "Paid" : "Unpaid",
-                                          style: TextStyle(
-                                              color: appTheme.textColor,
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.bold),
-                                        )),
-                                        CupertinoSwitch(
-                                          value: value,
-                                          onChanged: (bb) {
-                                            bloc.switchVal.value = bb;
-                                            bloc.invoiceDetailData.value
-                                                    .payment_status =
-                                                bb ? '1' : '0';
-                                          },
-                                          activeColor: appTheme.activeTxtColor,
-                                        )
-                                      ],
-                                    );
-                                  },
+                              AbsorbPointer(
+                                absorbing: widget.isReadOnly,
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  padding: const EdgeInsets.only(
+                                      left: 16, right: 16, top: 8, bottom: 8),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: appTheme.listTileBgColor,
+                                  ),
+                                  child: ValueListenableBuilder(
+                                    valueListenable: bloc.switchVal,
+                                    builder: (context, value, child) {
+                                      return Row(
+                                        children: [
+                                          Expanded(
+                                              child: Text(
+                                            value ? "Paid" : "Unpaid",
+                                            style: TextStyle(
+                                                color: appTheme.textColor,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.bold),
+                                          )),
+                                          CupertinoSwitch(
+                                            value: value,
+                                            onChanged: (bb) {
+                                              bloc.switchVal.value = bb;
+                                              bloc.invoiceDetailData.value
+                                                      .payment_status =
+                                                  bb ? '1' : '0';
+                                            },
+                                            activeColor:
+                                                appTheme.activeTxtColor,
+                                          )
+                                        ],
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                               ValueListenableBuilder(
@@ -422,6 +438,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 builder: (context, value, child) {
                                   return commonRowWidget(context,
                                       title: "Currency",
+                                      isClickable: !widget.isReadOnly,
                                       value: bloc.selectedValueCur.value,
                                       onTap: () {
                                     CommonBottomSheetDialog(
@@ -442,27 +459,31 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               ),
                               AmountWidget(
                                   bloc: bloc, isReadOnly: widget.isReadOnly),
-                              CommonButton(
-                                  content: "Submit",
-                                  bgColor: appTheme.buttonBgColor,
-                                  textColor: appTheme.buttonTextColor,
-                                  outlinedBorderColor: appTheme.buttonBgColor,
-                                  onPressed: () async {
-                                    if (bloc.isValid(context)) {
-                                      //collect all data...
-                                      bloc.invoiceDetailData.value
-                                              .document_reference =
-                                          _eDescController.text;
-                                      bool res =
-                                          await bloc.updateScannedInvoice(
-                                              bloc.invoiceDetailData.value
-                                                  .toJson(),
-                                              context);
-                                      if (res) {
-                                        Navigator.pop(context, res);
-                                      }
-                                    }
-                                  })
+                              spacer(),
+                              widget.isReadOnly
+                                  ? Center()
+                                  : CommonButton(
+                                      content: "Submit",
+                                      bgColor: appTheme.buttonBgColor,
+                                      textColor: appTheme.buttonTextColor,
+                                      outlinedBorderColor:
+                                          appTheme.buttonBgColor,
+                                      onPressed: () async {
+                                        if (bloc.isValid(context)) {
+                                          //collect all data...
+                                          bloc.invoiceDetailData.value
+                                                  .document_reference =
+                                              _eDescController.text;
+                                          bool res =
+                                              await bloc.updateScannedInvoice(
+                                                  bloc.invoiceDetailData.value
+                                                      .toJson(),
+                                                  context);
+                                          if (res) {
+                                            Navigator.pop(context, res);
+                                          }
+                                        }
+                                      })
                             ],
                           ),
                         );
@@ -487,200 +508,201 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   }
 
   getLines() {
-    return /*bloc.invoiceDetailData.value.line_item_count == 0
+    return widget.isReadOnly &&
+            bloc.invoiceDetailData.value.line_item_count == 0
         ? Center()
-        :*/
-        Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            "Line Items",
-            style: TextStyle(
-                color: appTheme.activeTxtColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold),
-          ),
-        ),
-        InkWell(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => LineItemsListScreen(
-                          currencySign: bloc.selectedValueCurSign.value,
-                          id: bloc.invoiceDetailData.value.id ?? "",
-                          isPurchase: widget.isPurchase,
-                        ))).then((_) async {
-              //bloc.getInvoiceDetail(context, widget.id);
-              await bloc.getLineItemList(
-                  context, bloc.invoiceDetailData.value.id!);
-              setState(() {});
-            });
-          },
-          child: Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: appTheme.listTileBgColor,
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Line Items",
+                  style: TextStyle(
+                      color: appTheme.activeTxtColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => LineItemsListScreen(
+                                currencySign: bloc.selectedValueCurSign.value,
+                                id: bloc.invoiceDetailData.value.id ?? "",
+                                isPurchase: widget.isPurchase,
+                              ))).then((_) async {
+                    //bloc.getInvoiceDetail(context, widget.id);
+                    await bloc.getLineItemList(
+                        context, bloc.invoiceDetailData.value.id!);
+                    setState(() {});
+                  });
+                },
+                child: Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: appTheme.listTileBgColor,
+                    ),
+                    child: Row(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text("Consult line items",
-                                  style: TextStyle(
-                                      color: appTheme.textColor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                            Text(
-                                '${bloc.invoiceDetailData.value.line_item_count}',
-                                style: const TextStyle(
-                                  color: Colors.green,
-                                  fontSize: 16,
-                                ))
-                          ],
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text("Consult line items",
+                                        style: TextStyle(
+                                            color: appTheme.textColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  Text(
+                                      '${bloc.invoiceDetailData.value.line_item_count}',
+                                      style: const TextStyle(
+                                        color: Colors.green,
+                                        fontSize: 16,
+                                      ))
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text("Total",
+                                        style: TextStyle(
+                                          color: appTheme.textColor,
+                                          fontSize: 16,
+                                        )),
+                                  ),
+                                  getTotalWidget()
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(
-                          height: 5,
+                          width: 10,
                         ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text("Total",
-                                  style: TextStyle(
-                                    color: appTheme.textColor,
-                                    fontSize: 16,
-                                  )),
-                            ),
-                            getTotalWidget()
-                          ],
-                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: appTheme.textColor,
+                        )
                       ],
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: appTheme.textColor,
-                  )
-                ],
-              )),
-        ),
-      ],
-    );
+                    )),
+              ),
+            ],
+          );
   }
 
   getSplits() {
-    return /*bloc.invoiceDetailData.value.split_item_count == 0
+    return widget.isReadOnly &&
+            bloc.invoiceDetailData.value.split_item_count == 0
         ? Center()
-        : */
-        Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            "Split Items",
-            style: TextStyle(
-                color: appTheme.activeTxtColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold),
-          ),
-        ),
-        InkWell(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => SplitItemsListScreen(
-                          currencySign: bloc.selectedValueCurSign.value,
-                          totalAmount: bloc.invoiceDetailData.value.netAmount,
-//bloc.invoiceDetailData.value.totalAmount
-                          totalTaxAmount:
-                              bloc.invoiceDetailData.value.totalTaxAmount,
-//bloc.invoiceDetailData.value.totalTaxAmount,
-                          id: bloc.invoiceDetailData.value.id ?? "",
-                          isReadOnly: false,
-                        ))).then((onValue) async {
-              if (onValue == true) {
-                // bloc.getInvoiceDetail(context, widget.id);
-                await bloc.getSplitItemList(
-                    context, bloc.invoiceDetailData.value.id!);
-                setState(() {});
-              }
-            });
-          },
-          child: Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: appTheme.listTileBgColor,
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Split Items",
+                  style: TextStyle(
+                      color: appTheme.activeTxtColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SplitItemsListScreen(
+                                currencySign: bloc.selectedValueCurSign.value,
+                                totalAmount:
+                                    bloc.invoiceDetailData.value.netAmount,
+//bloc.invoiceDetailData.value.totalAmount
+                                totalTaxAmount:
+                                    bloc.invoiceDetailData.value.totalTaxAmount,
+//bloc.invoiceDetailData.value.totalTaxAmount,
+                                id: bloc.invoiceDetailData.value.id ?? "",
+                                isReadOnly: false,
+                              ))).then((onValue) async {
+                    if (onValue == true) {
+                      // bloc.getInvoiceDetail(context, widget.id);
+                      await bloc.getSplitItemList(
+                          context, bloc.invoiceDetailData.value.id!);
+                      setState(() {});
+                    }
+                  });
+                },
+                child: Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: appTheme.listTileBgColor,
+                    ),
+                    child: Row(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text("Consult Split items",
-                                  style: TextStyle(
-                                      color: appTheme.textColor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                            Text(
-                                '${bloc.invoiceDetailData.value.split_item_count}',
-                                style: const TextStyle(
-                                  color: Colors.green,
-                                  fontSize: 16,
-                                ))
-                          ],
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text("Consult Split items",
+                                        style: TextStyle(
+                                            color: appTheme.textColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  Text(
+                                      '${bloc.invoiceDetailData.value.split_item_count}',
+                                      style: const TextStyle(
+                                        color: Colors.green,
+                                        fontSize: 16,
+                                      ))
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text("Total",
+                                        style: TextStyle(
+                                          color: appTheme.textColor,
+                                          fontSize: 16,
+                                        )),
+                                  ),
+                                  getTotalWidget()
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(
-                          height: 5,
+                          width: 10,
                         ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text("Total",
-                                  style: TextStyle(
-                                    color: appTheme.textColor,
-                                    fontSize: 16,
-                                  )),
-                            ),
-                            getTotalWidget()
-                          ],
-                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: appTheme.textColor,
+                        )
                       ],
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: appTheme.textColor,
-                  )
-                ],
-              )),
-        ),
-      ],
-    );
+                    )),
+              ),
+            ],
+          );
   }
 
   Widget commonRowWidget(BuildContext context,
@@ -692,6 +714,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     final appTheme = AppTheme.of(context);
     return InkWell(
       onTap: () {
+        if (!isClickable) return;
         onTap();
       },
       child: Container(
@@ -800,6 +823,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                 builder: (context, value, child) {
                   return commonRowWidget(context,
                       title: "Category",
+                      isClickable: !widget.isReadOnly,
                       value: bloc.selectedValueC.value, onTap: () {
                     CommonBottomSheetDialog(
                         context: context,
@@ -828,6 +852,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                 valueListenable: bloc.selectedValueP,
                 builder: (context, value, child) {
                   return commonRowWidget(context,
+                      isClickable: !widget.isReadOnly,
                       title: "Product/Service",
                       value: bloc.selectedValueP.value, onTap: () {
                     CommonBottomSheetDialog(
