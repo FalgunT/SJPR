@@ -7,6 +7,7 @@ import 'package:sjpr/screen/lineitems/line_items_list.dart';
 import 'package:sjpr/widgets/amount_widget.dart';
 import 'package:sjpr/widgets/common_button.dart';
 import 'package:sjpr/widgets/empty_item_widget.dart';
+import 'package:sjpr/widgets/read_status_text.dart';
 import '../../common/AppEnums.dart';
 import '../../utils/color_utils.dart';
 import '../../utils/string_utils.dart';
@@ -86,6 +87,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               return ValueListenableBuilder(
                 valueListenable: bloc.invoiceDetailData,
                 builder: (BuildContext context, value, Widget? child) {
+                  String? date;
+                  if (bloc.invoiceDetailData.value.date != null) {
+                    date = DateFormat("dd MMM. yyyy").format(DateTime.parse(
+                        bloc.invoiceDetailData.value.date ?? ""));
+                  }
                   print(value.isObjectEmpty);
                   return value.isObjectEmpty
                       ? value1 == false
@@ -181,20 +187,16 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    bloc.invoiceDetailData.value.date ?? "",
+                                    date ?? "",
                                     //"22th feb,2024",
                                     style: TextStyle(
                                       color: appTheme.textColor,
                                       fontSize: 18,
                                     ),
                                   ),
-                                  const Text(
-                                    "" /*+ bloc.invoiceDetailData.value.read_*/,
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontSize: 18,
-                                    ),
-                                  ),
+                                  ReadStatusText(
+                                      readStatus: bloc
+                                          .invoiceDetailData.value.readStatus),
                                 ],
                               ),
                               Container(

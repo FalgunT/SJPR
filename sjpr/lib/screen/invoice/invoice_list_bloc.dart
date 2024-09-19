@@ -192,29 +192,10 @@ class InvoiceBloc extends BlocBase {
     return false;
   }
 
-  String getInvoiceStatus(String id) {
-    switch (id) {
-      case '0':
-        return 'updating';
-      case '1':
-        return 'To review';
-      case '2':
-        return 'Pending';
-      case '3':
-        return 'Processing';
-      case '4':
-        return 'Canceled';
-      case '5':
-        return 'Published';
-    }
-    return 'Unknown';
-  }
-
-
   Future getProfile(BuildContext context) async {
     if (await AppComponentBase.getInstance()
-        ?.getNetworkManager()
-        .isConnected() ??
+            ?.getNetworkManager()
+            .isConnected() ??
         false) {
       var getProfile = await AppComponentBase.getInstance()
           ?.getApiInterface()
@@ -231,9 +212,8 @@ class InvoiceBloc extends BlocBase {
     }
   }
 
-
   getFormetted(String input) {
-    if (input == null || input.isEmpty) {
+    if (input.isEmpty) {
       input = "0";
     }
     String res = "0.00";

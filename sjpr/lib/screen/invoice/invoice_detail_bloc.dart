@@ -146,19 +146,19 @@ class InvoiceDetailBloc extends BlocBase {
       taxRateList = getResponse.data;
       taxRateList.forEach(
         (element) {
-          if (element.id == invoiceDetailData.value.tax_rate_id) {
+          if (element.id == invoiceDetailData.value.taxRateId) {
             selectedValueTaxRate.value = element.taxRate;
           }
         },
       );
       if (isAdd) {
         selectedValueTaxRate.value = taxRateList.last.taxRate;
-        invoiceDetailData.value.tax_rate_id = taxRateList.last.id;
+        invoiceDetailData.value.taxRateId = taxRateList.last.id;
       } else {
-        String id = invoiceDetailData.value.tax_rate_id ?? '';
+        String id = invoiceDetailData.value.taxRateId ?? '';
         if (id.isEmpty) {
           selectedValueTaxRate.value = taxRateList.first.taxRate;
-          invoiceDetailData.value.tax_rate_id = taxRateList.first.id;
+          invoiceDetailData.value.taxRateId = taxRateList.first.id;
         }
       }
     }
@@ -464,7 +464,7 @@ class InvoiceDetailBloc extends BlocBase {
     } else if (bottomSheetType == SheetType.publishto) {
       id = invoiceDetailData.value.publish_to_id ?? '';
     } else if (bottomSheetType == SheetType.taxrate) {
-      id = invoiceDetailData.value.tax_rate_id ?? '';
+      id = invoiceDetailData.value.taxRateId ?? '';
     }
     if (id.isEmpty) {
       id = '0';
@@ -493,7 +493,7 @@ class InvoiceDetailBloc extends BlocBase {
       invoiceDetailData.value.scanned_category_id = '$id';
       selectedValueC.value = name;
     } else if (bottomSheetType == SheetType.taxrate) {
-      invoiceDetailData.value.tax_rate_id = '$id';
+      invoiceDetailData.value.taxRateId = '$id';
       selectedValueTaxRate.value = name;
     }
   }

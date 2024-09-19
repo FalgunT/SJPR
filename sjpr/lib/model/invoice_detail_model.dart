@@ -32,6 +32,9 @@ class InvoiceDetailData {
   String? userId;
   String? scanInvoice;
   String? id;
+  String? isPurchase;
+  String? isArchive;
+  String? readStatus;
   String? invoiceFileId;
   String? invoiceId;
   String? totalAmount;
@@ -39,8 +42,8 @@ class InvoiceDetailData {
   String? invoiceDate;
   String? totalTaxAmount;
   String? dueDate;
-  String? tax_rate_id;
-
+  String? taxRateId;
+  String? currency;
   String? supplierAddress;
   String? supplierName;
   String? supplierEmail;
@@ -49,11 +52,12 @@ class InvoiceDetailData {
   String? receiverEmail;
   String? receiverPhone;
   String? receiverAddress;
+  String? scannedOwnedById;
+  String? cis;
   int? line_item_count;
   String? scanned_category_id;
   String? scanned_product_service_id;
   String? scanned_type_id;
-
   String? document_reference;
   String? publish_to_id;
   String? payment_method_id;
@@ -69,6 +73,9 @@ class InvoiceDetailData {
       {this.userId,
       this.scanInvoice,
       this.id,
+      this.isPurchase,
+      this.isArchive,
+      this.readStatus,
       this.invoiceFileId,
       this.invoiceId,
       this.totalAmount,
@@ -76,7 +83,7 @@ class InvoiceDetailData {
       this.invoiceDate,
       this.totalTaxAmount,
       this.dueDate,
-      this.tax_rate_id,
+      this.taxRateId,
       this.supplierAddress,
       this.supplierName,
       this.supplierEmail,
@@ -85,6 +92,8 @@ class InvoiceDetailData {
       this.receiverEmail,
       this.receiverPhone,
       this.receiverAddress,
+      this.scannedOwnedById,
+      this.cis,
       this.line_item_count,
       this.date,
       this.scanned_category_id,
@@ -101,6 +110,9 @@ class InvoiceDetailData {
     userId = json['user_id'];
     scanInvoice = json['scan_invoice'];
     id = json['id'];
+    isPurchase = json['is_purchase'];
+    isArchive = json['is_archive'];
+    readStatus = json['read_status'];
     invoiceFileId = json['invoice_file_id'];
     invoiceId = json['invoice_id'];
     totalAmount = json['total_amount'];
@@ -108,7 +120,7 @@ class InvoiceDetailData {
     invoiceDate = json['invoice_date'];
     totalTaxAmount = json['total_tax_amount'];
     dueDate = json['due_date'];
-    tax_rate_id = json['tax_rate_id'];
+    taxRateId = json['tax_rate_id'];
     supplierAddress = json['supplier_address'];
     supplierName = json['supplier_name'];
     supplierEmail = json['supplier_email'];
@@ -117,6 +129,8 @@ class InvoiceDetailData {
     receiverEmail = json['receiver_email'];
     receiverPhone = json['receiver_phone'];
     receiverAddress = json['receiver_address'];
+    scannedOwnedById = json['scannedOwnedById'];
+    cis = json['cis'];
     line_item_count = json['line_item_count'];
     date = json['date'];
     scanned_category_id = json['scanned_category_id'];
@@ -141,6 +155,9 @@ class InvoiceDetailData {
         'user_id': userId ?? "",
         'scan_invoice': scanInvoice ?? "",
         'id': id ?? "",
+        'is_purchase': isPurchase ?? "",
+        'is_archive': isArchive ?? "",
+        'read_status': readStatus ?? "",
         'invoice_file_id': invoiceFileId ?? "",
         'invoice_id': invoiceId ?? "",
         'total_amount': totalAmount ?? "",
@@ -148,7 +165,7 @@ class InvoiceDetailData {
         'invoice_date': invoiceDate ?? "",
         'total_tax_amount': totalTaxAmount ?? "",
         'due_date': dueDate ?? "",
-        'tax_rate_id': tax_rate_id ?? "",
+        'tax_rate_id': taxRateId ?? "",
         'supplier_address': supplierAddress ?? "",
         'supplier_name': supplierName ?? "",
         'supplier_email': supplierEmail ?? "",
@@ -157,6 +174,8 @@ class InvoiceDetailData {
         'receiver_email': receiverEmail ?? "",
         'receiver_phone': receiverPhone ?? "",
         'receiver_address': receiverAddress ?? "",
+        'scanned_owned_by_id': scannedOwnedById ?? "",
+        'cis': cis ?? "",
         'line_item_count': line_item_count ?? 0,
         'date': date ?? "",
         'scanned_category_id': scanned_category_id ?? "",

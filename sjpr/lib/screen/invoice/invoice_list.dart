@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:sjpr/common/app_theme.dart';
 import 'package:sjpr/model/invoice_list_model.dart';
 import 'package:sjpr/screen/invoice/invoice_detail.dart';
@@ -9,6 +10,7 @@ import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
 import 'package:sjpr/widgets/delete_confirmation_dialog.dart';
 import 'package:sjpr/widgets/empty_item_widget.dart';
+import 'package:sjpr/widgets/read_status_text.dart';
 import 'custom_camera2.dart';
 
 class InvoiceListScreen extends StatefulWidget {
@@ -301,6 +303,11 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
   }
 
   getChild(InvoiceListData listData) {
+    String? date;
+    if (listData.date != null) {
+      date = DateFormat("dd MMM. yyyy")
+          .format(DateTime.parse(listData.date ?? ""));
+    }
     return InkWell(
       onTap: () async {
         if (_tabController.index == 1) {
@@ -344,7 +351,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     Text(
-                      listData.date ?? '',
+                      date ?? "",
                       style: const TextStyle(color: Colors.white),
                     )
                   ],
@@ -361,13 +368,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
-                  Text(
-                    bloc.getInvoiceStatus(listData.readStatus!),
-                    style: TextStyle(
-                        color: listData.readStatus == "4"
-                            ? Colors.red
-                            : Colors.green),
-                  ),
+                  ReadStatusText(readStatus: listData.readStatus),
                 ],
               ),
               const SizedBox(
