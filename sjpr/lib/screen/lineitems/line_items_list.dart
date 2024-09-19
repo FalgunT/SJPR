@@ -110,13 +110,22 @@ class _LineItemsListScreenState extends State<LineItemsListScreen> {
                   height: 20,
                 ),
                 Expanded(
-                  child: ValueListenableBuilder(
-                    valueListenable: bloc.lineItemListData,
-                    builder: (context, value, child) {
-                      return getView(value);
-                    },
-                  ),
-                ),
+                    child: ValueListenableBuilder(
+                        valueListenable: bloc.isWaitingForDetail,
+                        builder: (context, value1, child) {
+                          return ValueListenableBuilder(
+                            valueListenable: bloc.lineItemListData,
+                            builder: (context, value, child) {
+                              return (value.isEmpty)
+                                  ? value1 == false
+                                      ? EmptyItemWidget(
+                                          title: StringUtils.noLineItems,
+                                          detail: "")
+                                      : Container()
+                                  : getView(value);
+                            },
+                          );
+                        })),
                 const SizedBox(
                   height: 20,
                 ),

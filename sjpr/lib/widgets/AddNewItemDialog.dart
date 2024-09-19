@@ -62,7 +62,7 @@ class AddNewItemDialog {
                               : TextInputType.text,
                           inputFormatters: getTextFormatter(isAmt,
                               isDouble:
-                                  label.contains("Quantity") ? false : true),
+                                  /*label.contains("Quantity") ? false :*/ true),
                           decoration: InputDecoration(
                             filled: false,
                             focusedBorder: OutlineInputBorder(

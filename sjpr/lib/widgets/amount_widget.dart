@@ -294,6 +294,7 @@ class _AmountWidgetState extends State<AmountWidget> {
     debugPrint('-------------------------------------------');
     debugPrint(apiAmount.toString());
     debugPrint('-------------------------------------------');
+
   }
 
   void reset() {
@@ -352,11 +353,14 @@ class _AmountWidgetState extends State<AmountWidget> {
   getApiTotal() {
     double? tot = double.parse(apiAmount.grandTotal);
     if (tot == 0.0) {
-      return widget.bloc.invoiceDetailData.value.totalAmount ?? '0.00';
+      return widget.bloc.getFormetted(
+          widget.bloc.invoiceDetailData.value.totalAmount ?? '0.00');
     } else {
       return apiAmount.grandTotal;
     }
   }
+
+
 
   void checkforApiAmount() {
     double? localTotal =
@@ -367,8 +371,8 @@ class _AmountWidgetState extends State<AmountWidget> {
     debugPrint('local:' + localTotal.toString());
     debugPrint('api:' + tot.toString());
     //check if initial value is 0 for the invoice
-    if(localTotal==0){
-      error ="";
+    if (localTotal == 0) {
+      error = "";
       return;
     }
     if (localTotal != tot) {
@@ -401,6 +405,8 @@ class _AmountWidgetState extends State<AmountWidget> {
     }
     return '';
   }
+
+
 }
 
 class ApiAmount {

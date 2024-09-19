@@ -8,8 +8,10 @@ import '../../di/app_component_base.dart';
 class LineItemListBloc extends BlocBase {
   ValueNotifier<List<LineItemListData>> lineItemListData =
       ValueNotifier<List<LineItemListData>>([]);
+  ValueNotifier<bool> isWaitingForDetail = ValueNotifier<bool>(true);
 
   Future getLineItemList(BuildContext context, String invoiceId) async {
+    isWaitingForDetail.value = true;
     var getLineItemListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
         .getApiRepository()
@@ -23,6 +25,7 @@ class LineItemListBloc extends BlocBase {
             ?.displayToast(message: getLineItemListResponse.message!);
       }
     }
+    isWaitingForDetail.value= false;
   }
 
   @override

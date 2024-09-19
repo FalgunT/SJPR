@@ -69,6 +69,7 @@ class _LineAmountWidgetState extends State<LineAmountWidget> {
           children: [
             commonRowWidget(context,
                 title: "Quantity",
+                isNumber: true,
                 isClickable: !widget.isReadOnly,
                 value: widget.bloc.lineitemdetail.value.quantity, onTap: () {
               AddNewItemDialog(
@@ -82,6 +83,7 @@ class _LineAmountWidgetState extends State<LineAmountWidget> {
                   onPressed: (String v) {
                     debugPrint('F() called--->, $v');
                     widget.bloc.lineitemdetail.value.quantity = v;
+                    updateAmount();
                     setState(() {});
                   });
             }),
@@ -104,7 +106,7 @@ class _LineAmountWidgetState extends State<LineAmountWidget> {
                   onPressed: (String v) {
                     debugPrint('F() called--->, $v');
                     widget.bloc.lineitemdetail.value.unitPrice = v;
-                    setState(() {});
+                    updateAmount();
                   });
             }),
             commonRowWidget(context,
@@ -333,9 +335,16 @@ class _LineAmountWidgetState extends State<LineAmountWidget> {
     setInitial();
   }
 
-  void setInitial() {
-    double qty = double.parse(apiAmount.qty);
-    double up = double.parse(apiAmount.unitP);
+  void setInitial({bool isInit = true}) {
+    double qty = 0, up = 0;
+    if (isInit) {
+      qty = double.parse(apiAmount.qty);
+      up = double.parse(apiAmount.unitP);
+    } else {
+      qty = double.parse(widget.bloc.lineitemdetail.value.quantity);
+      up = double.parse(widget.bloc.lineitemdetail.value.unitPrice);
+    }
+
     double tot = qty * up;
 
     widget.bloc.lineitemdetail.value.netAmount =
@@ -365,6 +374,8 @@ class _LineAmountWidgetState extends State<LineAmountWidget> {
 
   void updateAmount() {
     error = "";
+    //qty and unit price
+    setInitial(isInit: false);
     int id = getTaxRateValue();
     taxId = id;
     if (id > -1) {
@@ -414,8 +425,8 @@ class _LineAmountWidgetState extends State<LineAmountWidget> {
     debugPrint('local:' + localTotal.toString());
     debugPrint('api:' + tot.toString());
     //check if initial value is 0 for the invoice
-    if(localTotal==0){
-      error ="";
+    if (localTotal == 0) {
+      error = "";
       return;
     }
     if (localTotal != tot) {

@@ -18,7 +18,6 @@ class LineItemsBloc extends BlocBase {
   TextEditingController txtController = TextEditingController();
   ValueNotifier<bool> isWaitingForDetail = ValueNotifier<bool>(true);
 
-
   ValueNotifier<LineItem> lineitemdetail =
       ValueNotifier<LineItem>(LineItem.empty());
 
@@ -26,6 +25,7 @@ class LineItemsBloc extends BlocBase {
   ValueNotifier<String> selectedValueP = ValueNotifier<String>("None");
   ValueNotifier<String> selectedValueClass = ValueNotifier<String>("None");
   ValueNotifier<String> selectedValueL = ValueNotifier<String>("None");
+
   //ValueNotifier<String> selectedValueCur = ValueNotifier<String>("");
   ValueNotifier<String> selectedValueCustomer = ValueNotifier<String>("None");
   ValueNotifier<String> selectedValueTaxRate = ValueNotifier<String>("None");
@@ -36,6 +36,7 @@ class LineItemsBloc extends BlocBase {
   List<Record1> locationList = [];
   List<Customer> customerList = [];
   List<DataItem> taxRateList = [];
+
   //List<CurrencyModel> currencyList = [];
 
   Future getLineItemDetail(BuildContext context, String lineItemId) async {
@@ -45,12 +46,14 @@ class LineItemsBloc extends BlocBase {
         .getApiRepository()
         .getLineItemDetail(lineItemId);
     if (getLineItemListResponse != null) {
-      CommonToast.getInstance()?.displayToast(
-          bContext: context, message: getLineItemListResponse.message!);
       if (getLineItemListResponse.status == true) {
         lineitemdetail.value = getLineItemListResponse.data.first;
         debugPrint(lineitemdetail.value.toString());
-        setValues();
+        await setValues();
+      }
+      if (getLineItemListResponse.status == false) {
+        CommonToast.getInstance()?.displayToast(
+            message: getLineItemListResponse.message, bContext: context);
       }
     }
 
@@ -227,12 +230,11 @@ class LineItemsBloc extends BlocBase {
       if (isAdd) {
         selectedValueTaxRate.value = taxRateList.last.taxRate;
         lineitemdetail.value.taxRateId = taxRateList.last.id;
-      }else{
-        if(lineitemdetail.value.taxRateId.isEmpty){
+      } else {
+        if (lineitemdetail.value.taxRateId.isEmpty) {
           selectedValueTaxRate.value = taxRateList.first.taxRate;
           lineitemdetail.value.taxRateId = taxRateList.first.id;
         }
-
       }
     }
   }
@@ -347,8 +349,6 @@ class LineItemsBloc extends BlocBase {
     return ' ($currencySign)';
   }
 
-
-
   /*Future getCurrency(BuildContext context) async {
     var getCategoryListResponse = await AppComponentBase.getInstance()
         ?.getApiInterface()
@@ -452,12 +452,28 @@ class LineItemsBloc extends BlocBase {
     return false;
   }
 
-  void setValues() {
+  setValues() async {
     if (lineitemdetail.value.name == null ||
         lineitemdetail.value.name.isEmpty) {
       lineitemdetail.value.name = lineitemdetail.value.description ?? "";
     }
     txtController.text = lineitemdetail.value.description ?? "";
+    await checkNullAmount();
+  }
+
+  checkNullAmount() async {
+    lineitemdetail.value.totalAmount =
+        getFormetted(lineitemdetail.value.totalAmount ?? '0.00');
+    lineitemdetail.value.netAmount =
+        getFormetted(lineitemdetail.value.netAmount ?? '0.00');
+    lineitemdetail.value.taxRate =
+        getFormetted(lineitemdetail.value.taxRate ?? '0.00');
+
+    lineitemdetail.value.quantity =
+        getFormetted(lineitemdetail.value.quantity ?? '0.00');
+
+    lineitemdetail.value.unitPrice =
+        getFormetted(lineitemdetail.value.unitPrice ?? '0.00');
   }
 
   getFormetted(String input) {
@@ -467,4 +483,17 @@ class LineItemsBloc extends BlocBase {
     double number = double.parse(input);
     return NumberFormat('##0.00').format(number);
   }
+
+/*getIntFormetted(String input) {
+    if (input == null || input.isEmpty) {
+      input = "0";
+    }
+    int number = 0;
+    try {
+      number = int.parse(input);
+    } catch (e) {
+      print(e);
+    }
+    return number.toString();
+  }*/
 }

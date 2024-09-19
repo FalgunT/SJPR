@@ -61,10 +61,20 @@ class InvoiceDetailBloc extends BlocBase {
       if (getInvoiceDetailResponse.status == true &&
           getInvoiceDetailResponse.data != null) {
         invoiceDetailData.value = getInvoiceDetailResponse.data!;
+        await checkNullAmount();
         getLineItemList(context, invoiceDetailData.value.id!);
       }
     }
     isWaitingForDetail.value = false;
+  }
+
+  checkNullAmount() async {
+    invoiceDetailData.value.totalAmount =
+        getFormetted(invoiceDetailData.value.totalAmount ?? '0.00');
+    invoiceDetailData.value.netAmount =
+        getFormetted(invoiceDetailData.value.netAmount ?? '0.00');
+    invoiceDetailData.value.totalTaxAmount =
+        getFormetted(invoiceDetailData.value.totalTaxAmount ?? '0.00');
   }
 
   Future getLineItemList(BuildContext context, String invoiceId) async {
@@ -453,7 +463,7 @@ class InvoiceDetailBloc extends BlocBase {
       id = invoiceDetailData.value.payment_method_id ?? '';
     } else if (bottomSheetType == SheetType.publishto) {
       id = invoiceDetailData.value.publish_to_id ?? '';
-    }else if (bottomSheetType == SheetType.taxrate) {
+    } else if (bottomSheetType == SheetType.taxrate) {
       id = invoiceDetailData.value.tax_rate_id ?? '';
     }
     if (id.isEmpty) {
@@ -482,7 +492,7 @@ class InvoiceDetailBloc extends BlocBase {
     } else if (bottomSheetType == SheetType.category) {
       invoiceDetailData.value.scanned_category_id = '$id';
       selectedValueC.value = name;
-    }else if (bottomSheetType == SheetType.taxrate) {
+    } else if (bottomSheetType == SheetType.taxrate) {
       invoiceDetailData.value.tax_rate_id = '$id';
       selectedValueTaxRate.value = name;
     }

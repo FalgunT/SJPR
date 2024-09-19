@@ -72,9 +72,9 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
       body: SingleChildScrollView(
         child: ValueListenableBuilder(
             valueListenable: bloc.isWaitingForDetail,
-            builder: (context, value, _) {
+            builder: (context, value1, _) {
               if (bloc.isWaitingForDetail.value) {
-                return Center();
+                return const Center();
               } else {
                 return ValueListenableBuilder(
                     valueListenable: bloc.lineitemdetail,
@@ -563,6 +563,7 @@ class _LineItemsDetailScreenState extends State<LineItemsDetailScreen> {
       await bloc.getLineItemDetail(context, widget.lineitem_id);
     } else {
       bloc.lineitemdetail.value.invoiceId = widget.invoice_id;
+      bloc.isWaitingForDetail.value = false;
     }
     bloc.getDetailCategory(context);
     bloc.getProductService(context);
