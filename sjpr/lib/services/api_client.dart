@@ -8,7 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ApiClient {
-  static String baseUrl = 'https://sjprcrm.com/api/client';
+  // test server
+  //static String baseUrl = 'https://sjprcrm.com/api/client';
+  //Live Server
+  static String baseUrl = 'https://sjpr-online.com/api/client';
   static String freshDeskUrl = '';
   static String userManualUrl = '';
   static String version = "";

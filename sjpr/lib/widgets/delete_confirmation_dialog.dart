@@ -5,12 +5,16 @@ import 'package:sjpr/widgets/common_button.dart';
 import '../common/app_theme.dart';
 
 class DeleteConfirmationDialog extends StatelessWidget {
-  const DeleteConfirmationDialog({
+  DeleteConfirmationDialog({
     super.key,
     required this.label,
     required this.onPressed,
+    this.desc = "Are you sure you want to delete this item?",
   });
+
   final String label;
+  String desc;
+
   final VoidCallback onPressed;
 
   @override
@@ -36,8 +40,8 @@ class DeleteConfirmationDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Are you sure you want to delete this item?',
+            Text(
+              desc,
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.white,
@@ -48,7 +52,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
             const SizedBox(height: 24),
             CommonButton(
                 textFontSize: 16,
-                content: "Continue to delete",
+                content: "Continue",
                 bgColor: buttonBgColor,
                 textColor: buttonTextColor,
                 outlinedBorderColor: buttonBgColor,

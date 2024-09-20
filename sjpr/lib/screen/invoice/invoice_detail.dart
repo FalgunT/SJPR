@@ -13,6 +13,7 @@ import '../../utils/color_utils.dart';
 import '../../utils/string_utils.dart';
 import '../../widgets/AddNewItemDialog.dart';
 import '../../widgets/CommonBottomSheetDialog.dart';
+import '../../widgets/delete_confirmation_dialog.dart';
 import '../splititems/split_items_list.dart';
 
 class InvoiceDetailScreen extends StatefulWidget {
@@ -117,14 +118,29 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                   widget.isReadOnly
                                       ? Center()
                                       : InkWell(
-                                          onTap: () async {
+                                          onTap: () {
                                             //set flag cancel ...
                                             //and update the invoice..
-                                            bool res =
-                                                await bloc.CancelInvoice();
-                                            if (res) {
-                                              Navigator.pop(context, res);
-                                            }
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return DeleteConfirmationDialog(
+                                                  label: 'Move to Archive',
+                                                  desc:
+                                                      "Are you sure you want to cancel and move this item to archive?",
+                                                  onPressed: () async {
+
+                                                    bool res = await bloc
+                                                        .CancelInvoice();
+                                                    debugPrint('Res: $res');
+                                                    if (res /*&& mounted*/) {
+                                                      Navigator.pop(context);// dialog close
+                                                      Navigator.pop(context, res);// this page close
+                                                    }
+                                                  },
+                                                );
+                                              },
+                                            );
                                           },
                                           child: Container(
                                             padding: const EdgeInsets.only(

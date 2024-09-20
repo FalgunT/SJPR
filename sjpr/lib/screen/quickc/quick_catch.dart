@@ -1,5 +1,6 @@
 import 'package:flutter_svg/svg.dart';
 import 'package:sjpr/screen/invoice/invoice_list.dart';
+import 'package:sjpr/screen/uploadstatements/upload_screen.dart';
 import 'package:sjpr/utils/color_utils.dart';
 import 'package:sjpr/utils/image_utils.dart';
 import 'package:sjpr/utils/string_utils.dart';
@@ -241,6 +242,33 @@ class _QuickCatchState extends State<QuickCatch> with TickerProviderStateMixin {
                                             );*/
                                             break;
                                           case 3:
+                                            /*if (index1 == 0) {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return const CommingSoonDialog();
+                                                },
+                                              );
+                                            } else {
+                                              //upload bank statement page...
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                                      return UploadScreen(
+                                                        title: quickCatchItems
+                                                            .elementAt(index)
+                                                            .dashboardItems!
+                                                            .elementAt(index1)
+                                                            .title ??
+                                                            "",
+                                                        isBankStmt: true,
+                                                      );
+                                                    }),
+                                              );
+                                            }*/
+
                                             showDialog(
                                               context: context,
                                               builder: (BuildContext context) {
@@ -257,12 +285,13 @@ class _QuickCatchState extends State<QuickCatch> with TickerProviderStateMixin {
                                             );
                                             break;
                                           case 5:
-                                            showDialog(
+
+                                           /* showDialog(
                                               context: context,
                                               builder: (BuildContext context) {
                                                 return const CommingSoonDialog();
                                               },
-                                            );
+                                            );*/
                                             break;
                                           case 6:
                                             showDialog(
